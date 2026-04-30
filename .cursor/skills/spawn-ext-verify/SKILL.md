@@ -23,3 +23,4 @@ Goal: ship only packs that pass strict validation and install cleanly.
 3. Confirm materialized paths under `files:` exist as expected; confirm `artifact` paths are not overwritten on a repeat add/update where applicable.
 4. If `healthcheck` is configured: `spawn extension healthcheck <name>` from the target.
 5. Document distribution: plain repo URL/path, zip, or entry in an `extensions.yaml` bundle for `spawn build install`.
+6. **Version:** If this session changed **`config.yaml`**, skills, **`extsrc/files/`** layout, or **`mcp.json`** in a user-visible way, **prompt** the author to bump **`version`** with **`spawn-ext-increment-version`** before tagging or releasing — unless they confirm it was docs-only typos with no behavioral impact.

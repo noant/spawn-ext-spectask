@@ -11,3 +11,4 @@ Goal: before editing YAML heavily, decide what the methodology teaches and where
 4. Split long specs into `extsrc/files/` and keep `extsrc/skills/*.md` as thin procedures that point to those reads.
 5. Align names with uniqueness rules (prefixed skill ids, MCP server ids, path prefixes) if this pack coexists with others.
 6. Implement the tree under `extsrc/files/`, then run `spawn-ext-config` and `spawn-ext-verify` workflows.
+7. **Version:** If namespaces, static vs artifact split, or read surfaces change shipped methodology, **prompt** the author to bump **`version`** via **`spawn-ext-increment-version`** before consumers upgrade.

@@ -11,3 +11,4 @@ Goal: add or change agent skills shipped with the extension.
 4. Under `skills:` list `required-read` target paths only when they are mandatory for that skill beyond merged global/local rules; avoid pointless duplication.
 5. After normalization, skill display names must remain unique across all extensions installed in one target — use a stable prefix.
 6. Run `spawn extension check . --strict` after adding or renaming skill files.
+7. **Version:** Adding, removing, or materially changing skills or their **`required-read`** affects consumers — **prompt** the author to bump **`version`** via **`spawn-ext-increment-version`** before release (unless the change is typo-only text with no behavior impact).

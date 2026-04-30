@@ -23,3 +23,4 @@ Goal: start a new Spawn extension (methodology pack) from zero or from an existi
 3. Set `schema: 1`, `name`, `version` in `config.yaml`; remove empty stub keys you will not use yet if the tool allows, or leave minimal valid maps.
 4. Plan top-level namespaces under `extsrc/files/` (e.g. `my-org/spec/`, `my-org/guides/`) so paths do not collide with other extensions in combined targets.
 5. Next steps: use sibling skills to declare `files`/`folders`, add templates under `extsrc/files/`, then `spawn extension check . --strict`.
+6. **Later:** whenever packaging meaningfully evolves after bootstrap, **prompt** a **`version`** bump using **`spawn-ext-increment-version`** before publishing (initial `0.1.0` or `1.0.0` is typical until first stable story).

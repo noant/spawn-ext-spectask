@@ -38,6 +38,7 @@ empty_maps:
 3. **Skills registration**: declare each shipped `extsrc/skills/*.md` under `skills:` whenever you need `required-read`, explicit `name`/`description`, or stable metadata; do not rely on discovery alone for published packs.
 4. **Folders vs files**: `folders:` declares directory **policy** (`mode`); templates for real files still require separate `files:` entries (and files on disk under `extsrc/files/`).
 5. **`spawn/navigation.yaml`**: follow **`spawn_navigation_yaml_authoring_rule`** (below).
+6. **Version discipline:** When edits materially change consumer-visible packaging (`files`, `folders`, `skills`, ignores, `setup`, read surfaces), **prompt** the author to bump **`version`** via **`spawn-ext-increment-version`** before tagging or publishing (omit prompt only for typo-only edits with no behavioral impact).
 
 ## spawn_navigation_yaml_authoring_rule
 
