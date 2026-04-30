@@ -21,7 +21,7 @@ files:
     description: "Index of architecture documents under spec/design/ — path and description per entry."
     mode: artifact
     globalRead: auto
-    localRead: auto
+    localRead: required
 
 skills:
   spectask-create.md:
