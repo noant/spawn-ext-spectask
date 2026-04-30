@@ -29,6 +29,17 @@ One line (same result without a prior global install; run from that repo root):
 uvx --from spawn-cli spawn init && uvx --from spawn-cli spawn extension add https://github.com/noant/spawn-ext-spectask.git
 ```
 
+### Update or remove
+
+From the **root of the target git repository**:
+
+```bash
+spawn extension update spectask
+spawn extension remove spectask
+```
+
+Extension ids match the `name` field in this pack’s `extsrc/config.yaml` (`spectask` for this repository).
+
 ## How it works
 
 Before anything is implemented, the agent composes a task document: a one-sentence goal, a before/after description, affected modules, and resolution of any ambiguous points. After that come two explicit human checkpoints: you approve the **plan**, then you approve the **code**. Between those points the agent must not drift from what was agreed.
