@@ -1,0 +1,51 @@
+schema: 1
+name: spectask
+version: "1.0.0"
+
+folders:
+  spec/tasks:
+    mode: artifact
+
+files:
+  spec/main.md:
+    description: "Spec-Tasks methodology — folder structure, seven-step process, overview template."
+    mode: static
+    globalRead: required
+    localRead: required
+  spec/design/hla.md:
+    description: "Project high-level architecture; updated in Step 7."
+    mode: artifact
+    globalRead: auto
+    localRead: auto
+
+skills:
+  spectask-create.md:
+    name: spectask-create
+    description: "Use when drafting a new spectask (specification only, per spec/main.md)."
+    required-read:
+      - spawn/navigation.yaml
+      - spec/main.md
+  spectask-spec-review-passed.md:
+    name: spectask-spec-review-passed
+    description: "Step 3 — spec approved (spec/main.md)."
+    required-read:
+      - spawn/navigation.yaml
+      - spec/main.md
+  spectask-execute.md:
+    name: spectask-execute
+    description: "Steps 4–5 in spec/main.md; then wait for user Step 6."
+    required-read:
+      - spawn/navigation.yaml
+      - spec/main.md
+  spectask-code-review-passed.md:
+    name: spectask-code-review-passed
+    description: "After user confirms code review — Steps 6–7 in one run (spec/main.md)."
+    required-read:
+      - spawn/navigation.yaml
+      - spec/main.md
+  spectask-extend.md:
+    name: spectask-extend
+    description: "Use when adding a new rule file under spec/extend/ (per spec/main.md)."
+    required-read:
+      - spawn/navigation.yaml
+      - spec/main.md

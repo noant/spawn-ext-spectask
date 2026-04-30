@@ -1,0 +1,13 @@
+extensions:
+  extension-creator:
+  - {path: .cursor/skills/spawn-ext-bootstrap/SKILL.md, skill: 
+      spawn-ext-bootstrap}
+  - {path: .cursor/skills/spawn-ext-config/SKILL.md, skill: spawn-ext-config}
+  - {path: .cursor/skills/spawn-ext-increment-version/SKILL.md, skill: 
+      spawn-ext-increment-version}
+  - {path: .cursor/skills/spawn-ext-mcp/SKILL.md, skill: spawn-ext-mcp}
+  - {path: .cursor/skills/spawn-ext-skill-sources/SKILL.md, skill: 
+      spawn-ext-skill-sources}
+  - {path: .cursor/skills/spawn-ext-verify/SKILL.md, skill: spawn-ext-verify}
+  - {path: .cursor/skills/spawn-methodology-shape/SKILL.md, skill: 
+      spawn-methodology-shape}
