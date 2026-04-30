@@ -3,8 +3,9 @@
 ## Folder Structure
 
 - spec/main.md — this file.
+- spec/design.yaml — index of architecture documents (`path` + `description` per entry); optional but recommended when multiple design files exist.
 - spec/design/hla.md — project high-level architecture (required).
-- spec/design/{name}.md — other architecture documents (optional; ADRs, notes, etc.); must be declared as readable paths for agents — typically by adding them under another Spawn extension’s `files:` (with appropriate reads) so they appear in `spawn/navigation.yaml`.
+- spec/design/{name}.md — other architecture documents (optional; ADRs, notes, etc.); register in **spec/design.yaml** and declare as readable paths for agents — typically by adding them under a Spawn extension’s `files:` (with appropriate reads) so they appear in `spawn/navigation.yaml`.
 - spec/tasks/{X}-{name}/ — task folder (artifact tree in this methodology pack).
 - spec/tasks/{X}-{name}/overview.md — task overview (required).
 - spec/tasks/{X}-{name}/{N}-{description}.md — subtask files (optional).
@@ -109,7 +110,8 @@ On confirmation ("code review passed", "lgtm", "ok"):
 Do not start Step 7 until **Code review passed** is marked (Step 6).
 
 1. Update spec/design/hla.md — create the file if it does not exist yet (always, regardless of scope).
-2. Rename folder to _DONE_{X}-{name}.
+2. If the task introduced or renamed architecture docs under spec/design/, update **spec/design.yaml** (path + description for each).
+3. Rename folder to _DONE_{X}-{name}.
 
 → set [V] "HLA updated"
 
