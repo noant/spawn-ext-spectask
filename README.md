@@ -4,12 +4,31 @@ Spectask is a methodology and structured workflow that enforces specification be
 
 ## Install
 
-From the **root of the target git repository**, run (initialize Spawn once per repo, then add the extension):
+### 1. Install Spawn CLI (uv tool)
+
+Install [uv](https://docs.astral.sh/uv/), then install the Spawn command from PyPI into uv’s tools directory (**`spawn` must be on `PATH`** after install — see uv’s docs for tool paths):
+
+```bash
+uv tool install spawn-cli
+```
+
+Upstream source repository: **[github.com/noant/spawn-cli](https://github.com/noant/spawn-cli)**.
+
+### 2. Initialize the repo and add Spectask
+
+From the **root of the target git repository**, initialize Spawn once per repo, then install this extension:
 
 ```bash
 spawn init
 spawn extension add https://github.com/noant/spawn-ext-spectask.git
 ```
+
+One line (same result without a prior global install; run from that repo root):
+
+```bash
+uvx --from spawn-cli spawn init && uvx --from spawn-cli spawn extension add https://github.com/noant/spawn-ext-spectask.git
+```
+
 ## How it works
 
 Before anything is implemented, the agent composes a task document: a one-sentence goal, a before/after description, affected modules, and resolution of any ambiguous points. After that come two explicit human checkpoints: you approve the **plan**, then you approve the **code**. Between those points the agent must not drift from what was agreed.
