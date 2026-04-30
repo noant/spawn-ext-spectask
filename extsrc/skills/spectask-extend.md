@@ -3,6 +3,8 @@ name: spectask-extend
 description: Use when adding a new rule file under spec/extend/ (per spec/main.md).
 ---
 
+Operate within the **spectask** process defined in attached **spec/main.md**.
+
 Add `spec/extend/{name}.md` and obey **Folder Structure** rules.
 
 New extend files only affect agents once they appear in **`spawn/navigation.yaml`** — that usually means declaring the path (and `globalRead` / `localRead`) in a Spawn extension’s **`config.yaml`** for this repo (e.g. extend the spectask pack or add a small companion extension), then reinstall/update extensions.
