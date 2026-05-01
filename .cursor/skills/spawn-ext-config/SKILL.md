@@ -3,18 +3,6 @@ name: spawn-ext-config
 description: Declare config.yaml files/folders/ignores/setup and mirror every path under extsrc/files.
 ---
 
-Read `spawn/navigation.yaml` first.
-
-Mandatory reads:
-- `spawn-ext-guide/ai/core.md` - Machine baseline — terms, extsrc tree rules, static vs artifact, name and uniqueness, install outputs.
-- `spawn-ext-guide/ai/config-yaml.md` - Machine schema for config.yaml — keys, files/folders/skills modes, reads, ignores, setup, annotated example.
-
-Contextual reads:
-- `spawn-ext-guide/ai/config-yaml.md` - Machine schema for config.yaml — keys, files/folders/skills modes, reads, ignores, setup, annotated example.
-- `spawn-ext-guide/ai/skill-sources.md` - Machine rules for extsrc/skills/*.md — frontmatter, name/description resolution, rendered skill shape, example.
-- `spawn-ext-guide/ai/mcp-json.md` - Machine schema for extsrc/mcp.json — servers, transport, env, capabilities, JSON examples.
-- `spawn-ext-guide/ai/cli.md` - Machine CLI reference — spawn init/extension/build commands, extensions.yaml bundle shape, authoring checklist.
-
 
 Goal: wire every template path under `extsrc/files/` into `config.yaml` with correct `mode`, `globalRead`/`localRead`, and optional `folders`/`setup`/`agent-ignore`/`git-ignore`.
 
@@ -25,3 +13,14 @@ Goal: wire every template path under `extsrc/files/` into `config.yaml` with cor
 5. Reference setup scripts only with basenames that exist under `extsrc/setup/`; hooks must be idempotent and safe for artifact data.
 6. Run `spawn extension check . --strict` and fix reported issues.
 7. **Version:** If these edits materially change what consumers get (paths, read surfaces, ignores, setup), **prompt** the author to bump **`version`** using **`spawn-ext-increment-version`** before tagging or publishing. Trivial typo-only fixes to existing templates may skip a bump — ask if unsure.
+
+
+Mandatory reads:
+- `spawn-ext-guide/ai/core.md` - Machine baseline — terms, extsrc tree rules, static vs artifact, name and uniqueness, install outputs.
+- `spawn-ext-guide/ai/config-yaml.md` - Machine schema for config.yaml — keys, files/folders/skills modes, reads, ignores, setup, annotated example.
+- `spawn/navigation.yaml` - Merged Spawn navigation (read-required, read-contextual).
+
+Contextual reads:
+- `spawn-ext-guide/ai/skill-sources.md` - Machine rules for extsrc/skills/*.md — frontmatter, name/description resolution, rendered skill shape, example.
+- `spawn-ext-guide/ai/mcp-json.md` - Machine schema for extsrc/mcp.json — servers, transport, env, capabilities, JSON examples.
+- `spawn-ext-guide/ai/cli.md` - Machine CLI reference — spawn init/extension/build commands, extensions.yaml bundle shape, authoring checklist.

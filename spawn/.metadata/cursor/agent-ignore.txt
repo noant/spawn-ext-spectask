@@ -1,3 +1,6 @@
+spawn/.core/**
+spawn/.metadata/**
+spawn/.extend/**
 spawn/**
 !spawn/navigation.yaml
 !spawn/rules/**
