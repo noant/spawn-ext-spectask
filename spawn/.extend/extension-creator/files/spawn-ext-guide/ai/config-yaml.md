@@ -24,6 +24,7 @@ prerequisite: spawn-ext-guide/ai/core.md (vocabulary, static vs artifact, layout
 | agent-ignore | no | list[string] | globs merged into IDE agent-ignore |
 | git-ignore | no | list[string] | lines merged into target `.gitignore` |
 | setup | no | object | lifecycle phase → script basename under `extsrc/setup/` |
+| hints | no | object | optional `global` / `local` → each `list[string]` — plain-text agent reminders (see **`config_yaml.hints`**) |
 
 constraint: use ONLY keys above; unknown keys MAY be rejected or warned under strict validation in future.
 
@@ -34,11 +35,11 @@ empty_maps:
 ## agent_authoring_invariants
 
 1. **Mirror rule**: every file under `extsrc/files/**` MUST appear as a key under `files:`; key = path relative to **target** root (POSIX). No stray templates; no missing declarations before `--strict`.
-2. **Strict descriptions**: if `globalRead` or `localRead` is **`required`** or **`auto`**, `description` MUST be non-empty.
+2. **Strict descriptions**: if either flag is **not `no`**, `description` MUST be non-empty.
 3. **Skills registration**: declare each shipped `extsrc/skills/*.md` under `skills:` whenever you need `required-read`, explicit `name`/`description`, or stable metadata; do not rely on discovery alone for published packs.
 4. **Folders vs files**: `folders:` declares directory **policy** (`mode`); templates for real files still require separate `files:` entries (and files on disk under `extsrc/files/`).
 5. **`spawn/navigation.yaml`**: follow **`spawn_navigation_yaml_authoring_rule`** (below).
-6. **Version discipline:** When edits materially change consumer-visible packaging (`files`, `folders`, `skills`, ignores, `setup`, read surfaces), **prompt** the author to bump **`version`** via **`spawn-ext-increment-version`** before tagging or publishing (omit prompt only for typo-only edits with no behavioral impact).
+6. **Version discipline:** When edits materially change consumer-visible packaging (`files`, `folders`, `skills`, ignores, `setup`, **`hints`**, read surfaces), **prompt** the author to bump **`version`** via **`spawn-ext-increment-version`** before tagging or publishing (omit prompt only for typo-only edits with no behavioral impact).
 
 ## spawn_navigation_yaml_authoring_rule
 
@@ -131,6 +132,24 @@ phases:
 | healthcheck | `spawn extension healthcheck <name>` from target |
 
 scripts: trusted code; SHOULD be idempotent; MUST NOT silently delete artifact user data; MUST fail loudly on unsafe migration.
+
+## config_yaml.hints
+
+Optional map. Allowed keys **`global`** and **`local`**; values are **`list[string]`** (YAML strings — plain prose only; no indirection into `files:` paths).
+
+merge_semantics (Spawn):
+
+- Normalize (strip/dedupe) by **exact string**; first occurrence wins.
+- **`global`**: surfaced on **`spawn/navigation.yaml`** under this extension’s **`read-required` `- ext:` → `hints`**, echoed into **every rendered skill** (every installed pack’s **`hints.global`**, ordered like extension merges), merged into **`AGENTS.md`** / entry rollup together with maintainer **`read-required`** → `rules` → `hint`-style merges.
+- **`local`**: only when rendering skills **owned by this pack** (after that pack’s share of globals); NOT written onto the navigation ext **`hints`** field; omitted from **`AGENTS.md`** rollups sourced from packs alone.
+
+constraints:
+
+- Oversized strings MAY emit **`SpawnWarning`**.
+- Persisted **`spawn/navigation.yaml`** MAY truncate per-entry past **512** Unicode codepoints.
+- Rendered IDE skill **Hints** blocks MAY truncate total size; **`AGENTS.md`** MAY retain full hint text yet still WARN on thresholds.
+
+hints complement — do not replace — **`globalRead`** / **`localRead`** and skill **`required-read`** for substantive methodology bodies.
 
 ## annotated_config_yaml_example
 

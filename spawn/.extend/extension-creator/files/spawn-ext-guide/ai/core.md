@@ -66,6 +66,8 @@ outputs_sequence:
 2. materialize `extsrc/files/` templates per `files` entries and static/artifact rules
 3. Spawn metadata and IDE outputs (adapter-specific paths): `spawn/navigation.yaml`, rendered skills, merged MCP, agent-ignore fragments as per adapters.
 
+exact IDE paths/formats: adapter-dependent; derived only from `config.yaml`, skill sources, and `mcp.json`.
+
 ## sibling_machine_docs
 
 - `spawn-ext-guide/ai/config-yaml.md` — full `config.yaml` schema, annotated example.

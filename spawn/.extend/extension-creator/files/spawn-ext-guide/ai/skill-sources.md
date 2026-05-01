@@ -14,7 +14,8 @@ format:
 - encoding: UTF-8
 - body_format: Markdown
 - filename MUST match key under `config.skills` when that skill is declared.
-- for packs you publish: declare **every** shipped skill file under `skills:` so `required-read`, `name`, and `description` are explicit (discovery alone may omit overrides).
+- discovery: installed `extsrc/skills/*.md` + `skills:` entries together (keys supply overrides/`required-read`).
+- for packs you publish: declare **every** shipped skill file under `skills:` so metadata is explicit; do not rely on discovery alone (see **`config-yaml`** invariant 3).
 
 ## frontmatter_body_collision
 

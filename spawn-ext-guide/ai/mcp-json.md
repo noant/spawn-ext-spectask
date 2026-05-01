@@ -42,8 +42,8 @@ format_note:
 
 ## env_value_semantics
 
-- non-object scalar OR any JSON value that is not a mapping → user-supplied secret: IDE config uses placeholder not literal; NEVER commit secrets in `mcp.json`.
-- object optional fields:
+- **A** non-object scalar, or JSON value not a mapping → user secret → IDE placeholder (never literals in repo).
+- **B** mapping → optional fields:
 
 | field | type | default | semantics |
 |-------|------|---------|-----------|
@@ -62,7 +62,7 @@ format_note:
 
 ## validation
 
-- `spawn extension check` ensures JSON parses; full semantic validation MAY occur when MCP loaded for rendering.
+- `spawn extension check`: JSON parses; semantic issues (e.g. missing `name`) MAY surface when MCP is loaded for rendering.
 
 ## examples.reference_only
 

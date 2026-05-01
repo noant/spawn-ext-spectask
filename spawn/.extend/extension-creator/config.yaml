@@ -1,5 +1,5 @@
 schema: 1
-version: 0.1.2
+version: 0.1.3
 name: extension-creator
 
 files:
@@ -49,6 +49,13 @@ skills:
     required-read:
       - spawn-ext-guide/ai/core.md
       - spawn-ext-guide/ai/config-yaml.md
+  spawn-ext-hints.md:
+    name: spawn-ext-hints
+    description: Add optional hints.global / hints.local in config.yaml — plain-text agent reminders merged like global reads vs pack-local skills.
+    required-read:
+      - spawn-ext-guide/ai/core.md
+      - spawn-ext-guide/ai/config-yaml.md
+      - spawn-ext-guide/user-guide.md
   spawn-ext-skill-sources.md:
     name: spawn-ext-skill-sources
     description: Author extsrc/skills and register them in config with required-read merges.

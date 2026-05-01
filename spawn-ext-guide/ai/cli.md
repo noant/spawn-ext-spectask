@@ -25,7 +25,7 @@ target_install:
 - `spawn extension list`
 - `spawn extension update <name>`
 - `spawn extension remove <name>`
-- `spawn extension healthcheck <name>` when healthcheck script configured
+- `spawn extension healthcheck <name>` when `setup.healthcheck` is set
 
 bundled_install:
 
@@ -59,6 +59,6 @@ constraint: each entry resolves to tree containing `extsrc/` with `config.yaml`;
 4. optional `extsrc/mcp.json` with top-level `servers`
 5. optional `extsrc/setup/*.py` referenced from `setup`
 6. `spawn extension check . --strict`
-7. disposable target: `spawn init`; `spawn extension add <source>`; verify navigation and skills
+7. disposable target: `spawn init`; `spawn extension add <source>`; configure IDE if needed; verify navigation/skills
 8. distribute repo or zip for consumers (`spawn extension add` or `extensions.yaml` entry)
 9. after substantive packaging changes (templates under `extsrc/files/`, `skills`, `mcp.json`, `files:`/`folders:`/`setup`/ignores): **prompt** author to bump **`version`** in **`extsrc/config.yaml`** using **`spawn-ext-increment-version`** before tagging or publishing (skip only for trivial typo-only edits with no consumer-visible behavior change)
