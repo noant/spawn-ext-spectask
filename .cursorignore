@@ -1,2 +1,5 @@
-# spawn:start
-# spawn:end
+# spawn:core:start
+spawn/.core/**
+spawn/.metadata/**
+spawn/.extend/**
+# spawn:core:end
