@@ -9,8 +9,9 @@ folders:
     mode: artifact
 
 agent-ignore:
-  - spec/seeds/**/_DONE_*/**
-  - spec/tasks/**/_DONE_*/**
+  - spec/seeds/_DONE_*.md
+  - spec/tasks/**/_DONE_*/overview.md
+  - spec/tasks/**/_DONE_*/*.md
 
 files:
   spec/main.md:
