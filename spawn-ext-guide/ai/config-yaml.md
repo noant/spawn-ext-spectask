@@ -195,4 +195,4 @@ matching_extsrc_paths:
 - `extsrc/files/spec/design/notes.md`
 - `extsrc/skills/acme-run-task.md`
 - optional `extsrc/setup/after_install.py`, `extsrc/setup/healthcheck.py`
-- optional `extsrc/mcp.json` (see `spawn-ext-guide/ai/mcp-json.md`)
+- optional `extsrc/mcp/windows.json`, `linux.json`, `macos.json` (see `spawn-ext-guide/ai/mcp-json.md`)

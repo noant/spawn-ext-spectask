@@ -1,5 +1,5 @@
 schema: 1
-version: 0.1.4
+version: 0.1.5
 name: extension-creator
 
 files:
@@ -24,7 +24,9 @@ files:
     globalRead: no
     localRead: auto
   spawn-ext-guide/ai/mcp-json.md:
-    description: Machine schema for extsrc/mcp.json — servers, transport, env, capabilities, JSON examples.
+    description: >-
+      Machine schema for extsrc/mcp/windows.json, linux.json, macos.json — servers,
+      OS selection, aligned name sets, transport, env, capabilities, JSON examples.
     mode: static
     globalRead: no
     localRead: auto
@@ -65,7 +67,9 @@ skills:
       - spawn-ext-guide/ai/skill-sources.md
   spawn-ext-mcp.md:
     name: spawn-ext-mcp
-    description: Add extsrc/mcp.json using Spawn servers format and safe env placeholders.
+    description: >-
+      Add or edit extsrc/mcp/*.json — three platform files, Spawn servers shape,
+      matching server names, safe env placeholders.
     required-read:
       - spawn-ext-guide/ai/core.md
       - spawn-ext-guide/ai/mcp-json.md

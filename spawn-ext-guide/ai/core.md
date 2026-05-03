@@ -8,7 +8,7 @@ encoding: utf-8
 
 ## authoring_context
 
-- **Extension source tree** (what you edit while authoring): `<extension-repo>/extsrc/` — `config.yaml`, mirror templates under `extsrc/files/`, skill sources under `extsrc/skills/`, optional `mcp.json`, `setup/*.py`.
+- **Extension source tree** (what you edit while authoring): `<extension-repo>/extsrc/` — `config.yaml`, mirror templates under `extsrc/files/`, skill sources under `extsrc/skills/`, optional **`extsrc/mcp/*.json`** (per-platform MCP), `setup/*.py`.
 - **Target repo** (consumer): paths under `files:` / `folders:` are relative to the **target root** after install (e.g. `spec/guide.md`), not `extsrc/files/spec/guide.md`. Templates live only under `extsrc/files/` in the **source** pack.
 
 ## vocabulary
@@ -29,7 +29,7 @@ encoding: utf-8
 <extension-repo>/
   extsrc/
     config.yaml    # REQUIRED
-    mcp.json       # OPTIONAL
+    mcp/           # OPTIONAL — windows.json, linux.json, macos.json (cross-platform MCP)
     skills/*.md    # OPTIONAL; filename = key under config.skills when declared
     files/...      # mirrors paths under config.files
     setup/*.py     # OPTIONAL lifecycle scripts
@@ -52,7 +52,7 @@ constraints:
 ## uniqueness_constraints.target_wide
 
 - normalized skill `name`: UNIQUE across all extensions in one target.
-- MCP `servers[].name` (in `extsrc/mcp.json`): UNIQUE across all extensions in one target.
+- MCP `servers[].name` (in **`extsrc/mcp/*.json`**, unified name set across platforms): UNIQUE across all extensions in one target.
 - naming convention: prefix ids (`acme-run-task`, `acme-docs-mcp`) to reduce collisions.
 - `files` / `folders` paths SHOULD use namespaces so multiple extensions do not clash.
 
@@ -66,12 +66,12 @@ outputs_sequence:
 2. materialize `extsrc/files/` templates per `files` entries and static/artifact rules
 3. Spawn metadata and IDE outputs (adapter-specific paths): `spawn/navigation.yaml`, rendered skills, merged MCP, agent-ignore fragments as per adapters.
 
-exact IDE paths/formats: adapter-dependent; derived only from `config.yaml`, skill sources, and `mcp.json`.
+exact IDE paths/formats: adapter-dependent; derived only from `config.yaml`, skill sources, and **`extsrc/mcp/*.json`** for the host OS.
 
 ## sibling_machine_docs
 
 - `spawn-ext-guide/ai/config-yaml.md` — full `config.yaml` schema, annotated example.
 - `spawn-ext-guide/ai/skill-sources.md` — `extsrc/skills/*.md` format, frontmatter, rendering.
-- `spawn-ext-guide/ai/mcp-json.md` — `extsrc/mcp.json` schema and examples.
+- `spawn-ext-guide/ai/mcp-json.md` — `extsrc/mcp/*.json` schema and examples.
 - `spawn-ext-guide/ai/cli.md` — Spawn CLI, `extensions.yaml`, authoring checklist.
 - `spawn-ext-guide/user-guide.md` — human-readable narrative (same topics).

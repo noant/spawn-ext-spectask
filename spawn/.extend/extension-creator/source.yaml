@@ -3,5 +3,5 @@ source:
   type: git
   path: https://github.com/noant/spawn-ext-creator.git
 installed:
-  version: 0.1.4
-  installedAt: '2026-05-02T00:15:32+00:00'
+  version: 0.1.5
+  installedAt: '2026-05-03T22:44:56+00:00'

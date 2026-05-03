@@ -15,8 +15,8 @@ prerequisite: target MUST be `spawn init` before extension install commands (exc
 
 extension_authoring:
 
-- `spawn extension init . --name <id>`: skeleton `extsrc/`, empty `config.yaml`
-- `spawn extension check .`: validate; `--strict` elevates to errors (missing listed skills, undeclared files under `extsrc/files/`, missing descriptions when read flags set, invalid `mcp.json`, missing setup scripts when referenced)
+- `spawn extension init . --name <id>`: skeleton `extsrc/`, empty `config.yaml`, empty **`extsrc/mcp/*.json`** (`windows`, `linux`, `macos`)
+- `spawn extension check .`: validate; `--strict` elevates to errors (missing listed skills, undeclared files under `extsrc/files/`, missing descriptions when read flags set, invalid or mismatched **`extsrc/mcp/*.json`**, stray obsolete **`extsrc/mcp.json`**, missing setup scripts when referenced)
 - `spawn extension from-rules <source> --name <id> --output <dir>`: bootstrap from repo `spawn/rules/`
 
 target_install:
@@ -56,9 +56,9 @@ constraint: each entry resolves to tree containing `extsrc/` with `config.yaml`;
 1. `spawn extension init . --name <pack-id>`
 2. add templates under `extsrc/files/`; declare every path in `files` with correct `mode`, `globalRead`, `localRead`
 3. add `extsrc/skills/*.md`; register each filename under `skills` when overrides or `required-read` needed
-4. optional `extsrc/mcp.json` with top-level `servers`
+4. optional **`extsrc/mcp/windows.json`**, **`linux.json`**, **`macos.json`** — each top-level **`servers`**; identical server **`name`** sets across platforms
 5. optional `extsrc/setup/*.py` referenced from `setup`
 6. `spawn extension check . --strict`
 7. disposable target: `spawn init`; `spawn extension add <source>`; configure IDE if needed; verify navigation/skills
 8. distribute repo or zip for consumers (`spawn extension add` or `extensions.yaml` entry)
-9. after substantive packaging changes (templates under `extsrc/files/`, `skills`, `mcp.json`, `files:`/`folders:`/`setup`/ignores): **prompt** author to bump **`version`** in **`extsrc/config.yaml`** using **`spawn-ext-increment-version`** before tagging or publishing (skip only for trivial typo-only edits with no consumer-visible behavior change)
+9. after substantive packaging changes (templates under `extsrc/files/`, `skills`, **`extsrc/mcp/*.json`**, `files:`/`folders:`/`setup`/ignores): **prompt** author to bump **`version`** in **`extsrc/config.yaml`** using **`spawn-ext-increment-version`** before tagging or publishing (skip only for trivial typo-only edits with no consumer-visible behavior change)

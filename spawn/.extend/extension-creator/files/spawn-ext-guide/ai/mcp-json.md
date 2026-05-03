@@ -5,21 +5,39 @@ encoding: utf-8
 prerequisite: spawn-ext-guide/ai/core.md (global uniqueness of server names)
 ---
 
-# extsrc/mcp.json — machine schema
+# extsrc/mcp/*.json — machine schema (per platform)
 
-path: `extsrc/mcp.json` (only under **extension source** `extsrc/`; not merged into arbitrary IDE JSON by hand — Spawn adapters emit IDE-specific config).
+paths (extension source **only**; not merged into arbitrary IDE JSON by hand — Spawn adapters emit IDE-specific config):
 
-constraint: valid JSON.
+- **`extsrc/mcp/windows.json`**
+- **`extsrc/mcp/linux.json`**
+- **`extsrc/mcp/macos.json`**
+
+constraint: **all three files** MUST exist when MCP is authored; each MUST be valid JSON.
+
+obsolete:
+
+- **`extsrc/mcp.json`** is NOT read; **`spawn extension check`** reports it if present.
+
+selection_and_merge:
+
+- Spawn picks **one** file for the **host OS** when normalizing MCP for rendering.
+- The **logical** MCP contract for the extension is the **union** of the three files subject to **`platform_name_alignment`** below.
+
+platform_name_alignment:
+
+- The **set** of server **`name`** values MUST be **identical** in all three JSON files (**order MAY differ** per file).
+- **`transport`**, **`env`**, **`capabilities`** MAY differ per platform when commands or URLs differ by OS.
 
 format_note:
 
-- extension uses top-level `servers` array (NOT IDE root `mcpServers` object); Spawn normalizes; adapters rewrite per IDE.
+- Each file uses top-level **`servers`** array (NOT IDE root **`mcpServers`** object); Spawn normalizes; adapters rewrite per IDE.
 
 ## top_level
 
 | field | type | semantics |
 |-------|------|-----------|
-| servers | array | each element one MCP server; missing or `[]` → no MCP from extension |
+| servers | array | each element one MCP server; `[]` allowed when all three files share empty name set |
 
 ## server_object
 
@@ -62,9 +80,11 @@ format_note:
 
 ## validation
 
-- `spawn extension check`: JSON parses; semantic issues (e.g. missing `name`) MAY surface when MCP is loaded for rendering.
+- `spawn extension check`: all three files present under `extsrc/mcp/` (when MCP is expected), JSON parse, **matching** server **`name`** sets across platforms, stray **`extsrc/mcp.json`** reported; semantic issues MAY surface when MCP is loaded for rendering.
 
 ## examples.reference_only
+
+body note: snippets are the **contents of one** platform file (`windows.json` \| `linux.json` \| `macos.json`). For production, replicate the **same** `servers` list into **all three** files when transports match, or adjust **`transport`** per file only where OS differs.
 
 example_stdio_secret_object:
 
