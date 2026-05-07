@@ -20,7 +20,7 @@
 5. **`read-required` (and contextual reads) in `spawn/navigation.yaml`:** obey Spawn’s merged navigation — treat required entries like **`read: required`** on the old registry.
 6. **Task-scoped reads:** from `spawn/navigation.yaml`, read every path the active task context clearly needs (not only globally required entries).
 7. **Process:** follow the workflow in this document — Steps 1–7, status marks, and user prompts as written.
-8. **Concrete codebase targets:** Every overview and every subtask must name specific repository paths plus named symbols — modules/packages (namespace), classes, methods, and standalone functions — that are added or modified. Tasks are executable edit specifications for the codebase, not intentions. Self Spec Review treats missing identifiers as defects to fix before Step 3.
+8. **Concrete codebase targets:** Every overview and every subtask must name specific repository paths plus named symbols — modules/packages (namespace), classes, methods, and standalone functions — that are added or modified. In subtasks, under **Code changes**, each **Before** / **After** pair must include a **concrete** minimal code excerpt in a fenced markdown block (real lines from the repo or the exact replacement), plus the short behavior line required by the [Subtask file template](#subtask-file-template). Do not substitute paraphrases or “change X to Y” without code. Tasks are executable edit specifications for the codebase, not intentions. Self Spec Review treats missing paths/symbols, missing or non-concrete Before/After code, or template violations as defects to fix before Step 3.
 
 ---
 
@@ -173,7 +173,7 @@ Omit `## Execution Scheme` if no decomposition (single-file spec).
 
 Filename must match the step id from `## Execution Scheme` (e.g. `1-abstractions.md`). One file per step.
 
-```markdown
+````markdown
 # Step {N}: {Short title}
 
 ## Goal
@@ -191,20 +191,32 @@ Filename must match the step id from `## Execution Scheme` (e.g. `1-abstractions
 ### `{path/to/file.ext}` — {path plus named symbols (module, class, method, or function) + what changes}
 
 **Before**
-{current code or prose to replace; use a minimal contiguous excerpt, or the exact line(s)}
+```code
+{concrete minimal excerpt or exact lines, not vague prose}
+```
+{what this code does — behavior, not a repeat of the diff}
 
 **After**
-{replacement or new block; must correspond one-to-one to Before when editing existing text}
+```code
+{replacement or new block — one-to-one with Before when editing existing text}
+```
+{what the new code does — behavior, not a repeat of the diff}
 
 ### `{path/to/other.ext}` — {where}
 **Before**
-{...}
+```code
+{concrete minimal excerpt or exact lines, not vague prose}
+```
+{what this code does — behavior, not a repeat of the diff}
 **After**
-{...}
+```code
+{replacement or new block — one-to-one with Before when editing existing text}
+```
+{what the new code does — behavior, not a repeat of the diff}
 
 ## Additional actions
 {Optional: shell commands, manual verification steps, follow-up tasks, or other non–file-edit work for this step.}
-```
+````
 
 ---
 
