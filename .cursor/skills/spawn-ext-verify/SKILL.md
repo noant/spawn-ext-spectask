@@ -14,6 +14,11 @@ Goal: ship only packs that pass strict validation and install cleanly.
 6. **Version:** If this session changed **`config.yaml`**, skills, **`extsrc/files/`** layout, or **`extsrc/mcp/*.json`** in a user-visible way, **prompt** the author to bump **`version`** with **`spawn-ext-increment-version`** before tagging or releasing — unless they confirm it was docs-only typos with no behavioral impact.
 
 
+Hints:
+- No emojis or exotic Unicode in code, logs, documentation, or messages; plain ASCII where practical.
+- User-facing replies, documentation, and task descriptions: concise wording; minimal markdown (avoid decorative bold/italic); explain with lists and structure; short, clear sentences.
+- If the user only asked a question, answer first; do not edit files unless changes are clearly needed.
+
 Mandatory reads:
 - `spawn-ext-guide/ai/core.md` - Machine baseline — terms, extsrc tree rules, static vs artifact, name and uniqueness, install outputs.
 - `spawn-ext-guide/ai/cli.md` - Machine CLI reference — spawn init/extension/build commands, extensions.yaml bundle shape, authoring checklist.

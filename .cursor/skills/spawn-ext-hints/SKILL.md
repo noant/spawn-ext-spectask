@@ -14,6 +14,11 @@ Goal: add short methodology reminders Spawn injects beside reads and skills — 
 6. **Version:** If hint text or which strings are global vs local changes observable behavior for consumers, **prompt** the author to bump **`version`** via **`spawn-ext-increment-version`** before release.
 
 
+Hints:
+- No emojis or exotic Unicode in code, logs, documentation, or messages; plain ASCII where practical.
+- User-facing replies, documentation, and task descriptions: concise wording; minimal markdown (avoid decorative bold/italic); explain with lists and structure; short, clear sentences.
+- If the user only asked a question, answer first; do not edit files unless changes are clearly needed.
+
 Mandatory reads:
 - `spawn-ext-guide/ai/core.md` - Machine baseline — terms, extsrc tree rules, static vs artifact, name and uniqueness, install outputs.
 - `spawn-ext-guide/ai/config-yaml.md` - Machine schema for config.yaml — keys, files/folders/skills modes, reads, ignores, setup, annotated example.

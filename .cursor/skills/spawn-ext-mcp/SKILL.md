@@ -28,6 +28,11 @@ Goal: declare MCP servers bundled with the extension so Spawn merges them per ho
 Changing **`servers`**, transports, **`env`** contract, or **`capabilities`** is consumer-visible MCP behavior — **prompt** the author to bump **`version`** via **`spawn-ext-increment-version`** before publishing.
 
 
+Hints:
+- No emojis or exotic Unicode in code, logs, documentation, or messages; plain ASCII where practical.
+- User-facing replies, documentation, and task descriptions: concise wording; minimal markdown (avoid decorative bold/italic); explain with lists and structure; short, clear sentences.
+- If the user only asked a question, answer first; do not edit files unless changes are clearly needed.
+
 Mandatory reads:
 - `spawn-ext-guide/ai/core.md` - Machine baseline — terms, extsrc tree rules, static vs artifact, name and uniqueness, install outputs.
 - `spawn-ext-guide/ai/mcp-json.md` - Machine schema for extsrc/mcp/windows.json, linux.json, macos.json — servers, OS selection, aligned name sets, transport, env, capabilities, JSON examples.
