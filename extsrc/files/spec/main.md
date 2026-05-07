@@ -8,7 +8,7 @@
 - spec/design/{name}.md — other architecture documents (optional; ADRs, notes, etc.); register in **spec/design.yaml** and declare as readable paths for agents — typically by adding them under a Spawn extension’s `files:` (with appropriate reads) so they appear in `spawn/navigation.yaml`.
 - spec/tasks/{X}-{name}/ — task folder (artifact tree in this methodology pack).
 - spec/tasks/{X}-{name}/overview.md — task overview (required).
-- spec/tasks/{X}-{name}/{N}-{description}.md — subtask files (optional; required when `## Execution Scheme` defines 2+ steps); see [Subtask file template](#subtask-file-template).
+- spec/tasks/{X}-{name}/{N}-{description}.md — subtask files (optional; required when `## Execution Scheme` defines 2+ steps).
 - spec/seeds/{X}-{slug}.md — seed file (artifact tree in this methodology pack).
 
 **Embedded rules:**
@@ -16,10 +16,11 @@
 1. Under `spec/`, only paths allowed by this Folder Structure; no other files.
 2. Do not create READMEs or extra docs under `spec/`.
 3. **Next task `X`:** 1 + max task id from every `spec/tasks/` subfolder (`{id}-*` and `_DONE_{id}-*`); if none, **1**.
-4. **New spec tasks:** follow **Step 1** and the **[overview.md Template](#overviewmd-template)** at the end of this file. Older `spec/tasks/_DONE_*` overviews may predate the template; **do not** copy their structure unless it already matches the template.
+4. **New spec tasks:** follow **Step 1** and the overview template at the end of this file. Older `spec/tasks/_DONE_*` overviews may predate the template; **do not** copy their structure unless it already matches the template.
 5. **`read-required` (and contextual reads) in `spawn/navigation.yaml`:** obey Spawn’s merged navigation — treat required entries like **`read: required`** on the old registry.
 6. **Task-scoped reads:** from `spawn/navigation.yaml`, read every path the active task context clearly needs (not only globally required entries).
 7. **Process:** follow the workflow in this document — Steps 1–7, status marks, and user prompts as written.
+8. **Concrete codebase targets:** Every overview and every subtask must name specific repository paths plus named symbols — modules/packages (namespace), classes, methods, and standalone functions — that are added or modified. Tasks are executable edit specifications for the codebase, not intentions. Self Spec Review treats missing identifiers as defects to fix before Step 3.
 
 ---
 
@@ -38,10 +39,10 @@ Mark each status [V] on completion. Prompt the user after steps 2, 5, and 6.
 **Executor:** AI Agent (current context)
 
 1.1 **Implementation clarifications** *(blocking)* — Before writing any spec content, identify ambiguous, optional, or convention-dependent aspects. Ask the user explicit questions and wait for answers. Record answers (or agreed defaults) in **Details**. Skip only if the task has a single obvious implementation path.
-1.2 **Design overview** — in task `overview.md`, add **Design overview** section: affected modules, data flow changes, integration points.
+1.2 **Design overview** — in task `overview.md`, add **Design overview** section: affected modules; concrete paths and symbols (Embedded rule 8); data flow changes; integration points.
 1.3 **Overview** — `spec/tasks/{X}-{name}/overview.md` must follow [overview.md Template](#overviewmd-template): sections through `## Details` (before/after and code examples go there); **Goal** = one sentence. Add `## Execution Scheme` only when work splits into 2+ steps.
 1.4 **Execution Plan** — If 2+ steps: `## Execution Scheme` step ids must match `{N}-{description}.md` from 1.5.
-1.5 **Decomposition** — create {N}-{description}.md per step: goal, approach, affected files, code changes (before/after). You may launch a **New sub-agent** for read-only codebase analysis to determine accurate **Before** / **After** text, then merge its findings into the step files (analysis only; parent agent owns decomposition and the spec).
+1.5 **Decomposition** — create {N}-{description}.md per step: goal, approach, affected files (with named classes/methods/functions per path), code changes (before/after). You may launch a **New sub-agent** for read-only codebase analysis to determine accurate **Before** / **After** text, then merge its findings into the step files (analysis only; parent agent owns decomposition and the spec).
 
 → set [V] "Spec created"
 
@@ -51,7 +52,7 @@ Mark each status [V] on completion. Prompt the user after steps 2, 5, and 6.
 
 **Executor:** AI Agent (New sub-agent)
 
-Review the spec for: architectural impact, implementation errors, sequencing issues. Fix if needed.
+Review the spec for: architectural impact, implementation errors, sequencing issues; verify every step and overview list concrete files, modules, and symbols (classes, methods, functions) per Embedded rule 8. Fix if needed.
 
 → set [V] "Self spec review passed"
 → prompt: "Self spec review passed — spec is ready for your review (Step 3). Reply 'spec review passed', 'lgtm', or 'ok' when satisfied."
@@ -143,6 +144,7 @@ Do not start Step 7 until **Code review passed** is marked (Step 6).
 
 ## Design overview
 - Affected modules: {list}
+- Files & symbols (concrete paths; class / method / function / module names to touch): {list}
 - Data flow changes: {description}
 - Integration points: {list}
 
@@ -181,12 +183,12 @@ Filename must match the step id from `## Execution Scheme` (e.g. `1-abstractions
 {Order of work, constraints, references to spec/design if needed.}
 
 ## Affected files
-- `{path/relative/to/repo/root}` — {what changes}
+- `{path/relative/to/repo/root}`
 - `{...}` — {...}
 
 ## Code changes (before / after)
 
-### `{path/to/file.ext}` — {where: function name, heading, line range, or “new file”}
+### `{path/to/file.ext}` — {path plus named symbols (module, class, method, or function) + what changes}
 
 **Before**
 {current code or prose to replace; use a minimal contiguous excerpt, or the exact line(s)}
