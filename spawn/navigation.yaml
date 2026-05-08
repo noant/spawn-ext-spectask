@@ -1,6 +1,15 @@
 read-required:
 - rules:
-    - hint: No emojis or exotic Unicode in code, logs, documentation, or messages; plain ASCII where practical.
-    - hint: "User-facing replies, documentation, and task descriptions: concise wording; minimal markdown (avoid decorative bold/italic); explain with lists and structure; short, clear sentences."
-    - hint: If the user only asked a question, answer first; do not edit files unless changes are clearly needed.
-read-contextual: []
+  - hint: No emojis or exotic Unicode in code, logs, documentation, or messages; plain ASCII where practical.
+  - hint: 'User-facing replies, documentation, and task descriptions: concise wording; minimal markdown (avoid decorative bold/italic); explain with lists and structure; short, clear sentences.'
+  - hint: Specifications, code comments, and project documentation must be written in English.
+  - hint: If the user only asked a question, answer first; do not edit files unless changes are clearly needed.
+read-contextual:
+- ext: spectask
+  files:
+  - path: spec/main.md
+    description: Spec-Tasks methodology — folder structure, seven-step process, overview template.
+  - path: spec/design/hla.md
+    description: Project high-level architecture; updated in Step 7.
+  - path: spec/design.yaml
+    description: Index of architecture documents under spec/design/ — path and description per entry.

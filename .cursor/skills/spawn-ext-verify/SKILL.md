@@ -17,6 +17,7 @@ Goal: ship only packs that pass strict validation and install cleanly.
 Hints:
 - No emojis or exotic Unicode in code, logs, documentation, or messages; plain ASCII where practical.
 - User-facing replies, documentation, and task descriptions: concise wording; minimal markdown (avoid decorative bold/italic); explain with lists and structure; short, clear sentences.
+- Specifications, code comments, and project documentation must be written in English.
 - If the user only asked a question, answer first; do not edit files unless changes are clearly needed.
 
 Mandatory reads:
@@ -28,3 +29,6 @@ Contextual reads:
 - `spawn-ext-guide/ai/config-yaml.md` - Machine schema for config.yaml — keys, files/folders/skills modes, reads, ignores, setup, annotated example.
 - `spawn-ext-guide/ai/skill-sources.md` - Machine rules for extsrc/skills/*.md — frontmatter, name/description resolution, rendered skill shape, example.
 - `spawn-ext-guide/ai/mcp-json.md` - Machine schema for extsrc/mcp/windows.json, linux.json, macos.json — servers, OS selection, aligned name sets, transport, env, capabilities, JSON examples.
+- `spec/main.md` - Spec-Tasks methodology — folder structure, seven-step process, overview template.
+- `spec/design/hla.md` - Project high-level architecture; updated in Step 7.
+- `spec/design.yaml` - Index of architecture documents under spec/design/ — path and description per entry.

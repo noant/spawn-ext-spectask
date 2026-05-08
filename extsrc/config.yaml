@@ -1,16 +1,25 @@
 schema: 1
 name: spectask
-version: "1.2.9"
+version: "1.2.10"
 
 folders:
   spec/tasks:
     mode: artifact
   spec/seeds:
     mode: artifact
+  "spec/.config":
+    mode: artifact
 
 agent-ignore:
   - spec/seeds/_DONE_*.md
   - spec/tasks/**/_DONE_*/_DONE_*.md
+  - spec/.config/**
+
+git-ignore:
+  - spec/.config/**
+
+setup:
+  after-install: install_spectask_mcp.py
 
 files:
   spec/main.md:
@@ -30,6 +39,9 @@ files:
     localRead: required
 
 skills:
+  spectask-task-from-jira.md:
+    name: spectask-task-from-jira
+    description: "Import external tracker tickets into spec/tasks/{task-code}-{slug}/; offline fallback."
   spectask-create.md:
     name: spectask-create
     description: "Use when drafting a new spectask (specification only, per spec/main.md)."

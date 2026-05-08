@@ -1,0 +1,12 @@
+{
+  "servers": [
+    {
+      "name": "spectask-mcp-jira",
+      "transport": {
+        "type": "stdio",
+        "command": "python",
+        "args": ["-m", "spectask_mcp", "serve"]
+      }
+    }
+  ]
+}

@@ -6,22 +6,21 @@
 - spec/design.yaml — index of architecture documents (`path` + `description` per entry); optional but recommended when multiple design files exist.
 - spec/design/hla.md — project high-level architecture (required).
 - spec/design/{name}.md — other architecture documents (optional; ADRs, notes, etc.); register in **spec/design.yaml** and declare as readable paths for agents — typically by adding them under a Spawn extension’s `files:` (with appropriate reads) so they appear in `spawn/navigation.yaml`.
-- spec/tasks/{X}-{name}/ — task folder (artifact tree in this methodology pack).
-- spec/tasks/{X}-{name}/overview.md — task overview (required).
-- spec/tasks/{X}-{name}/{N}-{description}.md — subtask files (optional; required when `## Execution Scheme` defines 2+ steps).
+- spec/tasks/{task-code}-{slug}/ — task folder (artifact tree). `{task-code}` identifies the task (often a serial code; may instead be a key from an external ticket/issue tracker). `{slug}` is a short descriptive name.
+- spec/tasks/{task-code}-{slug}/overview.md — task overview (required).
+- spec/tasks/{task-code}-{slug}/{N}-{description}.md — subtask files (optional; required when `## Execution Scheme` defines 2+ steps).
 - spec/seeds/{X}-{slug}.md — seed file (artifact tree in this methodology pack).
 
 **Embedded rules:**
 
 1. Under `spec/`, only paths allowed by this Folder Structure; no other files.
 2. Do not create READMEs or extra docs under `spec/`.
-3. **Next task `X`:** 1 + max task id from every `spec/tasks/` subfolder (`{id}-*` and `_DONE_{id}-*`); if none, **1**.
-4. **New spec tasks:** follow **Step 1** and the overview template at the end of this file. Older `spec/tasks/_DONE_*` overviews may predate the template; **do not** copy their structure unless it already matches the template.
-5. **`read-required` (and contextual reads) in `spawn/navigation.yaml`:** obey Spawn’s merged navigation — treat required entries like **`read: required`** on the old registry.
-6. **Task-scoped reads:** from `spawn/navigation.yaml`, read every path the active task context clearly needs (not only globally required entries).
-7. **Process:** follow the workflow in this document — Steps 1–7, status marks, and user prompts as written.
-8. **Concrete codebase targets:** Every overview and subtask must name specific paths and symbols (packages/modules, classes, methods, functions) under change. In subtasks, each **Code changes** **Before** / **After** pair is a fenced minimal excerpt—real lines or the exact replacement—plus the short behavior line from the subtask file template. Prose-only or “change X to Y” without code is invalid. Specs are executable edits, not intentions. Self Spec Review treats missing targets, non-concrete Before/After, or template violations as defects before Step 3.
-9. **Greenfield (new symbols):** Same **Before**/**After** under **Code changes**. **Before** may be context-only (location/insertion—nothing to quote); **After** is fenced code + behavior line, like rule 8. Vague **Before** or non-concrete **After** → Self Spec Review defects before Step 3.
+3. Numeric `task-code`: Suggest the next task number to the user and wait for their explicit reply before creating `spec/tasks/{task-code}-{slug}/`.
+4. `task-code` from external tracker: When the task is imported from an external ticket/issue tracker, `task-code` must be that ticket key (e.g. `PROJ-123`). Additional `-` segments may carry the slug as usual.
+5. New spec tasks: follow Step 1 and the overview template at the end of this file. Older `spec/tasks/_DONE_*` overviews may predate the template; do not copy their structure unless it already matches the template.
+6. Process: follow the workflow in this document — Steps 1–7, status marks, and user prompts as written.
+7. Concrete codebase targets: Every overview and subtask must name specific paths and symbols (packages/modules, classes, methods, functions) under change. In subtasks, each Code changes Before / After pair is a fenced minimal excerpt—real lines or the exact replacement—plus the short behavior line from the subtask file template. Prose-only or "change X to Y" without code is invalid. Specs are executable edits, not intentions. Self Spec Review treats missing targets, non-concrete Before/After, or template violations as defects before Step 3.
+8. Greenfield (new symbols): Same Before/After under Code changes. Before may be context-only (location/insertion—nothing to quote); After is fenced code + behavior line, like rule 7. Vague Before or non-concrete After → Self Spec Review defects before Step 3.
 
 ---
 
@@ -40,8 +39,8 @@ Mark each status [V] on completion. Prompt the user after steps 2, 5, and 6.
 **Executor:** AI Agent (current context)
 
 1.1 **Implementation clarifications** *(blocking)* — Before writing any spec content, identify ambiguous, optional, or convention-dependent aspects. Ask the user explicit questions and wait for answers. Record answers (or agreed defaults) in **Details**. Skip only if the task has a single obvious implementation path.
-1.2 **Design overview** — in task `overview.md`, add **Design overview** section: affected modules; concrete paths and symbols (Embedded rule 8); data flow changes; integration points.
-1.3 **Overview** — `spec/tasks/{X}-{name}/overview.md` must follow [overview.md Template](#overviewmd-template): sections through `## Details` (before/after and code examples go there); **Goal** = one sentence. Add `## Execution Scheme` only when work splits into 2+ steps.
+1.2 **Design overview** — in task `overview.md`, add **Design overview** section: affected modules; concrete paths and symbols (Embedded rule 7); data flow changes; integration points.
+1.3 **Overview** — `spec/tasks/{task-code}-{slug}/overview.md` must follow overview.md template: sections through `## Details` (before/after and code examples go there); **Goal** = one sentence. Add `## Execution Scheme` only when work splits into 2+ steps.
 1.4 **Execution Plan** — If 2+ steps: `## Execution Scheme` step ids must match `{N}-{description}.md` from 1.5.
 1.5 **Decomposition** — create {N}-{description}.md per step: goal, approach, affected files (with named classes/methods/functions per path), code changes (before/after). You may launch a **New sub-agent** for read-only codebase analysis to determine accurate **Before** / **After** text, then merge its findings into the step files (analysis only; parent agent owns decomposition and the spec).
 
@@ -53,7 +52,7 @@ Mark each status [V] on completion. Prompt the user after steps 2, 5, and 6.
 
 **Executor:** AI Agent (New sub-agent)
 
-Review the spec for: architectural impact, implementation errors, sequencing issues; verify every step and overview list concrete files, modules, and symbols (classes, methods, functions) per Embedded rule 8. Fix if needed.
+Review the spec for: architectural impact, implementation errors, sequencing issues; verify every step and overview list concrete files, modules, and symbols (classes, methods, functions) per Embedded rule 7. Fix if needed.
 
 → set [V] "Self spec review passed"
 → prompt: "Self spec review passed — spec is ready for your review (Step 3). Reply 'spec review passed', 'lgtm', or 'ok' when satisfied."
@@ -116,7 +115,7 @@ Do not start Step 7 until **Code review passed** is marked (Step 6).
 2. **Scope** — From subtasks, Execution Scheme, and files changed or added in this task, choose which `path` rows need updates; update all that matter, skip the rest.
 3. **Write** — For each chosen path, align the markdown with the repo after this task; create the file if it is listed but missing.
 4. If the task introduced or renamed architecture docs under **spec/design/**, update **spec/design.yaml** (`path` + `description` for each).
-5. Rename folder to _DONE_{X}-{name}.
+5. Rename folder to _DONE_{task-code}-{name}.
 6. If Source seed Path in overview is concrete and the listed spec/seeds file has linked task to this overview, rename it once with _DONE_ added.
 
 → set [V] "Design documents updated"
@@ -126,7 +125,7 @@ Do not start Step 7 until **Code review passed** is marked (Step 6).
 ## overview.md Template
 
 ```markdown
-# {X}: {Title}
+# {task-code}: {Title}
 
 ## Source seed
 - Path: {seed path or none}
