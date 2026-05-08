@@ -1,7 +1,7 @@
 """One-shot CLI fetch from spec/.config Jira settings.
 
 Exit codes:
-    0 - Success; human-readable issue or listing on stdout.
+    0 - Success; issue fields (no comments) or five-issue listing on stdout.
     1 - Usage or miscellaneous errors (e.g. invalid auth for selected Jira type).
     2 - No valid config (missing spec workspace, missing/unreadable config.yaml).
     3 - Jira unreachable (connection timeout, DNS, HTTP errors after connect).
@@ -22,7 +22,7 @@ _MISSING_CFG = (
 
 
 def run_once(*, issue_key: str | None, verbose: bool = False) -> int:
-    """Load optional config from spec/.config; print issue bundle or listing; return exit code."""
+    """Load optional config from spec/.config; print query_jira output (fields or listing); return exit code."""
     cfg = load_optional_config()
     if cfg is None:
         print(_MISSING_CFG, file=sys.stderr)

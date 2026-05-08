@@ -64,9 +64,10 @@ def run_stdio() -> int:
             _jira_fetch_impl,
             name="jira_fetch",
             description=(
-                "Fetch one Jira issue (with comments) when issue_key is found; "
-                "if issue_key is set but not found, returns up to 30 possible matches "
-                "from open issues then the standard unresolved listing."
+                "When issue_key is omitted or not found: return the five most recently "
+                "created unresolved issues as key<TAB>summary lines. "
+                "When issue_key resolves to an issue: return key, summary, "
+                "and fields JSON (no comments)."
             ),
         )
 

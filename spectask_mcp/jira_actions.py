@@ -1,7 +1,9 @@
 """Shared Jira query logic for CLI and MCP.
 
-Plaintext formatting matches MCP jira_fetch intent: issue detail with JSON fields body
-plus comments; unresolved listing as newline-separated key/summary pairs.
+Plaintext formatting matches MCP jira_fetch intent: issue detail with JSON fields only
+(no comments). Unresolved listing is up to five newest-created issues as ``key<TAB>summary`` lines.
+
+A wrong or missing ``issue_key`` yields the same listing shape as when no key is passed (no not-found banner).
 
 CLI exit semantics are enforced in ``run_once`` (see ``run_cmd.py``). This layer
 propagates ``JiraConnectionError`` for unreachable Jira; callers map that to exit 3.
@@ -15,46 +17,12 @@ Exit code reference for CLI wrappers:
 
 from __future__ import annotations
 
-import difflib
 import json
 
 from spectask_mcp.config import SpectaskLocalConfig
 from spectask_mcp.jira.factory import backend_from_config
 from spectask_mcp.jira.http_common import JiraHttpTraceFn
 from spectask_mcp.jira.types import IssueBundle
-
-_LIST_LIMIT = 50
-_NOT_FOUND_POOL_LIMIT = 100
-_CANDIDATE_LIMIT = 30
-_CANDIDATE_SCORE_FLOOR = 0.34
-
-
-def _rank_pairs_for_query(query: str, pairs: list[tuple[str, str]]) -> list[tuple[str, str]]:
-    q = query.casefold().strip()
-    if not q:
-        return []
-    scored: list[tuple[float, tuple[str, str]]] = []
-    for k, s in pairs:
-        kf = k.casefold()
-        sf = s.casefold()
-        if q == kf:
-            score = 1.0
-        elif kf.startswith(q) or q in kf:
-            score = 0.9
-        elif q in sf:
-            score = 0.7
-        else:
-            score = difflib.SequenceMatcher(None, q, kf).ratio()
-        scored.append((score, (k, s)))
-    scored.sort(key=lambda item: (-item[0], item[1][0]))
-    out: list[tuple[str, str]] = []
-    for sc, pair in scored:
-        if sc <= _CANDIDATE_SCORE_FLOOR:
-            break
-        out.append(pair)
-        if len(out) >= _CANDIDATE_LIMIT:
-            break
-    return out
 
 
 def _format_issue(bundle: IssueBundle) -> str:
@@ -65,15 +33,7 @@ def _format_issue(bundle: IssueBundle) -> str:
         "",
         "Fields:",
         fields_json,
-        "",
-        "Comments:",
     ]
-    if not bundle.comments:
-        lines.append("(none)")
-    else:
-        for i, c in enumerate(bundle.comments, start=1):
-            body = c.strip() if c else ""
-            lines.append(f"{i}. {body}" if body else f"{i}.")
     return "\n".join(lines)
 
 
@@ -88,7 +48,7 @@ def query_jira(
     issue_key: str | None,
     trace: JiraHttpTraceFn | None = None,
 ) -> str:
-    """Run one Jira query: single issue (or list fallback) or open-issue listing.
+    """Run one Jira query: issue detail when key resolves, else five-issue listing.
 
     Raises:
         JiraConnectionError: network/HTTP failures talking to Jira.
@@ -100,18 +60,11 @@ def query_jira(
         if not key:
             key = None
 
+        pairs = backend.list_open_issues(limit=5)
         if key is not None:
             bundle = backend.get_issue_bundle(key)
             if bundle is not None:
                 return _format_issue(bundle)
-            pairs = backend.list_open_issues(limit=_NOT_FOUND_POOL_LIMIT)
-            candidates = _rank_pairs_for_query(key, pairs)
-            lines = [f"Issue {key} not found.", ""]
-            if candidates:
-                lines.extend(["Possible matches (up to 30):", _format_list(candidates), ""])
-            lines.extend(["Open unresolved issues:", _format_list(pairs[:_LIST_LIMIT])])
-            return "\n".join(lines)
-        pairs = backend.list_open_issues(limit=_LIST_LIMIT)
         return _format_list(pairs)
     finally:
         close = getattr(backend, "close", None)
