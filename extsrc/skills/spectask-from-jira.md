@@ -1,5 +1,5 @@
 ---
-name: spectask-task-from-jira
+name: spectask-from-jira
 description: Import a ticket from an external tracker into spec/tasks; manual fallback if MCP/config missing.
 ---
 
