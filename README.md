@@ -101,6 +101,41 @@ After install, invoke methodology steps using these **skills** by name; Spawn re
 | **spectask-code-review-passed** | Step 6: **Code review passed** in `overview.md` + Step 6 prompt; then **Step 7** in `spec/main.md`. |
 | **spectask-design** | Register architecture files in `spec/design.yaml` or draft `spec/design/*.md`. |
 | **spectask-seed-create** | Capture a rough idea as `spec/seeds/{X}-{slug}.md`; offer **spectask-create** when the user promotes. |
+| **spectask-from-jira** | Import a Jira issue into `spec/tasks/{task-code}-{slug}/` using MCP or CLI, with a manual fallback. |
+
+## Jira integration and MCP
+
+This extension ships MCP server entries under `extsrc/mcp/` (per platform). After you install the pack with Spawn, those definitions are merged into your workspace; your IDE typically lists the **spectask-mcp-jira** server from that merge so you do not maintain a separate MCP JSON snippet for this tool. The server runs **spectask-mcp** in stdio mode (`spectask-mcp serve`). The same PyPI package also exposes a small **CLI** for non-MCP use (for example `spectask-mcp run --issue KEY`).
+
+On extension install, the **after-install** hook (`extsrc/setup/install_spectask_mcp.py`) runs `uv tool install` / `uv tool upgrade` for the `spectask-mcp` PyPI package, then optionally launches **interactive setup** (`spectask-mcp interactive --setup`) when stdin is a TTY. You can run that command again anytime from the repo root.
+
+**Credentials and proxy** live in `spec/.config/config.yaml`. That path is listed in `git-ignore` / `agent-ignore` in `extsrc/config.yaml`, so secrets stay local. Both top-level sections are required for a valid file:
+
+- **jira** — `type`: `self_hosted` or `atlassian_cloud`; `address`: base URL (no trailing slash); `ignore_tls`: boolean; auth via `pat_token` (self-hosted) or `email` + `api_token` (cloud). Empty strings are allowed for unused auth fields.
+- **proxy** — `enabled`: boolean; when enabled, `socks_host`, `socks_port`, `socks_username`, `socks_password`, and `remote_dns` (boolean; use proxy-side DNS / socks5h when `true`).
+
+Example shape (replace values; do not commit real secrets):
+
+```yaml
+jira:
+  type: atlassian_cloud
+  address: https://your-domain.atlassian.net
+  ignore_tls: false
+  pat_token: ""
+  email: "you@example.com"
+  api_token: "your-api-token"
+proxy:
+  enabled: false
+  socks_host: "127.0.0.1"
+  socks_port: 1080
+  socks_username: ""
+  socks_password: ""
+  remote_dns: false
+```
+
+**Interactive setup** walks through Jira type, URL, tokens, optional SOCKS5, and `remote_dns`, then writes this file to `spec/.config/config.yaml`.
+
+To **import a Jira ticket into a Spectask folder**, use the **spectask-from-jira** skill so the agent follows the workflow (prefer MCP tool `jira_fetch`, else CLI, else pasted content). Starting a full Step 1 spec from that scaffold still goes through **spectask-create** and `spec/main.md` as usual.
 
 ## Navigation and reads
 
