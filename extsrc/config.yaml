@@ -1,6 +1,6 @@
 schema: 1
 name: spectask
-version: "1.2.10"
+version: "1.2.11"
 
 folders:
   spec/tasks:
@@ -40,7 +40,7 @@ files:
 
 skills:
   spectask-task-from-jira.md:
-    name: spectask-task-from-jira
+    name: spectask-from-jira
     description: "Import external tracker tickets into spec/tasks/{task-code}-{slug}/; offline fallback."
   spectask-create.md:
     name: spectask-create
