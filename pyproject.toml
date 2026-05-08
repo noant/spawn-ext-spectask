@@ -1,11 +1,12 @@
 [project]
 name = "spectask-mcp"
-version = "0.1.6"
+version = "0.1.7"
 description = "Stdio MCP and CLI for Spectask-Jira workflows"
 requires-python = ">=3.11"
 dependencies = [
   "mcp>=1.2.0",
-  "httpx[socks]>=0.27.0",
+  "jira>=3.10.0",
+  "requests[socks]>=2.32.0",
   "PyYAML>=6.0.1",
 ]
 

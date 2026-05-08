@@ -1,4 +1,4 @@
-"""Shared httpx helpers: client factory and Jira REST API v3 calls."""
+"""Shared Jira REST helpers (parsing, search, issue bundle via pycontribs ``JIRA``)."""
 
 from __future__ import annotations
 
@@ -8,44 +8,18 @@ from collections.abc import Callable
 from typing import Any
 from urllib.parse import quote
 
-import httpx
+import requests
+from jira import JIRA
+from jira.exceptions import JIRAError
 
-from spectask_mcp.config import ProxySection, SpectaskLocalConfig
 from spectask_mcp.jira.base import JiraConnectionError
 from spectask_mcp.jira.types import IssueBundle
 
 OPEN_ISSUES_JQL = "resolution = Unresolved ORDER BY updated DESC"
 
-RequestPrepare = Callable[[dict[str, Any]], None] | None
 JiraHttpTraceFn = Callable[[str, str, int, str], None]
 
 COMMENT_PAGE_SIZE = 100
-
-
-def _socks_proxy_url(proxy: ProxySection) -> str:
-    host = proxy.socks_host.strip()
-    port = int(proxy.socks_port)
-    user = proxy.socks_username
-    password = proxy.socks_password
-    if user or password:
-        u = quote(user, safe="")
-        p = quote(password, safe="")
-        return f"socks5://{u}:{p}@{host}:{port}"
-    return f"socks5://{host}:{port}"
-
-
-def build_httpx_client(cfg: SpectaskLocalConfig) -> httpx.Client:
-    """Build a client with TLS verify and optional SOCKS5 proxy from config."""
-    verify = not cfg.jira.ignore_tls
-    proxy: str | None = None
-    if cfg.proxy.enabled:
-        proxy = _socks_proxy_url(cfg.proxy)
-    return httpx.Client(
-        proxy=proxy,
-        verify=verify,
-        timeout=httpx.Timeout(60.0),
-        follow_redirects=True,
-    )
 
 
 def _strip_html(s: str) -> str:
@@ -86,35 +60,10 @@ def _comment_body_text(comment: dict[str, Any]) -> str:
     return ""
 
 
-def _request(
-    client: httpx.Client,
-    method: str,
-    url: str,
-    prepare: RequestPrepare,
-    *,
-    trace: JiraHttpTraceFn | None = None,
-    **kwargs: Any,
-) -> httpx.Response:
-    req_kwargs = dict(kwargs)
-    if prepare is not None:
-        prepare(req_kwargs)
-    try:
-        resp = client.request(method, url, **req_kwargs)
-    except httpx.RequestError as e:
-        raise JiraConnectionError(str(e)) from e
-    if trace is not None:
-        try:
-            body = resp.text
-        except OSError:
-            body = ""
-        trace(method, url, resp.status_code, body)
-    return resp
-
-
-def _raise_http(resp: httpx.Response) -> None:
+def _raise_requests_http(resp: requests.Response) -> None:
     try:
         resp.raise_for_status()
-    except httpx.HTTPStatusError as e:
+    except requests.HTTPError as e:
         snippet = ""
         try:
             snippet = (e.response.text or "")[:500]
@@ -126,30 +75,41 @@ def _raise_http(resp: httpx.Response) -> None:
         raise JiraConnectionError(msg) from e
 
 
-def fetch_issue_bundle(
-    client: httpx.Client,
-    base_url: str,
+def _map_jira_error(exc: BaseException) -> JiraConnectionError:
+    if isinstance(exc, JIRAError):
+        snippet = (exc.text or "")[:500] if getattr(exc, "text", None) else ""
+        code = getattr(exc, "status_code", None)
+        msg = f"Jira HTTP {code}" if code is not None else str(exc)
+        if snippet:
+            msg = f"{msg}: {snippet}"
+        return JiraConnectionError(msg)
+    if isinstance(exc, requests.RequestException):
+        return JiraConnectionError(str(exc))
+    return JiraConnectionError(str(exc))
+
+
+def fetch_issue_bundle_via_jira(
+    jira: JIRA,
     issue_key: str,
-    prepare: RequestPrepare,
     trace: JiraHttpTraceFn | None = None,
 ) -> IssueBundle | None:
-    """GET issue with renderedFields; comments paginated with renderedBody when available."""
+    """Load issue with renderedFields; paginate comments with renderedBody when available."""
+    del trace  # traced via session hook when verbose
     safe_key = quote(issue_key, safe="")
-    issue_url = f"{base_url}/rest/api/3/issue/{safe_key}"
-    r_issue = _request(
-        client,
-        "GET",
-        issue_url,
-        prepare,
-        trace=trace,
-        params={"expand": "renderedFields"},
-    )
-    if r_issue.status_code == 404:
-        return None
-    _raise_http(r_issue)
-    issue = r_issue.json()
-    key = str(issue.get("key", issue_key))
-    fields = issue.get("fields")
+    try:
+        issue = jira.issue(safe_key, expand="renderedFields")
+    except JIRAError as e:
+        if e.status_code == 404:
+            return None
+        raise _map_jira_error(e) from e
+    except requests.RequestException as e:
+        raise JiraConnectionError(str(e)) from e
+
+    raw = issue.raw
+    if not isinstance(raw, dict):
+        raw = {}
+    key = str(raw.get("key", issue_key))
+    fields = raw.get("fields")
     if not isinstance(fields, dict):
         fields = {}
     summary_raw = fields.get("summary")
@@ -158,33 +118,27 @@ def fetch_issue_bundle(
     comments_ordered: list[str] = []
     start_at = 0
     while True:
-        c_url = f"{base_url}/rest/api/3/issue/{safe_key}/comment"
-        r_c = _request(
-            client,
-            "GET",
-            c_url,
-            prepare,
-            trace=trace,
-            params={
-                "startAt": start_at,
-                "maxResults": COMMENT_PAGE_SIZE,
-                "expand": "renderedBody",
-                "orderBy": "created",
-            },
-        )
-        _raise_http(r_c)
-        payload = r_c.json()
-        batch = payload.get("comments")
-        if not isinstance(batch, list) or not batch:
+        try:
+            comment_list = jira.comments(
+                safe_key,
+                expand="renderedBody",
+                start_at=start_at,
+                max_results=COMMENT_PAGE_SIZE,
+                order_by="created",
+            )
+        except JIRAError as e:
+            raise _map_jira_error(e) from e
+        except requests.RequestException as e:
+            raise JiraConnectionError(str(e)) from e
+
+        if not comment_list:
             break
-        for c in batch:
-            if isinstance(c, dict):
-                comments_ordered.append(_comment_body_text(c))
-        start_at += len(batch)
-        total = payload.get("total")
-        if isinstance(total, int) and start_at >= total:
-            break
-        if len(batch) < COMMENT_PAGE_SIZE:
+        for c in comment_list:
+            raw_c = getattr(c, "raw", None)
+            if isinstance(raw_c, dict):
+                comments_ordered.append(_comment_body_text(raw_c))
+        start_at += len(comment_list)
+        if len(comment_list) < COMMENT_PAGE_SIZE:
             break
 
     return IssueBundle(key=key, summary=summary, fields=dict(fields), comments=comments_ordered)
@@ -214,41 +168,42 @@ def _open_issue_pairs_from_search_body(body: Any) -> list[tuple[str, str]]:
     return out
 
 
-def fetch_open_issues(
-    client: httpx.Client,
-    base_url: str,
-    prepare: RequestPrepare,
+def fetch_open_issues_via_jira(
+    jira: JIRA,
     limit: int,
     trace: JiraHttpTraceFn | None = None,
 ) -> list[tuple[str, str]]:
     """POST /search/jql first; on 404/410 fall back to POST /search. Return (key, summary) pairs."""
-    enhanced_url = f"{base_url}/rest/api/3/search/jql"
-    legacy_url = f"{base_url}/rest/api/3/search"
-    r = _request(
-        client,
-        "POST",
-        enhanced_url,
-        prepare,
-        trace=trace,
-        json={
-            "jql": OPEN_ISSUES_JQL,
-            "maxResults": limit,
-            "fields": ["summary"],
-        },
-    )
-    if r.status_code in (404, 410):
-        r = _request(
-            client,
-            "POST",
-            legacy_url,
-            prepare,
-            trace=trace,
+    del trace  # session hook when verbose
+    base = jira.server_url.rstrip("/")
+    enhanced_url = f"{base}/rest/api/3/search/jql"
+    legacy_url = f"{base}/rest/api/3/search"
+    session = jira._session
+    try:
+        r = session.post(
+            enhanced_url,
             json={
                 "jql": OPEN_ISSUES_JQL,
-                "startAt": 0,
                 "maxResults": limit,
                 "fields": ["summary"],
             },
         )
-    _raise_http(r)
+    except requests.RequestException as e:
+        raise JiraConnectionError(str(e)) from e
+
+    if r.status_code in (404, 410):
+        try:
+            r = session.post(
+                legacy_url,
+                json={
+                    "jql": OPEN_ISSUES_JQL,
+                    "startAt": 0,
+                    "maxResults": limit,
+                    "fields": ["summary"],
+                },
+            )
+        except requests.RequestException as e:
+            raise JiraConnectionError(str(e)) from e
+
+    _raise_requests_http(r)
     return _open_issue_pairs_from_search_body(r.json())
