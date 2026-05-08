@@ -19,6 +19,8 @@ class ProxySection:
     socks_port: int
     socks_username: str
     socks_password: str
+    # If True, use socks5h so the proxy resolves hostnames (not the local OS).
+    remote_dns: bool = False
 
 
 @dataclass
@@ -152,12 +154,17 @@ def _parse_proxy_section(raw: Any) -> ProxySection | None:
         return None
     socks_username = user_raw
     socks_password = pass_raw
+    rdb = _coerce_bool(raw.get("remote_dns"), False)
+    if rdb is None:
+        return None
+    remote_dns = rdb
     return ProxySection(
         enabled=enabled,
         socks_host=socks_host,
         socks_port=port,
         socks_username=socks_username,
         socks_password=socks_password,
+        remote_dns=remote_dns,
     )
 
 
@@ -222,5 +229,6 @@ def config_to_ordered_dict(cfg: SpectaskLocalConfig) -> dict[str, Any]:
             "socks_port": p.socks_port,
             "socks_username": p.socks_username,
             "socks_password": p.socks_password,
+            "remote_dns": p.remote_dns,
         },
     }

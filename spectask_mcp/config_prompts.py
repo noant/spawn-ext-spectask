@@ -235,6 +235,7 @@ def run_interactive(*, prompted_by_setup: bool = False) -> int:
         socks_port = 1080
         socks_username = ""
         socks_password = ""
+        remote_dns = False
 
         if proxy_enabled:
             host = _prompt_nonempty("SOCKS5 host: ")
@@ -258,6 +259,15 @@ def run_interactive(*, prompted_by_setup: bool = False) -> int:
 
             socks_password = getpass("SOCKS5 password (optional, input hidden): ")
 
+            yn_rd = _prompt_yes_no(
+                "Resolve Jira hostname through the proxy (remote DNS / socks5h)?",
+                default_no=True,
+            )
+            if yn_rd is None:
+                print("Answer y or n (empty means No); aborted.", file=sys.stderr)
+                return 1
+            remote_dns = yn_rd
+
         jira = JiraSection(
             type=jira_type,
             address=address,
@@ -272,6 +282,7 @@ def run_interactive(*, prompted_by_setup: bool = False) -> int:
             socks_port=socks_port,
             socks_username=socks_username,
             socks_password=socks_password,
+            remote_dns=remote_dns,
         )
         cfg = SpectaskLocalConfig(jira=jira, proxy=proxy)
         target = config_yaml_path(workspace)

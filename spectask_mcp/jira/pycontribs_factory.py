@@ -12,6 +12,7 @@ from spectask_mcp.jira.http_common import JiraHttpTraceFn
 
 
 def _socks_proxy_url(proxy: ProxySection) -> str:
+    scheme = "socks5h" if proxy.remote_dns else "socks5"
     host = proxy.socks_host.strip()
     port = int(proxy.socks_port)
     user = proxy.socks_username
@@ -19,8 +20,8 @@ def _socks_proxy_url(proxy: ProxySection) -> str:
     if user or password:
         u = quote(user, safe="")
         p = quote(password, safe="")
-        return f"socks5://{u}:{p}@{host}:{port}"
-    return f"socks5://{host}:{port}"
+        return f"{scheme}://{u}:{p}@{host}:{port}"
+    return f"{scheme}://{host}:{port}"
 
 
 def _attach_jira_verbose_trace(jira: JIRA, trace: JiraHttpTraceFn) -> None:
@@ -48,9 +49,11 @@ def connect_jira_client(
         url = _socks_proxy_url(cfg.proxy)
         proxies = {"http": url, "https": url}
 
+    rest_api_version = "3" if cfg.jira.type == "atlassian_cloud" else "2"
+
     base_kw: dict[str, Any] = {
         "server": cfg.jira.address.rstrip("/"),
-        "options": {"verify": verify},
+        "options": {"verify": verify, "rest_api_version": rest_api_version},
         "timeout": 60.0,
         "max_retries": 3,
         "proxies": proxies,

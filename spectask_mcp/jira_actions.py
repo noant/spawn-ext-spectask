@@ -1,7 +1,8 @@
 """Shared Jira query logic for CLI and MCP.
 
 Plaintext formatting matches MCP jira_fetch intent: issue detail with JSON fields only
-(no comments). Unresolved listing is up to five newest-created issues as ``key<TAB>summary`` lines.
+(no comments). Listing is up to five issues assigned to the current user, unresolved,
+newest-created first, as ``key<TAB>summary`` lines (see ``CURRENT_USER_OPEN_ISSUES_JQL`` in ``spectask_mcp.jira.jql``).
 
 A wrong or missing ``issue_key`` yields the same listing shape as when no key is passed (no not-found banner).
 

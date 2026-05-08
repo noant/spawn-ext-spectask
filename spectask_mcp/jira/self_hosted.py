@@ -11,8 +11,8 @@ from spectask_mcp.jira.base import JiraBackend
 from spectask_mcp.jira.http_common import (
     JiraHttpTraceFn,
     fetch_issue_bundle_via_jira,
-    fetch_open_issues_via_jira,
 )
+from spectask_mcp.jira.http_self_hosted import fetch_open_issues_self_hosted
 from spectask_mcp.jira.pycontribs_factory import connect_jira_client
 from spectask_mcp.jira.types import IssueBundle
 
@@ -36,7 +36,7 @@ class SelfHostedJiraClient(JiraBackend):
         )
 
     def list_open_issues(self, limit: int = 50) -> list[tuple[str, str]]:
-        return fetch_open_issues_via_jira(self._jira, limit, trace=self._trace)
+        return fetch_open_issues_self_hosted(self._jira, limit, trace=self._trace)
 
     def close(self) -> None:
         self._jira.close()

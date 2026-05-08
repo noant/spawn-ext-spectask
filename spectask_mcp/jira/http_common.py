@@ -1,4 +1,4 @@
-"""Shared Jira REST helpers (parsing, search, issue bundle via pycontribs ``JIRA``)."""
+"""Shared Jira REST helpers (HTTP errors, search JSON parsing, issue bundle via pycontribs ``JIRA``)."""
 
 from __future__ import annotations
 
@@ -12,8 +12,6 @@ from jira.exceptions import JIRAError
 
 from spectask_mcp.jira.base import JiraConnectionError
 from spectask_mcp.jira.types import IssueBundle
-
-OPEN_ISSUES_JQL = "resolution = Unresolved ORDER BY created DESC"
 
 JiraHttpTraceFn = Callable[[str, str, int, str], None]
 
@@ -98,44 +96,3 @@ def _open_issue_pairs_from_search_body(body: Any) -> list[tuple[str, str]]:
                 summ = str(s)
         out.append((str(k), summ))
     return out
-
-
-def fetch_open_issues_via_jira(
-    jira: JIRA,
-    limit: int,
-    trace: JiraHttpTraceFn | None = None,
-) -> list[tuple[str, str]]:
-    """POST /search/jql first; on 404/410 fall back to POST /search. Return (key, summary) pairs."""
-    del trace  # session hook when verbose
-    base = jira.server_url.rstrip("/")
-    enhanced_url = f"{base}/rest/api/3/search/jql"
-    legacy_url = f"{base}/rest/api/3/search"
-    session = jira._session
-    try:
-        r = session.post(
-            enhanced_url,
-            json={
-                "jql": OPEN_ISSUES_JQL,
-                "maxResults": limit,
-                "fields": ["summary"],
-            },
-        )
-    except requests.RequestException as e:
-        raise JiraConnectionError(str(e)) from e
-
-    if r.status_code in (404, 410):
-        try:
-            r = session.post(
-                legacy_url,
-                json={
-                    "jql": OPEN_ISSUES_JQL,
-                    "startAt": 0,
-                    "maxResults": limit,
-                    "fields": ["summary"],
-                },
-            )
-        except requests.RequestException as e:
-            raise JiraConnectionError(str(e)) from e
-
-    _raise_requests_http(r)
-    return _open_issue_pairs_from_search_body(r.json())

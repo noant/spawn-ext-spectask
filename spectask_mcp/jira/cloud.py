@@ -4,10 +4,10 @@ from __future__ import annotations
 
 from spectask_mcp.config import SpectaskLocalConfig
 from spectask_mcp.jira.base import JiraBackend
+from spectask_mcp.jira.http_cloud import fetch_open_issues_cloud
 from spectask_mcp.jira.http_common import (
     JiraHttpTraceFn,
     fetch_issue_bundle_via_jira,
-    fetch_open_issues_via_jira,
 )
 from spectask_mcp.jira.pycontribs_factory import connect_jira_client
 from spectask_mcp.jira.types import IssueBundle
@@ -32,7 +32,7 @@ class AtlassianCloudJiraClient(JiraBackend):
         )
 
     def list_open_issues(self, limit: int = 50) -> list[tuple[str, str]]:
-        return fetch_open_issues_via_jira(self._jira, limit, trace=self._trace)
+        return fetch_open_issues_cloud(self._jira, limit, trace=self._trace)
 
     def close(self) -> None:
         self._jira.close()
