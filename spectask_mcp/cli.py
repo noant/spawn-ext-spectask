@@ -19,6 +19,12 @@ def main(argv: list[str] | None = None) -> None:
     )
     p_run = sub.add_parser("run", help="Fetch Jira issue or list open issues once")
     p_run.add_argument("--issue", default=None, help="Jira issue key, e.g. PROJ-123")
+    p_run.add_argument(
+        "-v",
+        "--verbose",
+        action="store_true",
+        help="Log each Jira HTTP response (method, URL, status, body) to stderr",
+    )
     sub.add_parser("serve", help="Run stdio MCP server")
 
     ns = p.parse_args(argv)
@@ -29,7 +35,7 @@ def main(argv: list[str] | None = None) -> None:
 
     if ns.cmd == "run":
         from spectask_mcp.run_cmd import run_once
-        raise SystemExit(run_once(issue_key=ns.issue))
+        raise SystemExit(run_once(issue_key=ns.issue, verbose=ns.verbose))
 
     if ns.cmd == "serve":
         from spectask_mcp.mcp_app import run_stdio

@@ -20,6 +20,7 @@ import json
 
 from spectask_mcp.config import SpectaskLocalConfig
 from spectask_mcp.jira.factory import backend_from_config
+from spectask_mcp.jira.http_common import JiraHttpTraceFn
 from spectask_mcp.jira.types import IssueBundle
 
 _LIST_LIMIT = 50
@@ -82,14 +83,18 @@ def _format_list(pairs: list[tuple[str, str]]) -> str:
     return "\n".join(f"{k}\t{s}" for k, s in pairs)
 
 
-def query_jira(cfg: SpectaskLocalConfig, issue_key: str | None) -> str:
+def query_jira(
+    cfg: SpectaskLocalConfig,
+    issue_key: str | None,
+    trace: JiraHttpTraceFn | None = None,
+) -> str:
     """Run one Jira query: single issue (or list fallback) or open-issue listing.
 
     Raises:
         JiraConnectionError: network/HTTP failures talking to Jira.
         ValueError: backend cannot be constructed from config (e.g. missing token).
     """
-    backend = backend_from_config(cfg)
+    backend = backend_from_config(cfg, trace=trace)
     try:
         key = issue_key.strip() if isinstance(issue_key, str) else None
         if not key:

@@ -21,14 +21,24 @@ _MISSING_CFG = (
 )
 
 
-def run_once(*, issue_key: str | None) -> int:
+def run_once(*, issue_key: str | None, verbose: bool = False) -> int:
     """Load optional config from spec/.config; print issue bundle or listing; return exit code."""
     cfg = load_optional_config()
     if cfg is None:
         print(_MISSING_CFG, file=sys.stderr)
         return 2
     try:
-        out = query_jira(cfg, issue_key)
+        trace = None
+        if verbose:
+            def _trace(method: str, url: str, status: int, body: str) -> None:
+                print(
+                    f"{method} {url} -> {status}\n{body}\n",
+                    file=sys.stderr,
+                    flush=True,
+                )
+
+            trace = _trace
+        out = query_jira(cfg, issue_key, trace=trace)
     except JiraConnectionError as exc:
         print(f"Jira server unreachable: {exc}", file=sys.stderr)
         return 3

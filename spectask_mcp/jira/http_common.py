@@ -17,6 +17,7 @@ from spectask_mcp.jira.types import IssueBundle
 OPEN_ISSUES_JQL = "resolution = Unresolved ORDER BY updated DESC"
 
 RequestPrepare = Callable[[dict[str, Any]], None] | None
+JiraHttpTraceFn = Callable[[str, str, int, str], None]
 
 COMMENT_PAGE_SIZE = 100
 
@@ -89,15 +90,24 @@ def _request(
     method: str,
     url: str,
     prepare: RequestPrepare,
+    *,
+    trace: JiraHttpTraceFn | None = None,
     **kwargs: Any,
 ) -> httpx.Response:
     req_kwargs = dict(kwargs)
     if prepare is not None:
         prepare(req_kwargs)
     try:
-        return client.request(method, url, **req_kwargs)
+        resp = client.request(method, url, **req_kwargs)
     except httpx.RequestError as e:
         raise JiraConnectionError(str(e)) from e
+    if trace is not None:
+        try:
+            body = resp.text
+        except OSError:
+            body = ""
+        trace(method, url, resp.status_code, body)
+    return resp
 
 
 def _raise_http(resp: httpx.Response) -> None:
@@ -120,6 +130,7 @@ def fetch_issue_bundle(
     base_url: str,
     issue_key: str,
     prepare: RequestPrepare,
+    trace: JiraHttpTraceFn | None = None,
 ) -> IssueBundle | None:
     """GET issue with renderedFields; comments paginated with renderedBody when available."""
     safe_key = quote(issue_key, safe="")
@@ -129,6 +140,7 @@ def fetch_issue_bundle(
         "GET",
         issue_url,
         prepare,
+        trace=trace,
         params={"expand": "renderedFields"},
     )
     if r_issue.status_code == 404:
@@ -151,6 +163,7 @@ def fetch_issue_bundle(
             "GET",
             c_url,
             prepare,
+            trace=trace,
             params={
                 "startAt": start_at,
                 "maxResults": COMMENT_PAGE_SIZE,
@@ -205,6 +218,7 @@ def fetch_open_issues(
     base_url: str,
     prepare: RequestPrepare,
     limit: int,
+    trace: JiraHttpTraceFn | None = None,
 ) -> list[tuple[str, str]]:
     """POST /search/jql first; on 404/410 fall back to POST /search. Return (key, summary) pairs."""
     enhanced_url = f"{base_url}/rest/api/3/search/jql"
@@ -214,6 +228,7 @@ def fetch_open_issues(
         "POST",
         enhanced_url,
         prepare,
+        trace=trace,
         json={
             "jql": OPEN_ISSUES_JQL,
             "maxResults": limit,
@@ -226,6 +241,7 @@ def fetch_open_issues(
             "POST",
             legacy_url,
             prepare,
+            trace=trace,
             json={
                 "jql": OPEN_ISSUES_JQL,
                 "startAt": 0,
