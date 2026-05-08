@@ -2,3 +2,4 @@
 spawn/.metadata/temp/**
 # spawn:end
 *.pyc
+*.lock

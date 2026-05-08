@@ -44,6 +44,7 @@ def build_httpx_client(cfg: SpectaskLocalConfig) -> httpx.Client:
         proxy=proxy,
         verify=verify,
         timeout=httpx.Timeout(60.0),
+        follow_redirects=True,
     )
 
 
