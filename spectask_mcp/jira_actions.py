@@ -15,6 +15,7 @@ Exit code reference for CLI wrappers:
 
 from __future__ import annotations
 
+import difflib
 import json
 
 from spectask_mcp.config import SpectaskLocalConfig
@@ -22,6 +23,37 @@ from spectask_mcp.jira.factory import backend_from_config
 from spectask_mcp.jira.types import IssueBundle
 
 _LIST_LIMIT = 50
+_NOT_FOUND_POOL_LIMIT = 100
+_CANDIDATE_LIMIT = 30
+_CANDIDATE_SCORE_FLOOR = 0.34
+
+
+def _rank_pairs_for_query(query: str, pairs: list[tuple[str, str]]) -> list[tuple[str, str]]:
+    q = query.casefold().strip()
+    if not q:
+        return []
+    scored: list[tuple[float, tuple[str, str]]] = []
+    for k, s in pairs:
+        kf = k.casefold()
+        sf = s.casefold()
+        if q == kf:
+            score = 1.0
+        elif kf.startswith(q) or q in kf:
+            score = 0.9
+        elif q in sf:
+            score = 0.7
+        else:
+            score = difflib.SequenceMatcher(None, q, kf).ratio()
+        scored.append((score, (k, s)))
+    scored.sort(key=lambda item: (-item[0], item[1][0]))
+    out: list[tuple[str, str]] = []
+    for sc, pair in scored:
+        if sc <= _CANDIDATE_SCORE_FLOOR:
+            break
+        out.append(pair)
+        if len(out) >= _CANDIDATE_LIMIT:
+            break
+    return out
 
 
 def _format_issue(bundle: IssueBundle) -> str:
@@ -67,6 +99,13 @@ def query_jira(cfg: SpectaskLocalConfig, issue_key: str | None) -> str:
             bundle = backend.get_issue_bundle(key)
             if bundle is not None:
                 return _format_issue(bundle)
+            pairs = backend.list_open_issues(limit=_NOT_FOUND_POOL_LIMIT)
+            candidates = _rank_pairs_for_query(key, pairs)
+            lines = [f"Issue {key} not found.", ""]
+            if candidates:
+                lines.extend(["Possible matches (up to 30):", _format_list(candidates), ""])
+            lines.extend(["Open unresolved issues:", _format_list(pairs[:_LIST_LIMIT])])
+            return "\n".join(lines)
         pairs = backend.list_open_issues(limit=_LIST_LIMIT)
         return _format_list(pairs)
     finally:

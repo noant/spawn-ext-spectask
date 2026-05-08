@@ -65,7 +65,8 @@ def run_stdio() -> int:
             name="jira_fetch",
             description=(
                 "Fetch one Jira issue (with comments) when issue_key is found; "
-                "otherwise list open unresolved issues."
+                "if issue_key is set but not found, returns up to 30 possible matches "
+                "from open issues then the standard unresolved listing."
             ),
         )
 
