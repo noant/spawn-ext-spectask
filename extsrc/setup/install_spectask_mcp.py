@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""After-install: uv install or upgrade spectask-mcp; run optional interactive Jira setup.
+"""After-install: uv tool install (and upgrade when supported) for spectask-mcp; optional Jira setup.
+
+Uses `uv tool install` so no project virtualenv is required. When the running `uv`
+exposes `tool upgrade`, runs `uv tool upgrade spectask-mcp` after install (fresh
+install needs install first; upgrade alone errors if the tool is missing).
 
 Spawn runs scripts from materialized packs with the target workspace as cwd when the
 CLI installs from repo root (see spawn-ext-guide user-guide / spawn extension commands).
@@ -33,6 +37,18 @@ def _run_uv_best_effort(cmd: list[str], cwd: str) -> None:
         _log_uv_failure(cmd, proc)
 
 
+def _uv_tool_upgrade_supported(cwd: str) -> bool:
+    """True if this uv binary supports `tool upgrade` (older uv builds may omit it)."""
+    proc = subprocess.run(
+        ["uv", "tool", "upgrade", "-h"],
+        cwd=cwd,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        check=False,
+    )
+    return proc.returncode == 0
+
+
 def _run_interactive_setup(cwd: str) -> None:
     """Prefer spectask-mcp on PATH; fall back to python -m."""
     commands: list[list[str]] = [["spectask-mcp", "interactive", "--setup"]]
@@ -56,8 +72,10 @@ def _run_interactive_setup(cwd: str) -> None:
 
 def main() -> int:
     cwd = _cwd()
-    _run_uv_best_effort(["uv", "pip", "install", "spectask-mcp"], cwd)
-    _run_uv_best_effort(["uv", "pip", "install", "--upgrade", "spectask-mcp"], cwd)
+    pkg = "spectask-mcp"
+    _run_uv_best_effort(["uv", "tool", "install", pkg], cwd)
+    if _uv_tool_upgrade_supported(cwd):
+        _run_uv_best_effort(["uv", "tool", "upgrade", pkg], cwd)
     _run_interactive_setup(cwd)
     return 0
 
