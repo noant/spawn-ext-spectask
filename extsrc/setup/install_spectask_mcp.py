@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""After-install: uv tool install (and upgrade when supported) for spectask-mcp; optional Jira setup.
+"""After-install: uv tool install then upgrade for spectask-mcp; optional Jira setup.
 
-Uses `uv tool install` so no project virtualenv is required. When the running `uv`
-exposes `tool upgrade`, runs `uv tool upgrade spectask-mcp` after install (fresh
-install needs install first; upgrade alone errors if the tool is missing).
+Uses `uv tool install` so no project virtualenv is required. Always runs
+`uv tool upgrade spectask-mcp` after install (best-effort; older `uv` without
+`tool upgrade` logs a failure). Fresh install needs install first; upgrade alone
+errors if the tool is missing.
 
 Spawn runs scripts from materialized packs with the target workspace as cwd when the
 CLI installs from repo root (see spawn-ext-guide user-guide / spawn extension commands).
@@ -32,21 +33,14 @@ def _log_uv_failure(cmd: list[str], proc: subprocess.CompletedProcess[Any]) -> N
 
 
 def _run_uv_best_effort(cmd: list[str], cwd: str) -> None:
-    proc = subprocess.run(cmd, cwd=cwd, check=False)
-    if proc.returncode != 0:
-        _log_uv_failure(cmd, proc)
-
-
-def _uv_tool_upgrade_supported(cwd: str) -> bool:
-    """True if this uv binary supports `tool upgrade` (older uv builds may omit it)."""
     proc = subprocess.run(
-        ["uv", "tool", "upgrade", "-h"],
+        cmd,
         cwd=cwd,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
+        stdin=subprocess.DEVNULL,
         check=False,
     )
-    return proc.returncode == 0
+    if proc.returncode != 0:
+        _log_uv_failure(cmd, proc)
 
 
 def _run_interactive_setup(cwd: str) -> None:
@@ -74,8 +68,7 @@ def main() -> int:
     cwd = _cwd()
     pkg = "spectask-mcp"
     _run_uv_best_effort(["uv", "tool", "install", pkg], cwd)
-    if _uv_tool_upgrade_supported(cwd):
-        _run_uv_best_effort(["uv", "tool", "upgrade", pkg], cwd)
+    _run_uv_best_effort(["uv", "tool", "upgrade", pkg], cwd)
     _run_interactive_setup(cwd)
     return 0
 
