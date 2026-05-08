@@ -59,7 +59,12 @@ def connect_jira_client(
     if cfg.jira.type == "self_hosted":
         if not cfg.jira.pat_token:
             raise ValueError("self_hosted Jira requires pat_token")
-        client = JIRA(token_auth=cfg.jira.pat_token.strip(), **base_kw)
+        client = JIRA(
+            token_auth=cfg.jira.pat_token.strip(),
+            get_server_info=False,
+            logging=False,
+            **base_kw,
+        )
     elif cfg.jira.type == "atlassian_cloud":
         if not cfg.jira.email or not cfg.jira.api_token:
             raise ValueError("atlassian_cloud Jira requires email and api_token")
@@ -68,6 +73,8 @@ def connect_jira_client(
                 cfg.jira.email.strip(),
                 cfg.jira.api_token.strip(),
             ),
+            get_server_info=False,
+            logging=False,
             **base_kw,
         )
     else:
