@@ -176,28 +176,10 @@ def fetch_issue_bundle(
     return IssueBundle(key=key, summary=summary, fields=dict(fields), comments=comments_ordered)
 
 
-def fetch_open_issues(
-    client: httpx.Client,
-    base_url: str,
-    prepare: RequestPrepare,
-    limit: int,
-) -> list[tuple[str, str]]:
-    """POST /search with unresolved JQL; return (key, summary) pairs."""
-    search_url = f"{base_url}/rest/api/3/search"
-    r = _request(
-        client,
-        "POST",
-        search_url,
-        prepare,
-        json={
-            "jql": OPEN_ISSUES_JQL,
-            "startAt": 0,
-            "maxResults": limit,
-            "fields": ["summary"],
-        },
-    )
-    _raise_http(r)
-    body = r.json()
+def _open_issue_pairs_from_search_body(body: Any) -> list[tuple[str, str]]:
+    """Parse Jira search JSON (legacy or enhanced); return (issue key, summary) pairs."""
+    if not isinstance(body, dict):
+        return []
     issues = body.get("issues")
     if not isinstance(issues, list):
         return []
@@ -216,3 +198,40 @@ def fetch_open_issues(
                 summ = str(s)
         out.append((str(k), summ))
     return out
+
+
+def fetch_open_issues(
+    client: httpx.Client,
+    base_url: str,
+    prepare: RequestPrepare,
+    limit: int,
+) -> list[tuple[str, str]]:
+    """POST /search/jql first; on 404/410 fall back to POST /search. Return (key, summary) pairs."""
+    enhanced_url = f"{base_url}/rest/api/3/search/jql"
+    legacy_url = f"{base_url}/rest/api/3/search"
+    r = _request(
+        client,
+        "POST",
+        enhanced_url,
+        prepare,
+        json={
+            "jql": OPEN_ISSUES_JQL,
+            "maxResults": limit,
+            "fields": ["summary"],
+        },
+    )
+    if r.status_code in (404, 410):
+        r = _request(
+            client,
+            "POST",
+            legacy_url,
+            prepare,
+            json={
+                "jql": OPEN_ISSUES_JQL,
+                "startAt": 0,
+                "maxResults": limit,
+                "fields": ["summary"],
+            },
+        )
+    _raise_http(r)
+    return _open_issue_pairs_from_search_body(r.json())
