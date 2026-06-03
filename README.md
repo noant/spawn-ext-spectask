@@ -46,12 +46,12 @@ Before anything is implemented, the agent composes a task document: a one-senten
 
 The full cycle:
 
-1. Agent drafts the specification and asks clarifying questions if anything is ambiguous
+1. Agent drafts the specification and asks clarifying questions if anything is ambiguous — invoke skill `spectask-create`
 2. Agent self-reviews the spec in a **dedicated subagent** (architectural impact, correctness, sequencing) — a separate context window focuses the review and usually catches more than an inline pass in the same thread
-3. **You approve the plan** ("ok" / "lgtm" / "spec review passed")
-4. Agent implements following the **Execution Scheme** in the spec — sequential and parallel phases — with one dedicated subagent per step
+3. **You approve the plan** — "ok" / "lgtm" / "spec review passed" or invoke skill `spectask-spec-review-passed`
+4. Agent implements following the **Execution Scheme** in the spec — sequential and parallel phases — with one dedicated subagent per step — invoke skill `spectask-execute`
 5. Agent self-reviews the code in a **dedicated subagent** (naming, imports, alignment with the spec), because a separate context window keeps the focus on the changes and the spec instead of the implementation thread that wrote them, which usually surfaces inconsistencies before your review
-6. **You approve the code** ("ok" / "lgtm" / "code review passed")
+6. **You approve the code** — "ok" / "lgtm" / "code review passed" or invoke skill `spectask-code-review-passed`
 7. Agent updates `spec/design/hla.md`, reconciles `spec/design.yaml` if needed, and marks the task as done
 
 ## The `spec/` layout
