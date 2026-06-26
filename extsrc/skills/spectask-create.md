@@ -11,4 +11,4 @@ Under this skill, writing implementation code without an approved specification 
 
 If work began from **`spec/seeds/`**, tie the seed to the new task in **Step 1** (**`linked task:`** + **Source seed** in **`overview.md`**) and close it in **Step 7** item **6**, per **`spec/main.md`**.
 
-When launching the Step 2 sub-agent, include this line in the prompt: "Start your response with the line `My model: {model-name}`." Use the returned model name when filling `- [V] Self spec review passed [model-name]`.
+When launching the Step 2 sub-agent, include this in the prompt: "Start your response with the line `My model: X` where X is your actual model identifier (e.g. `claude-sonnet-4-6`, `gpt-4o`) — write your actual model identifier in place of X." Use the returned model name when filling `- [V] Self spec review passed [model-name]`.
