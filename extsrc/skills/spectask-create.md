@@ -10,3 +10,5 @@ Complete **Steps 1–2** only — then stop and wait for the user’s **Step 3**
 Under this skill, writing implementation code without an approved specification is not allowed — stay within Steps 1–2 (overview.md and subtasks) until spec review passes.
 
 If work began from **`spec/seeds/`**, tie the seed to the new task in **Step 1** (**`linked task:`** + **Source seed** in **`overview.md`**) and close it in **Step 7** item **6**, per **`spec/main.md`**.
+
+When launching the Step 2 sub-agent, include this line in the prompt: "Start your response with the line `My model: {model-name}`." Use the returned model name when filling `- [V] Self spec review passed [model-name]`.
