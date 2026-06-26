@@ -1,5 +1,6 @@
 # spawn:start
 spawn/.metadata/temp/**
+spec/.config/**
 # spawn:end
 *.pyc
 *.lock

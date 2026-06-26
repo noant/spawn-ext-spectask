@@ -1,3 +1,10 @@
 {
-  "mcpServers": {}
+  "mcpServers": {
+    "spectask-mcp-jira": {
+      "command": "spectask-mcp",
+      "args": [
+        "serve"
+      ]
+    }
+  }
 }

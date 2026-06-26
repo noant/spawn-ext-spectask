@@ -5,6 +5,8 @@ description: Optional — capture an idea under spec/seeds/; see Seed file templ
 
 Operate within the **spectask** process defined in attached **spec/main.md**.
 
+**task-code** for **spec/tasks/** (separate from seed numeric **X**): **Embedded rules** 3-4 in **spec/main.md**.
+
 Follow the short **Seed** paragraph and **[Seed file template (header)](#seed-file-template-header)** in **spec/main.md**.
 
 Pick a kebab-case **slug** and the next **`X`** under **`spec/seeds/`** (default: max numeric prefix among **`*.md`** there + **1**). Create **`spec/seeds/{X}-{slug}.md`**: **`linked task: none`** unless it already binds to an **`overview.md`** path — blank line — then informal notes (**not** a full spectask).

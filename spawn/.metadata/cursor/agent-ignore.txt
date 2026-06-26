@@ -1,2 +1,3 @@
 spec/seeds/_DONE_*.md
 spec/tasks/**/_DONE_*/_DONE_*.md
+spec/.config/**

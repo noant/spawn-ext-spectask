@@ -1,14 +1,16 @@
 ---
-name: spectask-execute
-description: Steps 4–5 in spec/main.md; then wait for user Step 6.
+name: spectask-from-jira
+description: Import external tracker tickets into spec/tasks/{task-code}-{slug}/; offline fallback.
 ---
 
 
-Operate within the **spectask** process defined in attached **spec/main.md**.
+### Workflow
 
-Complete **Steps 4–5**. Then wait for the user for **Step 6**.
+1. Prefer the MCP tool `jira_fetch` (pass the issue key when known). If MCP is unavailable or the call fails, fall back to `spectask-mcp run --issue KEY`.
+2. On success: mkdir `spec/tasks/{task-code}-{slug}/` with `task-code` = ticket key; write `overview.md` using spectask template; copy ticket body into Details.
+3. On failure: ask user for key + pasted description; same layout.
 
-When launching sub-agents in Step 4 (one per Execution Scheme step) and Step 5 (self code review), include this in each prompt: "End your final response with the line `My model: X` where X is your actual model identifier (e.g. `claude-sonnet-4-6`, `gpt-4o`) — write your actual model identifier in place of X." Use each returned model name when filling subtask `Status:` lines (Step 4) and `- [V] Self code review passed [model-name]` (Step 5).
+For full **Step 1** spec work after the scaffold exists, follow **spectask-create** and **spec/main.md** (`task-code` rules 3-4).
 
 
 Hints:
