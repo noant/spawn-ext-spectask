@@ -52,11 +52,11 @@ Mark each status [V] on completion. Prompt the user after steps 2, 5, and 6.
 
 **Executor:** AI Agent (New sub-agent)
 
-Sub-agent prompt must include: "Start your response with the line `My model: X` where X is your actual model identifier (e.g. `claude-sonnet-4-6`, `gpt-4o`) — write your actual model identifier in place of X."
+Sub-agent prompt must include: "End your final response with the line `My model: X` where X is your actual model identifier (e.g. `claude-sonnet-4-6`, `gpt-4o`) — write your actual model identifier in place of X."
 
 Review the spec for: architectural impact, implementation errors, sequencing issues; verify every step and overview list concrete files, modules, and symbols (classes, methods, functions) per Embedded rule 7. Fix if needed.
 
-→ set [V] "Self spec review passed" — read the first line of the sub-agent response, extract model name, fill in brackets: `- [V] Self spec review passed [model-name]`
+→ set [V] "Self spec review passed" — read the last line of the sub-agent response, extract model name, fill in brackets: `- [V] Self spec review passed [model-name]`
 → prompt: "Self spec review passed — spec is ready for your review (Step 3). Reply 'spec review passed', 'lgtm', or 'ok' when satisfied."
 
 ---
@@ -79,10 +79,10 @@ On confirmation ("spec review passed", "lgtm", "ok"):
 On "run it" / "implement" / "execute" / any direct instruction to start implementation:
 0. If "Spec review passed" is not yet marked, set [V] "Spec review passed" automatically — the user's implementation command implies approval.
 1. Read all files in spec/extend/ first.
-2. MANDATORY! Launch a subagent per step — do NOT implement inline. No exceptions — even if a step seems trivial or small. Sub-agent prompt must include: "Start your response with the line `My model: X` where X is your actual model identifier (e.g. `claude-sonnet-4-6`, `gpt-4o`) — write your actual model identifier in place of X."
+2. MANDATORY! Launch a subagent per step — do NOT implement inline. No exceptions — even if a step seems trivial or small. Sub-agent prompt must include: "End your final response with the line `My model: X` where X is your actual model identifier (e.g. `claude-sonnet-4-6`, `gpt-4o`) — write your actual model identifier in place of X."
 3. Follow Execution Scheme: → sequential, || parallel.
 
-→ set [V] "Code implemented" — fill coordinator model name in brackets: `- [V] Code implemented [model-name]`; rename done subtasks to _DONE_ and set `Status: Done | model: {model}` in each subtask file using the model name read from that sub-agent's first response line
+→ set [V] "Code implemented" — fill coordinator model name in brackets: `- [V] Code implemented [model-name]`; rename done subtasks to _DONE_ and set `Status: Done | model: {model}` in each subtask file using the model name read from that sub-agent's last response line
 
 ---
 
@@ -90,11 +90,11 @@ On "run it" / "implement" / "execute" / any direct instruction to start implemen
 
 **Executor:** AI Agent (New sub-agent)
 
-Sub-agent prompt must include: "Start your response with the line `My model: X` where X is your actual model identifier (e.g. `claude-sonnet-4-6`, `gpt-4o`) — write your actual model identifier in place of X."
+Sub-agent prompt must include: "End your final response with the line `My model: X` where X is your actual model identifier (e.g. `claude-sonnet-4-6`, `gpt-4o`) — write your actual model identifier in place of X."
 
 Review all changes: inconsistencies, naming, missing imports, broken contracts. Fix if needed.
 
-→ set [V] "Self code review passed" — read the first line of the sub-agent response, extract model name, fill in brackets: `- [V] Self code review passed [model-name]`
+→ set [V] "Self code review passed" — read the last line of the sub-agent response, extract model name, fill in brackets: `- [V] Self code review passed [model-name]`
 → prompt: "Self review done. Reply 'code review passed' to proceed."
 
 ---
