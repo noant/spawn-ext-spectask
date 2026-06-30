@@ -1,12 +1,12 @@
 # Spectask (Spawn extension)
 
-Spectask is a methodology and structured workflow that enforces specification before implementation in AI-assisted development. This repository packages Spectask as a **Spawn extension**: methodology files, agent skills, and folder modes (`static` vs `artifact`) are declared in `extsrc/config.yaml` and installed into your project with the Spawn CLI.
+Spectask is a methodology and structured workflow that enforces specification before implementation in AI-assisted development. This repository packages Spectask as a **Spawn extension**: methodology files, agent skills, MCP descriptors, and folder modes (`static` vs `artifact`) are declared in `extsrc/config.yaml` and installed into your project with the Spawn CLI.
 
 ## Install
 
 ### 1. Install Spawn CLI (uv tool)
 
-Install [uv](https://docs.astral.sh/uv/), then install the Spawn command from PyPI into uv’s tools directory (**`spawn` must be on `PATH`** after install — see uv’s docs for tool paths):
+Install [uv](https://docs.astral.sh/uv/), then install the Spawn command from PyPI into uv's tools directory (**`spawn` must be on `PATH`** after install — see uv's docs for tool paths):
 
 ```bash
 uv tool install spawn-cli
@@ -38,7 +38,7 @@ spawn extension update spectask
 spawn extension remove spectask
 ```
 
-Extension ids match the `name` field in this pack’s `extsrc/config.yaml` (`spectask` for this repository).
+Extension ids match the `name` field in this pack's `extsrc/config.yaml` (`spectask` for this repository).
 
 ## How it works
 
@@ -49,10 +49,12 @@ The full cycle:
 1. Agent drafts the specification and asks clarifying questions if anything is ambiguous — invoke skill `spectask-create`
 2. Agent self-reviews the spec in a **dedicated subagent** (architectural impact, correctness, sequencing) — a separate context window focuses the review and usually catches more than an inline pass in the same thread
 3. **You approve the plan** — "ok" / "lgtm" / "spec review passed" or invoke skill `spectask-spec-review-passed`
-4. Agent implements following the **Execution Scheme** in the spec — sequential and parallel phases — with one dedicated subagent per step — invoke skill `spectask-execute`
+4. Agent implements following the **Execution Scheme** in the spec — sequential and parallel phases — with one dedicated subagent per step — invoke skill `spectask-execute` (all steps in one run) or `spectask-execute-step-by-step` (one subtask per run, wait for you between steps)
 5. Agent self-reviews the code in a **dedicated subagent** (naming, imports, alignment with the spec), because a separate context window keeps the focus on the changes and the spec instead of the implementation thread that wrote them, which usually surfaces inconsistencies before your review
 6. **You approve the code** — "ok" / "lgtm" / "code review passed" or invoke skill `spectask-code-review-passed`
 7. Agent updates `spec/design/hla.md`, reconciles `spec/design.yaml` if needed, and marks the task as done
+
+Agent-executed steps record the **LLM model name** in `overview.md` status lines (for example `- [V] Spec created [claude-sonnet-4-6]`) and in each subtask file (`Status: Done | model: {model}`). User-confirmed checkpoints (Steps 3 and 6) stay plain checkboxes.
 
 ## The `spec/` layout
 
@@ -61,10 +63,12 @@ All significant methodology layout lives under `spec/` as defined in the shipped
 - `spec/main.md` — process rules and the `overview.md` template
 - `spec/design.yaml` — index of architecture documents under `spec/design/` (path + description per entry)
 - `spec/design/hla.md` — current architecture overview; updated after every completed task
-- `spec/design/{name}.md` — additional architecture documents (ADRs, notes, etc.); register entries in `spec/design.yaml` and declare paths in the extension (or follow your org’s Spawn layout) so agents see them via merged navigation
+- `spec/design/{name}.md` — additional architecture documents (ADRs, notes, etc.); register entries in `spec/design.yaml` and declare paths in the extension (or follow your org's Spawn layout) so agents see them via merged navigation
 - `spec/tasks/{X}-{name}/overview.md` — task specification
-- `spec/tasks/{X}-{name}/{N}-{description}.md` — subtask files when decomposition is needed
+- `spec/tasks/{X}-{name}/{N}-{description}.md` — subtask files when decomposition is needed (each carries a `Status:` line with implementation state and model)
 - `spec/seeds/{X}-{slug}.md` — optional rough ideas before a full task; see [Seeds](#seeds)
+- `spec/extend/` — optional supplementary context the agent reads at the start of Step 4 (when present)
+- `spec/.config/config.yaml` — local Jira and proxy settings; git-ignored (see [Jira integration and MCP](#jira-integration-and-mcp))
 
 After **your** code approval (Step 6), Step 7 renames the task folder to `_DONE_{X}-{name}` — not before. That keeps history readable in the repository.
 
@@ -73,6 +77,8 @@ After **your** code approval (Step 6), Step 7 renames the task folder to `_DONE_
 **Specification before implementation.** The task is captured in a document that becomes the shared source of truth for you and the agent. This eliminates guesswork and rework.
 
 **Agent self-review.** Before asking you, the agent re-reads the specification and the changes it made. Small issues are caught before they reach you.
+
+**Model audit trail.** Agent-executed steps (1, 2, 4, 5, 7) and subtask files record which model performed the work, so you can trace who did what across long-running tasks.
 
 **Shared context via Spawn.** Org-wide rules and extra readable paths usually arrive through **additional Spawn extensions** (or extra `files:` entries in your own pack): declare them in `extsrc/config.yaml` with the right `globalRead` / `localRead` so they appear in merged **`spawn/navigation.yaml`** — same idea as registering extra `spec/design/{name}.md` files.
 
@@ -91,21 +97,22 @@ This extension declares `spec/seeds/` as an **artifact** folder in `extsrc/confi
 
 ## Skills
 
-After install, invoke methodology steps using these **skills** by name; Spawn renders them into your IDE’s skill/rules layout.
+After install, invoke methodology steps using these **skills** by name; Spawn renders them into your IDE's skill/rules layout.
 
 | Skill | Purpose |
 |--------|--------|
 | **spectask-create** | Draft a new task spec only — **Steps 1–2** in `spec/main.md` (no implementation, no HLA update). |
 | **spectask-spec-review-passed** | Step 3: **Spec review passed** in `overview.md` + Step 3 prompt. |
-| **spectask-execute** | **Steps 4–5** in `spec/main.md` (implement + self code review); then wait for the user — **Step 6**. |
+| **spectask-execute** | **Steps 4–5** in `spec/main.md` (implement all Execution Scheme steps + self code review); then wait for the user — **Step 6**. |
+| **spectask-execute-step-by-step** | **Step 4** only — one Execution Scheme subtask per run; wait for you between steps; self code review (Step 5) when all subtasks are done. |
 | **spectask-code-review-passed** | Step 6: **Code review passed** in `overview.md` + Step 6 prompt; then **Step 7** in `spec/main.md`. |
 | **spectask-design** | Register architecture files in `spec/design.yaml` or draft `spec/design/*.md`. |
 | **spectask-seed-create** | Capture a rough idea as `spec/seeds/{X}-{slug}.md`; offer **spectask-create** when the user promotes. |
-| **spectask-from-jira** | Import a Jira issue into `spec/tasks/{task-code}-{slug}/` using MCP or CLI, with a manual fallback. |
+| **spectask-from-jira** | Import a Jira issue into `spec/tasks/{task-code}-{slug}/` (MCP or CLI, with manual fallback); explore the codebase and complete Steps 1–2 before waiting for Step 3. |
 
 ## Jira integration and MCP
 
-This extension ships MCP server entries under `extsrc/mcp/` (per platform). After you install the pack with Spawn, those definitions are merged into your workspace; your IDE typically lists the **spectask-mcp-jira** server from that merge so you do not maintain a separate MCP JSON snippet for this tool. The server runs **spectask-mcp** in stdio mode (`spectask-mcp serve`). The same PyPI package also exposes a small **CLI** for non-MCP use (for example `spectask-mcp run --issue KEY`).
+This extension ships MCP server entries under `extsrc/mcp/` (per platform). After you install the pack with Spawn, those definitions are merged into your workspace; your IDE typically lists the **spectask-mcp-jira** server from that merge so you do not maintain a separate MCP JSON snippet for this tool. The server runs **spectask-mcp** in stdio mode (`spectask-mcp serve`). The same PyPI package also exposes a small **CLI** for non-MCP use.
 
 On extension install, the **after-install** hook (`extsrc/setup/install_spectask_mcp.py`) runs `uv tool install` / `uv tool upgrade` for the `spectask-mcp` PyPI package, then optionally launches **interactive setup** (`spectask-mcp interactive --setup`) when stdin is a TTY. You can run that command again anytime from the repo root.
 
@@ -135,13 +142,28 @@ proxy:
 
 **Interactive setup** walks through Jira type, URL, tokens, optional SOCKS5, and `remote_dns`, then writes this file to `spec/.config/config.yaml`.
 
-To **import a Jira ticket into a Spectask folder**, use the **spectask-from-jira** skill so the agent follows the workflow (prefer MCP tool `jira_fetch`, else CLI, else pasted content). Starting a full Step 1 spec from that scaffold still goes through **spectask-create** and `spec/main.md` as usual.
+**MCP tool `jira_fetch`** (available only when config is valid):
+
+- Omit `issue_key`, or pass a key that does not resolve: returns the five most recently created unresolved issues as `key<TAB>summary` lines.
+- Valid key: returns key, summary, and a JSON `fields` block (comments are not included).
+
+If `spec/.config/config.yaml` is missing or invalid, the MCP server still starts but registers no Jira tools until you configure credentials.
+
+**CLI** (`spectask-mcp run`):
+
+- Without `--issue`: same open-issue listing as above.
+- With `--issue KEY`: fetch one issue bundle.
+- `--verbose` / `-v`: log each Jira HTTP response (method, URL, status, body) to stderr.
+
+Deployment type (`atlassian_cloud` vs `self_hosted`) selects REST API version and search endpoints end-to-end; see `spec/design/hla.md` after install for details.
+
+To **import a Jira ticket into a Spectask folder**, use the **spectask-from-jira** skill so the agent follows the workflow (prefer MCP tool `jira_fetch`, else CLI, else pasted content). The skill scaffolds the task folder, maps ticket intent to concrete codebase paths, and completes Steps 1–2 before waiting for your Step 3 approval.
 
 ## Navigation and reads
 
 **`spawn/navigation.yaml`** (generated by Spawn after install) is the merged index of what agents should read first (`read-required` / contextual reads). It replaces a hand-maintained `spec/navigation.yaml` from older standalone Spectask layouts.
 
-**`spec/design.yaml`** is your project’s explicit list of architecture markdown paths under `spec/design/` with short descriptions. Keep it aligned whenever you add or rename design docs.
+**`spec/design.yaml`** is your project's explicit list of architecture markdown paths under `spec/design/` with short descriptions. Keep it aligned whenever you add or rename design docs.
 
 **spectask-design** covers entries in `spec/design.yaml` and companion files under `spec/design/`.
 
