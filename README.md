@@ -112,7 +112,7 @@ After install, invoke methodology steps using these **skills** by name; Spawn re
 
 ## Jira integration and MCP
 
-This extension ships MCP server entries under `extsrc/mcp/` (per platform). After you install the pack with Spawn, those definitions are merged into your workspace; your IDE typically lists the **spectask-mcp-jira** server from that merge so you do not maintain a separate MCP JSON snippet for this tool. The server runs **spectask-mcp** in stdio mode (`spectask-mcp serve`). The same PyPI package also exposes a small **CLI** for non-MCP use.
+This extension ships MCP server entries under `extsrc/mcp/` (per platform). After you install the pack with Spawn, those definitions are merged into your workspace; your IDE typically lists the **spectask-mcp-jira** server from that merge so you do not maintain a separate MCP JSON snippet for this tool. The server runs **spectask-mcp** via **uvx** in stdio mode (`uvx spectask-mcp serve`), resolving the latest PyPI release on each MCP start; **uv** must be on PATH. The same PyPI package also exposes a small **CLI** for non-MCP use (`spectask-mcp run`, `spectask-mcp interactive`), installed by the after-install hook with `uv tool install` / `uv tool upgrade`.
 
 On extension install, the **after-install** hook (`extsrc/setup/install_spectask_mcp.py`) runs `uv tool install` / `uv tool upgrade` for the `spectask-mcp` PyPI package, then optionally launches **interactive setup** (`spectask-mcp interactive --setup`) when stdin is a TTY. You can run that command again anytime from the repo root.
 

@@ -4,8 +4,8 @@
       "name": "spectask-mcp-jira",
       "transport": {
         "type": "stdio",
-        "command": "spectask-mcp",
-        "args": ["serve"]
+        "command": "uvx",
+        "args": ["spectask-mcp", "serve"]
       }
     }
   ]
