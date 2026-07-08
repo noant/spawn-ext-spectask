@@ -1,20 +1,94 @@
-"""Shared Jira REST helpers (HTTP errors, search JSON parsing, issue bundle via pycontribs ``JIRA``)."""
+# Step 1: Types and HTTP comment fetch
 
-from __future__ import annotations
+Status: Done | model: composer-2.5-fast
 
+## Goal
+Restore paginated Jira comment loading (max 70, author plus body) in shared HTTP helpers and populate `IssueBundle.comments`.
+
+## Approach
+1. Add `IssueComment(author, body)` in `types.py`; change `IssueBundle.comments` type.
+2. Restore comment parsing helpers and `_paginated_issue_comments_via_session` in `http_common.py` from commit `9385221`, with `COMMENT_MAX_FETCH = 70`, `_comment_author_name`, and `IssueComment` mapping.
+3. Call pagination from `fetch_issue_bundle_via_jira` after issue load; map each REST comment dict to `IssueComment`.
+4. Keep 404 on missing issue as `None`; 404 on comment endpoint returns empty list (issue with no comment resource).
+
+## Affected files
+- `spectask_mcp/jira/types.py` — `IssueComment`, `IssueBundle`
+- `spectask_mcp/jira/http_common.py` — imports, comment helpers, `_paginated_issue_comments_via_session`, `fetch_issue_bundle_via_jira`
+
+## Code changes (before / after)
+
+### `spectask_mcp/jira/types.py` — `IssueComment`, `IssueBundle.comments`
+
+**Before**
+```python
+@dataclass
+class IssueBundle:
+    """One issue with all comments, for MCP/CLI serialization."""
+
+    key: str
+    summary: str
+    fields: dict[str, Any]
+    comments: list[str]
+```
+Holds comment bodies as plain strings; today always empty at runtime.
+
+**After**
+```python
+@dataclass
+class IssueComment:
+    """One Jira issue comment for MCP/CLI serialization."""
+
+    author: str
+    body: str
+
+
+@dataclass
+class IssueBundle:
+    """One issue with comments, for MCP/CLI serialization."""
+
+    key: str
+    summary: str
+    fields: dict[str, Any]
+    comments: list[IssueComment]
+```
+Each comment carries author display name and plain-text body.
+
+### `spectask_mcp/jira/http_common.py` — imports and `IssueComment` type import
+
+**Before**
+```python
+from collections.abc import Callable
+from typing import Any
+from urllib.parse import quote
+```
+```python
+from spectask_mcp.jira.types import IssueBundle
+```
+No `html`/`re` imports; only `IssueBundle` imported from types.
+
+**After**
+```python
 import html
 import re
 from collections.abc import Callable
 from typing import Any
 from urllib.parse import quote
-
-import requests
-from jira import JIRA
-from jira.exceptions import JIRAError
-
-from spectask_mcp.jira.base import JiraConnectionError
+```
+```python
 from spectask_mcp.jira.types import IssueBundle, IssueComment
+```
+Imports needed for HTML/ADF comment body parsing and typed comment rows.
 
+### `spectask_mcp/jira/http_common.py` — constants and `_comment_author_name` (new)
+
+**Before**
+```python
+JiraHttpTraceFn = Callable[[str, str, int, str], None]
+```
+No comment constants or author helper.
+
+**After**
+```python
 JiraHttpTraceFn = Callable[[str, str, int, str], None]
 
 COMMENT_PAGE_SIZE = 100
@@ -29,8 +103,19 @@ def _comment_author_name(comment: dict[str, Any]) -> str:
             if isinstance(val, str) and val.strip():
                 return val.strip()
     return "unknown"
+```
+Caps fetch at 70 comments; resolves author from Jira comment JSON.
 
+### `spectask_mcp/jira/http_common.py` — `_strip_html`, `_adf_to_plain`, `_comment_body_text` (restore)
 
+**Before**
+```python
+def _raise_requests_http(resp: requests.Response) -> None:
+```
+No comment body parsing helpers before HTTP error mapping.
+
+**After**
+```python
 def _strip_html(s: str) -> str:
     t = re.sub(r"(?is)<script[^>]*>.*?</script>", "", s)
     t = re.sub(r"<[^>]+>", "", t)
@@ -69,61 +154,23 @@ def _comment_body_text(comment: dict[str, Any]) -> str:
     return ""
 
 
-def _description_plain(
-    fields: dict[str, Any],
-    rendered_fields: dict[str, Any] | None,
-) -> str:
-    rendered = rendered_fields if isinstance(rendered_fields, dict) else {}
-    rd = rendered.get("description")
-    if isinstance(rd, str) and rd.strip():
-        return _strip_html(rd)
-    desc = fields.get("description")
-    if isinstance(desc, str) and desc.strip():
-        return desc.strip()
-    if isinstance(desc, dict):
-        return _adf_to_plain(desc).strip()
-    return ""
-
-
-def _labels_from_fields(fields: dict[str, Any]) -> list[str]:
-    raw = fields.get("labels")
-    if not isinstance(raw, list):
-        return []
-    out: list[str] = []
-    for item in raw:
-        if isinstance(item, str) and item.strip():
-            out.append(item.strip())
-    return out
-
-
 def _raise_requests_http(resp: requests.Response) -> None:
-    try:
-        resp.raise_for_status()
-    except requests.HTTPError as e:
-        snippet = ""
-        try:
-            snippet = (e.response.text or "")[:500]
-        except OSError:
-            snippet = ""
-        msg = f"Jira HTTP {e.response.status_code}"
-        if snippet:
-            msg = f"{msg}: {snippet}"
-        raise JiraConnectionError(msg) from e
+```
+Plain-text comment bodies from rendered HTML, string body, or ADF.
 
+### `spectask_mcp/jira/http_common.py` — `_paginated_issue_comments_via_session` (restore, adapted)
 
-def _map_jira_error(exc: BaseException) -> JiraConnectionError:
-    if isinstance(exc, JIRAError):
-        snippet = (exc.text or "")[:500] if getattr(exc, "text", None) else ""
-        code = getattr(exc, "status_code", None)
-        msg = f"Jira HTTP {code}" if code is not None else str(exc)
-        if snippet:
-            msg = f"{msg}: {snippet}"
-        return JiraConnectionError(msg)
-    if isinstance(exc, requests.RequestException):
-        return JiraConnectionError(str(exc))
+**Before**
+```python
     return JiraConnectionError(str(exc))
 
 
+def fetch_issue_bundle_via_jira(
+```
+No comment pagination helper between `_map_jira_error` and issue fetch.
+
+**After**
+```python
 def _paginated_issue_comments_via_session(jira: JIRA, safe_key: str) -> list[IssueComment]:
     """Fetch up to COMMENT_MAX_FETCH comments; when truncated, keep the newest window."""
     session = jira._session
@@ -241,9 +288,42 @@ def _paginated_issue_comments_via_session(jira: JIRA, safe_key: str) -> list[Iss
 
 
 def fetch_issue_bundle_via_jira(
-    jira: JIRA,
-    issue_key: str,
-    trace: JiraHttpTraceFn | None = None,
+```
+Paginates `/comment` via pycontribs session; tail slice when `total > 70`; returns oldest-to-newest within the window.
+
+### `spectask_mcp/jira/http_common.py` — `fetch_issue_bundle_via_jira`
+
+**Before**
+```python
+) -> IssueBundle | None:
+    """Load issue with renderedFields; comments are not fetched (always empty)."""
+    del trace  # traced via session hook when verbose
+    safe_key = quote(issue_key, safe="")
+    try:
+        issue = jira.issue(safe_key, expand="renderedFields")
+    except JIRAError as e:
+        if e.status_code == 404:
+            return None
+        raise _map_jira_error(e) from e
+    except requests.RequestException as e:
+        raise JiraConnectionError(str(e)) from e
+
+    raw = issue.raw
+    if not isinstance(raw, dict):
+        raw = {}
+    key = str(raw.get("key", issue_key))
+    fields = raw.get("fields")
+    if not isinstance(fields, dict):
+        fields = {}
+    summary_raw = fields.get("summary")
+    summary = "" if summary_raw is None else str(summary_raw)
+
+    return IssueBundle(key=key, summary=summary, fields=dict(fields), comments=[])
+```
+Issue fetch only; comments list always empty.
+
+**After**
+```python
 ) -> IssueBundle | None:
     """Load issue with renderedFields; paginate comments with renderedBody when available."""
     del trace  # traced via session hook when verbose
@@ -264,43 +344,19 @@ def fetch_issue_bundle_via_jira(
     fields = raw.get("fields")
     if not isinstance(fields, dict):
         fields = {}
-    rendered_fields = raw.get("renderedFields")
     summary_raw = fields.get("summary")
     summary = "" if summary_raw is None else str(summary_raw)
-    description = _description_plain(fields, rendered_fields)
-    labels = _labels_from_fields(fields)
 
     comments_ordered = _paginated_issue_comments_via_session(jira, safe_key)
 
     return IssueBundle(
         key=key,
         summary=summary,
-        description=description,
-        labels=labels,
         fields=dict(fields),
         comments=comments_ordered,
     )
+```
+Issue detail bundle includes up to 70 comments with author and body.
 
-
-def _open_issue_pairs_from_search_body(body: Any) -> list[tuple[str, str]]:
-    """Parse Jira search JSON (legacy or enhanced); return (issue key, summary) pairs."""
-    if not isinstance(body, dict):
-        return []
-    issues = body.get("issues")
-    if not isinstance(issues, list):
-        return []
-    out: list[tuple[str, str]] = []
-    for item in issues:
-        if not isinstance(item, dict):
-            continue
-        k = item.get("key")
-        if not k:
-            continue
-        fields = item.get("fields")
-        summ = ""
-        if isinstance(fields, dict):
-            s = fields.get("summary")
-            if s is not None:
-                summ = str(s)
-        out.append((str(k), summ))
-    return out
+## Additional actions
+- Manual smoke: `spectask-mcp run --issue <KEY> --verbose` shows GETs to `.../comment` and a populated `Comments:` block when the issue has comments (formatting verified in step 2).

@@ -1,7 +1,7 @@
 """One-shot CLI fetch from spec/.config Jira settings.
 
 Exit codes:
-    0 - Success; issue fields (no comments) or five-issue listing on stdout.
+    0 - Success; issue fields and comments (up to 70) or five-issue listing on stdout.
     1 - Usage or miscellaneous errors (e.g. invalid auth for selected Jira type).
     2 - No valid config (missing spec workspace, missing/unreadable config.yaml).
     3 - Jira unreachable (connection timeout, DNS, HTTP errors after connect).

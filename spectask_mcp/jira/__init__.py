@@ -8,12 +8,13 @@ from spectask_mcp.jira.factory import backend_from_config
 from spectask_mcp.jira.jql import CURRENT_USER_OPEN_ISSUES_JQL
 from spectask_mcp.jira.pycontribs_factory import connect_jira_client
 from spectask_mcp.jira.self_hosted import SelfHostedJiraClient
-from spectask_mcp.jira.types import IssueBundle
+from spectask_mcp.jira.types import IssueBundle, IssueComment
 
 __all__ = [
     "CURRENT_USER_OPEN_ISSUES_JQL",
     "AtlassianCloudJiraClient",
     "IssueBundle",
+    "IssueComment",
     "JiraBackend",
     "JiraConnectionError",
     "SelfHostedJiraClient",

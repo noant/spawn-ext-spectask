@@ -9,7 +9,7 @@ from mcp.server.fastmcp import FastMCP
 
 from spectask_mcp.config import load_optional_config
 from spectask_mcp.jira.base import JiraConnectionError
-from spectask_mcp.jira_actions import query_jira
+from spectask_mcp.jira_actions import query_jira_for_mcp
 
 
 def _stderr_logger() -> logging.Logger:
@@ -40,7 +40,7 @@ def _jira_fetch_impl(issue_key: str | None = None) -> str:
         if cfg is None:
             return "No valid Jira configuration found."
 
-        return query_jira(cfg, issue_key)
+        return query_jira_for_mcp(cfg, issue_key)
     except JiraConnectionError as exc:
         return f"Jira server unreachable: {exc}"
     except ValueError as exc:
@@ -66,8 +66,8 @@ def run_stdio() -> int:
             description=(
                 "When issue_key is omitted or not found: return the five most recently "
                 "created unresolved issues as key<TAB>summary lines. "
-                "When issue_key resolves to an issue: return key, summary, "
-                "and fields JSON (no comments)."
+                "When issue_key resolves to an issue: return plain text with key, summary, "
+                "description, labels, and up to 70 comments (author: body per line)."
             ),
         )
 
