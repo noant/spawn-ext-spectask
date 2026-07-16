@@ -16,7 +16,7 @@ prerequisite: target MUST be `spawn init` before extension install commands (exc
 extension_authoring:
 
 - `spawn extension init . --name <id>`: skeleton `extsrc/`, empty `config.yaml`, empty **`extsrc/mcp/*.json`** (`windows`, `linux`, `macos`)
-- `spawn extension check .`: validate; `--strict` elevates to errors (missing listed skills, undeclared files under `extsrc/files/`, missing descriptions when read flags set, invalid or mismatched **`extsrc/mcp/*.json`**, stray obsolete **`extsrc/mcp.json`**, missing setup scripts when referenced)
+- `spawn extension check .`: validate; `--strict` elevates to errors (missing listed skills, undeclared files under `extsrc/files/`, missing descriptions when read flags set, invalid or mismatched **`extsrc/mcp/*.json`** including **`spawn_stdio_proxy`** without **`stdio`** transport, stray obsolete **`extsrc/mcp.json`**, missing setup scripts when referenced)
 - `spawn extension from-rules <source> --name <id> --output <dir>`: bootstrap from repo `spawn/rules/`
 
 target_install:

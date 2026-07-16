@@ -1,5 +1,5 @@
 schema: 1
-version: 0.1.5
+version: 0.2.1
 name: extension-creator
 
 files:
@@ -26,7 +26,8 @@ files:
   spawn-ext-guide/ai/mcp-json.md:
     description: >-
       Machine schema for extsrc/mcp/windows.json, linux.json, macos.json — servers,
-      OS selection, aligned name sets, transport, env, capabilities, JSON examples.
+      OS selection, aligned name sets, transport, spawn_stdio_proxy (stdio IDE proxy),
+      env, capabilities, validation against check, JSON examples.
     mode: static
     globalRead: no
     localRead: auto
@@ -69,7 +70,7 @@ skills:
     name: spawn-ext-mcp
     description: >-
       Add or edit extsrc/mcp/*.json — three platform files, Spawn servers shape,
-      matching server names, safe env placeholders.
+      matching server names, optional spawn_stdio_proxy for stdio, safe env placeholders.
     required-read:
       - spawn-ext-guide/ai/core.md
       - spawn-ext-guide/ai/mcp-json.md
@@ -93,6 +94,23 @@ skills:
       - spawn-ext-guide/ai/core.md
       - spawn-ext-guide/ai/config-yaml.md
       - spawn-ext-guide/user-guide.md
+  spawn-methodology-update.md:
+    name: spawn-methodology-update
+    description: >-
+      Update methodology from a user instruction — clarify scope, apply changes,
+      validate, bump version, and offer a git commit with a suggested message.
+    required-read:
+      - spawn-ext-guide/ai/core.md
+      - spawn-ext-guide/ai/config-yaml.md
+      - spawn-ext-guide/ai/skill-sources.md
+      - spawn-ext-guide/ai/cli.md
+  spawn-ext-extract-stack-patterns.md:
+    name: spawn-ext-extract-stack-patterns
+    description: Analyze a reference codebase and distill universal stack patterns into extension spec files and procedural skills.
+    required-read:
+      - spawn-ext-guide/ai/core.md
+      - spawn-ext-guide/ai/config-yaml.md
+      - spawn-ext-guide/ai/skill-sources.md
 
 agent-ignore: []
 git-ignore: []
