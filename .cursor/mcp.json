@@ -1,8 +1,9 @@
 {
   "mcpServers": {
     "spectask-mcp-jira": {
-      "command": "spectask-mcp",
+      "command": "uvx",
       "args": [
+        "spectask-mcp",
         "serve"
       ]
     }

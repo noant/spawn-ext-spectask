@@ -1,6 +1,6 @@
 schema: 1
 name: spectask
-version: "1.4.2"
+version: "1.6.5"
 
 folders:
   spec/tasks:
@@ -41,7 +41,7 @@ files:
 skills:
   spectask-from-jira.md:
     name: spectask-from-jira
-    description: "Import external tracker tickets into spec/tasks/{task-code}-{slug}/; offline fallback."
+    description: "Import Jira tickets into spec/tasks/{task-code}-{slug}/; codebase analysis for Step 1-2; offline fallback."
   spectask-create.md:
     name: spectask-create
     description: "Use when drafting a new spectask (specification only, per spec/main.md)."
@@ -51,6 +51,9 @@ skills:
   spectask-execute.md:
     name: spectask-execute
     description: "Steps 4–5 in spec/main.md; then wait for user Step 6."
+  spectask-execute-step-by-step.md:
+    name: spectask-execute-step-by-step
+    description: "Step 4 — one Execution Scheme subtask per run with per-step self-review; auto Step 5 when all done (spec/main.md)."
   spectask-code-review-passed.md:
     name: spectask-code-review-passed
     description: "After user confirms code review — Steps 6–7 in one run (spec/main.md)."

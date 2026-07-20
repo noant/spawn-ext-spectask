@@ -27,6 +27,8 @@ extensions:
     path: .cursor/skills/spectask-create/SKILL.md
   - skill: spectask-design
     path: .cursor/skills/spectask-design/SKILL.md
+  - skill: spectask-execute-step-by-step
+    path: .cursor/skills/spectask-execute-step-by-step/SKILL.md
   - skill: spectask-execute
     path: .cursor/skills/spectask-execute/SKILL.md
   - skill: spectask-from-jira

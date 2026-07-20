@@ -1,16 +1,28 @@
 ---
 name: spectask-from-jira
-description: Import external tracker tickets into spec/tasks/{task-code}-{slug}/; offline fallback.
+description: Import Jira tickets into spec/tasks/{task-code}-{slug}/; codebase analysis for Step 1-2; offline fallback.
 ---
 
 
-### Workflow
+Operate within the **spectask** process in attached **spec/main.md**.
+**task-code**: ticket key per **Embedded rule 4** (e.g. `PROJ-123`).
 
-1. Prefer the MCP tool `jira_fetch` (pass the issue key when known). If MCP is unavailable or the call fails, fall back to `spectask-mcp run --issue KEY`.
-2. On success: mkdir `spec/tasks/{task-code}-{slug}/` with `task-code` = ticket key; write `overview.md` using spectask template; copy ticket body into Details.
-3. On failure: ask user for key + pasted description; same layout.
+**Step 1. Fetch ticket**
 
-For full **Step 1** spec work after the scaffold exists, follow **spectask-create** and **spec/main.md** (`task-code` rules 3-4).
+1. Prefer MCP tool `jira_fetch` (pass issue key). On failure try `spectask-mcp run --issue KEY`. On failure ask the user for key + pasted title/body.
+
+**Step 2. Scaffold**
+
+2. Derive a kebab-case slug from the ticket summary.
+3. Create `spec/tasks/{task-code}-{slug}/`.
+
+**Step 3. Spec (Steps 1-2 per spec/main.md)**
+
+Ticket body is source requirements only — not a finished spec. Do not copy it as-is into overview.md.
+
+4. Explore the repo and relevant **spec/design/** docs to map ticket intent to concrete paths and symbols before writing anything.
+5. In **Details**, add a **Jira source** subsection (key, summary, relevant ticket fields/body). Clarifications and constraints go below it.
+6. Complete **Steps 1-2** exactly as in **spec/main.md** and **spectask-create** — then stop and wait for the user's Step 3.
 
 
 Hints:
