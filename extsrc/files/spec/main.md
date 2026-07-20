@@ -73,14 +73,18 @@ On confirmation ("spec review passed", "lgtm", "ok"):
 
 ## Step 4: Code Implemented
 
-**Executor:** AI Agent (current context) — reads `spec/extend/`, follows Execution Scheme, launches one sub-agent per step.
-**Each step in the Execution Scheme:** AI Agent (New sub-agent).
+**Executor (coordination):**
+- **Same chat as Steps 1–2:** the agent that created the spec must **not** coordinate Steps 4–5 itself. On the user's implementation command, launch **one New sub-agent** that owns Steps 4–5 end-to-end (coordinator). The parent waits for that sub-agent, then waits for the user for Step 6. Do not open a separate chat manually.
+- **Fresh execute chat** (no Steps 1–2 in this context): current agent is the coordinator.
+
+**Coordinator** — follows Execution Scheme, launches one sub-agent per step, then Step 5.
+**Each step in the Execution Scheme:** AI Agent (New sub-agent) — child of the coordinator.
 
 On "run it" / "implement" / "execute" / any direct instruction to start implementation:
 0. If "Spec review passed" is not yet marked, set [V] "Spec review passed" automatically — the user's implementation command implies approval.
-1. Read all files in spec/extend/ first.
-2. MANDATORY! Launch a subagent per step — do NOT implement inline. No exceptions — even if a step seems trivial or small. Sub-agent prompt must include: "End your final response with the line `My model: X` where X is your actual model identifier (e.g. `claude-sonnet-4-6`, `gpt-4o`) — write your actual model identifier in place of X."
-3. Follow Execution Scheme: → sequential, || parallel.
+0a. If this chat already completed Steps 1–2 for this task: launch the Steps 4–5 coordinator sub-agent (see Executor above) and stop coordinating inline. Include in its prompt: follow Steps 4–5 of this document for `spec/tasks/{task-code}-{slug}/`; end with `My model: X` as below.
+1. MANDATORY! Launch a subagent per step — do NOT implement inline. No exceptions — even if a step seems trivial or small. Sub-agent prompt must include: "End your final response with the line `My model: X` where X is your actual model identifier (e.g. `claude-sonnet-4-6`, `gpt-4o`) — write your actual model identifier in place of X."
+2. Follow Execution Scheme: → sequential, || parallel.
 
 → set [V] "Code implemented" — fill coordinator model name in brackets: `- [V] Code implemented [model-name]`; rename done subtasks to _DONE_ and set `Status: Done | model: {model}` in each subtask file using the model name read from that sub-agent's last response line
 

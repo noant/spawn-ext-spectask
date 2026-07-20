@@ -67,7 +67,6 @@ All significant methodology layout lives under `spec/` as defined in the shipped
 - `spec/tasks/{X}-{name}/overview.md` — task specification
 - `spec/tasks/{X}-{name}/{N}-{description}.md` — subtask files when decomposition is needed (each carries a `Status:` line with implementation state and model)
 - `spec/seeds/{X}-{slug}.md` — optional rough ideas before a full task; see [Seeds](#seeds)
-- `spec/extend/` — optional supplementary context the agent reads at the start of Step 4 (when present)
 - `spec/.config/config.yaml` — local Jira and proxy settings; git-ignored (see [Jira integration and MCP](#jira-integration-and-mcp))
 
 After **your** code approval (Step 6), Step 7 renames the task folder to `_DONE_{X}-{name}` — not before. That keeps history readable in the repository.
