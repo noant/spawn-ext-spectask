@@ -1,6 +1,6 @@
 schema: 1
 name: spectask
-version: "1.7.0"
+version: "1.7.1"
 
 folders:
   spec/tasks:
