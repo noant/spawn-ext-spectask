@@ -113,6 +113,17 @@ On confirmation ("code review passed", "lgtm", "ok"):
 
 ---
 
+## Follow-up changes after implementation
+
+If the user requests rework or fixes after Step 4:
+
+1. Carry out the changes.
+2. Ask: "Do you want to update the specifications of the current task?"
+   - Yes: edit the affected subtask files and/or `overview.md` to match the actual state; do not re-run the spec cycle.
+   - No: proceed without changes.
+
+---
+
 ## Step 7: Design documents updated
 
 **Executor:** AI Agent (current context)
