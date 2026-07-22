@@ -173,6 +173,7 @@ Propose only candidates that pass all of:
 2. **Actionable** — can become a short rule an agent can follow.
 3. **Standard candidate** — plausible as a lasting convention for this project.
 4. **Not already covered** — check existing **`spawn/rules/`**, **`spawn/navigation.yaml`** rule rows, and related Spawn reads / methodology files for duplicates or near-duplicates.
+5. **Pre-existing code OK** — If the pattern already exists in the codebase from before this task but is not yet captured in rules, it remains a valid candidate. Do not reject only because this task did not introduce it; discovery during close-out is enough to propose it.
 
 Reject immediately (do not offer):
 
