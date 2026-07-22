@@ -15,19 +15,34 @@
 
 1. Under `spec/`, only paths allowed by this Folder Structure; no other files.
 2. Do not create READMEs or extra docs under `spec/`.
-3. Numeric `task-code`: Suggest the next task number to the user and wait for their explicit reply before creating `spec/tasks/{task-code}-{slug}/`.
+3. Numeric `task-code`: Suggest the next task number to the user (Embedded rule 9) and wait for their explicit reply before creating `spec/tasks/{task-code}-{slug}/`.
 4. `task-code` from external tracker: When the task is imported from an external ticket/issue tracker, `task-code` must be that ticket key (e.g. `PROJ-123`). Additional `-` segments may carry the slug as usual.
 5. New spec tasks: follow Step 1 and the overview template at the end of this file. Older `spec/tasks/_DONE_*` overviews may predate the template; do not copy their structure unless it already matches the template.
 6. Process: follow the workflow in this document — Steps 1–7, status marks, and user prompts as written.
 7. Concrete codebase targets: Every overview and subtask must name specific paths and symbols (packages/modules, classes, methods, functions) under change. In subtasks, each Code changes Before / After pair is a fenced minimal excerpt—real lines or the exact replacement—plus the short behavior line from the subtask file template. Prose-only or "change X to Y" without code is invalid. Specs are executable edits, not intentions. Self Spec Review treats missing targets, non-concrete Before/After, or template violations as defects before Step 3.
 8. Greenfield (new symbols): Same Before/After under Code changes. Before may be context-only (location/insertion—nothing to quote); After is fenced code + behavior line, like rule 7. Vague Before or non-concrete After → Self Spec Review defects before Step 3.
+9. **User questions** — When you must ask the user (clarifications, confirmations, choices), use the platform structured ask tool when available; do not rely on free-form chat alone. Prefer multiple-choice when the tool supports it. Plain chat only when no structured tool exists. Tools by platform:
+   - **Cursor:** AskQuestion / cursor/ask_question
+   - **VS Code/Copilot:** AskQuestions / vscode_askQuestions
+   - **Claude Code:** AskUserQuestion; MCP elicitation/create
+   - **Codex:** request_user_input
+   - **Continue:** AskQuestion
+   - **Roo / Kilo:** ask_followup_question
+   - **Cline:** ask_question
+   - **Zed:** no native; ACP clients + elicitation WIP
+   - **JetBrains:** no native; chat text / Cline ACP
+   - **Windsurf:** Plan mode UI (no public tool name)
+   - **Factory Droid:** Spec mode chat; MCP interactive_clarify
+   - **LangGraph:** interrupt() / HumanInterrupt
+   - **MCP (generic):** elicitation/create
+   - **ACP (generic):** elicitation/create + vendor extensions
 
 ---
 
 ## Process Overview
 
 ```
-[1] spec created → [2] self spec review → [3] spec review (user) → [4] code implemented → [5] self code review → [6] code review (user) → [7] design documents updated
+[1] spec created → [2] self spec review → [3] spec review (user) → [4] code implemented → [5] self code review → [6] code review / debugging (user) → [7] design documents updated
 ```
 
 Mark each status [V] on completion. Prompt the user after steps 2, 5, and 6.
@@ -38,7 +53,7 @@ Mark each status [V] on completion. Prompt the user after steps 2, 5, and 6.
 
 **Executor:** AI Agent (current context)
 
-1.1 **Implementation clarifications** — **MANDATORY!** Before writing any spec content, identify ambiguous, optional, or convention-dependent aspects. Ask the user explicit questions and wait for answers. Record answers (or agreed defaults) in **Details**. Skip only if the task has a single obvious implementation path.
+1.1 **Implementation clarifications** — **MANDATORY!** Before writing any spec content, identify ambiguous, optional, or convention-dependent aspects. Ask the user explicit questions (Embedded rule 9) and wait for answers. Record answers (or agreed defaults) in **Details**. Skip only if the task has a single obvious implementation path.
 1.2 **Design overview** — in task `overview.md`, add **Design overview** section: affected modules; concrete paths and symbols (Embedded rule 7); data flow changes; integration points.
 1.3 **Overview** — `spec/tasks/{task-code}-{slug}/overview.md` must follow overview.md template: sections through `## Details` (before/after and code examples go there); **Goal** = one sentence. Add `## Execution Scheme` only when work splits into 2+ steps.
 1.4 **Execution Plan** — If 2+ steps: `## Execution Scheme` step ids must match `{N}-{description}.md` from 1.5.
@@ -103,12 +118,12 @@ Review all changes: inconsistencies, naming, missing imports, broken contracts. 
 
 ---
 
-## Step 6: Code Review
+## Step 6: Code Review / Debugging
 
 **Executor:** User
 
 On confirmation ("code review passed", "lgtm", "ok"):
-→ set [V] "Code review passed"
+→ set [V] "Code Review / Debugging passed"
 → prompt: "Will now update design documents (Step 7)."
 
 ---
@@ -118,7 +133,7 @@ On confirmation ("code review passed", "lgtm", "ok"):
 If the user requests rework or fixes after Step 4:
 
 1. Carry out the changes.
-2. Ask: "Do you want to update the specifications of the current task?"
+2. Ask via Embedded rule 9: "Do you want to update the specifications of the current task?"
    - Yes: edit the affected subtask files and/or `overview.md` to match the actual state; do not re-run the spec cycle.
    - No: proceed without changes.
 
@@ -128,7 +143,7 @@ If the user requests rework or fixes after Step 4:
 
 **Executor:** AI Agent (current context)
 
-Do not start Step 7 until **Code review passed** is marked (Step 6).
+Do not start Step 7 until **Code Review / Debugging passed** is marked (Step 6).
 
 1. **Index** — Read **spec/design.yaml**. If missing, only **spec/design/hla.md** applies (Folder Structure); add **spec/design.yaml** when you register more than one path under **spec/design/**.
 2. **Scope** — From subtasks, Execution Scheme, and files changed or added in this task, choose which `path` rows need updates; update all that matter, skip the rest.
@@ -155,7 +170,7 @@ Do not start Step 7 until **Code review passed** is marked (Step 6).
 - [ ] Spec review passed
 - [ ] Code implemented [model]
 - [ ] Self code review passed [model]
-- [ ] Code review passed
+- [ ] Code Review / Debugging passed
 - [ ] Design documents updated [model]
 
 ## Goal

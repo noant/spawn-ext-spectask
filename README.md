@@ -51,7 +51,7 @@ The full cycle:
 3. **You approve the plan** — "ok" / "lgtm" / "spec review passed" or invoke skill `spectask-spec-review-passed`
 4. Agent implements following the **Execution Scheme** in the spec — sequential and parallel phases — with one dedicated subagent per step — invoke skill `spectask-execute` (all steps in one run) or `spectask-execute-step-by-step` (one subtask per run, wait for you between steps)
 5. Agent self-reviews the code in a **dedicated subagent** (naming, imports, alignment with the spec), because a separate context window keeps the focus on the changes and the spec instead of the implementation thread that wrote them, which usually surfaces inconsistencies before your review
-6. **You approve the code** — "ok" / "lgtm" / "code review passed" or invoke skill `spectask-code-review-passed`
+6. **Code Review / Debugging** — "ok" / "lgtm" / "code review passed" or invoke skill `spectask-code-review-passed`
 7. Agent updates `spec/design/hla.md`, reconciles `spec/design.yaml` if needed, and marks the task as done
 
 Agent-executed steps record the **LLM model name** in `overview.md` status lines (for example `- [V] Spec created [claude-sonnet-4-6]`) and in each subtask file (`Status: Done | model: {model}`). User-confirmed checkpoints (Steps 3 and 6) stay plain checkboxes.
@@ -69,7 +69,7 @@ All significant methodology layout lives under `spec/` as defined in the shipped
 - `spec/seeds/{X}-{slug}.md` — optional rough ideas before a full task; see [Seeds](#seeds)
 - `spec/.config/config.yaml` — local Jira and proxy settings; git-ignored (see [Jira integration and MCP](#jira-integration-and-mcp))
 
-After **your** code approval (Step 6), Step 7 renames the task folder to `_DONE_{X}-{name}` — not before. That keeps history readable in the repository.
+After **Code Review / Debugging** (Step 6), Step 7 renames the task folder to `_DONE_{X}-{name}` — not before. That keeps history readable in the repository.
 
 ## Core principles
 
@@ -104,7 +104,7 @@ After install, invoke methodology steps using these **skills** by name; Spawn re
 | **spectask-spec-review-passed** | Step 3: **Spec review passed** in `overview.md` + Step 3 prompt. |
 | **spectask-execute** | **Steps 4–5** in `spec/main.md` (implement all Execution Scheme steps + self code review); then wait for the user — **Step 6**. |
 | **spectask-execute-step-by-step** | **Step 4** only — one Execution Scheme subtask per run; wait for you between steps; self code review (Step 5) when all subtasks are done. |
-| **spectask-code-review-passed** | Step 6: **Code review passed** in `overview.md` + Step 6 prompt; then **Step 7** in `spec/main.md`. |
+| **spectask-code-review-passed** | Step 6: **Code Review / Debugging passed** in `overview.md` + Step 6 prompt; then **Step 7** in `spec/main.md`. |
 | **spectask-design** | Register architecture files in `spec/design.yaml` or draft `spec/design/*.md`. |
 | **spectask-seed-create** | Capture a rough idea as `spec/seeds/{X}-{slug}.md`; offer **spectask-create** when the user promotes. |
 | **spectask-from-jira** | Import a Jira issue into `spec/tasks/{task-code}-{slug}/` (MCP or CLI, with manual fallback); explore the codebase and complete Steps 1–2 before waiting for Step 3. |
