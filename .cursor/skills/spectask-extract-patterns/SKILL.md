@@ -1,14 +1,17 @@
 ---
-name: spectask-code-review-passed
-description: After user confirms Code Review / Debugging — Steps 6–7 then optional pattern extract (spec/main.md).
+name: spectask-extract-patterns
+description: After Step 7 — optional extract of reusable patterns into spawn/rules/ and navigation (spec/main.md).
 ---
 
 
 Operate within the **spectask** process defined in attached **spec/main.md**.
 
-On the active `spec/tasks/{X}-{name}/overview.md`, finish **Step 6** (mark **Code Review / Debugging passed** and the Step 6 prompt), then complete **Step 7** through **Design documents updated** in the same run. If **`overview.md`** ties a **`spec/seeds/`** file to this task, run **Step 7** item **6** (seed `_DONE_` rename) per **`spec/main.md`**. If which task is unclear, use Embedded rule 9 to ask.
+Run **Optional: Pattern extract (after Step 7)** for the task just closed (or the completed / `_DONE_*` task the user names).
 
-After Step 7, run **Optional: Pattern extract (after Step 7)** per **`spec/main.md`** (same procedure as skill **spectask-extract-patterns**): filter candidates, then ask per candidate **Required** / **Optional** / **Decline**. Do not write under **`spawn/rules/`** or edit **`spawn/navigation.yaml`** until the user answers.
+1. Review the closed task: overview, subtasks, and what actually landed (code + design updates).
+2. Draft candidate standards, then **filter hard** with the selection criteria in **spec/main.md** — drop junk before the user sees the list.
+3. Ask via Embedded rule 9: **one question per survivor** (title + one-line rationale) with options **Required** / **Optional** / **Decline**.
+4. Write only Required/Optional answers under **`spawn/rules/`**, register them in **`spawn/navigation.yaml`** with that scope, and run **`spawn rules refresh`** per the Write rules in **spec/main.md**. If all Declined: write nothing.
 
 
 Hints:

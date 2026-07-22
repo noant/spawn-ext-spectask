@@ -5,7 +5,7 @@ description: Step 4 — one Execution Scheme subtask per run with per-step self-
 
 Operate within the **spectask** process defined in attached **spec/main.md**.
 
-Run **Step 4** one subtask at a time. Ask which task if unclear.
+Run **Step 4** one subtask at a time. If which task is unclear, use Embedded rule 9 to ask.
 
 1. Open `overview.md` and `## Execution Scheme`; set **Spec review passed** if not yet marked.
 2. Pick the next pending step (subtask file without `_DONE_` prefix). Respect sequential phases.

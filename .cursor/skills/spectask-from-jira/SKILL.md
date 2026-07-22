@@ -9,7 +9,7 @@ Operate within the **spectask** process in attached **spec/main.md**.
 
 **Step 1. Fetch ticket**
 
-1. Prefer MCP tool `jira_fetch` (pass issue key). On failure try `spectask-mcp run --issue KEY`. On failure ask the user for key + pasted title/body.
+1. Prefer MCP tool `jira_fetch` (pass issue key). On failure try `spectask-mcp run --issue KEY`. On failure use Embedded rule 9 to ask the user for key + pasted title/body.
 
 **Step 2. Scaffold**
 
@@ -26,6 +26,7 @@ Ticket body is source requirements only — not a finished spec. Do not copy it 
 
 
 Hints:
+- Use the platform ask tool when available (rule 9 in spec/main.md); plain chat otherwise.
 - No emojis or exotic Unicode in code, logs, documentation, or messages; plain ASCII where practical.
 - User-facing replies, documentation, and task descriptions: concise wording; minimal markdown (avoid decorative bold/italic); explain with lists and structure; short, clear sentences.
 - Specifications, code comments, and project documentation must be written in English.

@@ -8,7 +8,7 @@ Operate within the **spectask** process in attached **spec/main.md**.
 
 **Step 1. Fetch ticket**
 
-1. Prefer MCP tool `jira_fetch` (pass issue key). On failure try `spectask-mcp run --issue KEY`. On failure ask the user for key + pasted title/body.
+1. Prefer MCP tool `jira_fetch` (pass issue key). On failure try `spectask-mcp run --issue KEY`. On failure use Embedded rule 9 to ask the user for key + pasted title/body.
 
 **Step 2. Scaffold**
 

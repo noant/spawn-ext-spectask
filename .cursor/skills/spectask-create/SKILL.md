@@ -15,6 +15,7 @@ If work began from **`spec/seeds/`**, tie the seed to the new task in **Step 1**
 When launching the Step 2 sub-agent, include this in the prompt: "End your final response with the line `My model: X` where X is your actual model identifier (e.g. `claude-sonnet-4-6`, `gpt-4o`) — write your actual model identifier in place of X." Use the returned model name when filling `- [V] Self spec review passed [model-name]`.
 
 Hints:
+- Use the platform ask tool when available (rule 9 in spec/main.md); plain chat otherwise.
 - No emojis or exotic Unicode in code, logs, documentation, or messages; plain ASCII where practical.
 - User-facing replies, documentation, and task descriptions: concise wording; minimal markdown (avoid decorative bold/italic); explain with lists and structure; short, clear sentences.
 - Specifications, code comments, and project documentation must be written in English.

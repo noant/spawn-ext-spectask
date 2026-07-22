@@ -3,5 +3,5 @@ source:
   type: git
   path: https://github.com/noant/spawn-ext-spectask.git
 installed:
-  version: 1.6.5
-  installedAt: '2026-07-20T15:45:31+00:00'
+  version: 1.8.1
+  installedAt: '2026-07-22T21:33:57+00:00'

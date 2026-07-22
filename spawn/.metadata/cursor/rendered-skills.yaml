@@ -31,6 +31,8 @@ extensions:
     path: .cursor/skills/spectask-execute-step-by-step/SKILL.md
   - skill: spectask-execute
     path: .cursor/skills/spectask-execute/SKILL.md
+  - skill: spectask-extract-patterns
+    path: .cursor/skills/spectask-extract-patterns/SKILL.md
   - skill: spectask-from-jira
     path: .cursor/skills/spectask-from-jira/SKILL.md
   - skill: spectask-seed-create

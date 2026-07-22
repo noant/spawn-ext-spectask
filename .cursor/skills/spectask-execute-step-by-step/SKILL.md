@@ -6,7 +6,7 @@ description: Step 4 — one Execution Scheme subtask per run with per-step self-
 
 Operate within the **spectask** process defined in attached **spec/main.md**.
 
-Run **Step 4** one subtask at a time. Ask which task if unclear.
+Run **Step 4** one subtask at a time. If which task is unclear, use Embedded rule 9 to ask.
 
 1. Open `overview.md` and `## Execution Scheme`; set **Spec review passed** if not yet marked.
 2. Pick the next pending step (subtask file without `_DONE_` prefix). Respect sequential phases.
@@ -18,6 +18,7 @@ Run **Step 4** one subtask at a time. Ask which task if unclear.
 
 
 Hints:
+- Use the platform ask tool when available (rule 9 in spec/main.md); plain chat otherwise.
 - No emojis or exotic Unicode in code, logs, documentation, or messages; plain ASCII where practical.
 - User-facing replies, documentation, and task descriptions: concise wording; minimal markdown (avoid decorative bold/italic); explain with lists and structure; short, clear sentences.
 - Specifications, code comments, and project documentation must be written in English.
