@@ -174,6 +174,7 @@ Propose only candidates that pass all of:
 3. **Standard candidate** — plausible as a lasting convention for this project.
 4. **Not already covered** — check existing **`spawn/rules/`**, **`spawn/navigation.yaml`** rule rows, and related Spawn reads / methodology files for duplicates or near-duplicates.
 5. **Pre-existing code OK** — If the pattern already exists in the codebase from before this task but is not yet captured in rules, it remains a valid candidate. Do not reject only because this task did not introduce it; discovery during close-out is enough to propose it.
+6. **Code examples** — Prefer short real (or minimal realistic) code excerpts that show the pattern. Prose-only is acceptable when applicable.
 
 Reject immediately (do not offer):
 
@@ -198,8 +199,9 @@ Wait for answers. Write only candidates marked Required or Optional, each with t
 
 1. Write under **`spawn/rules/`** (create the folder if missing).
 2. Prefer an existing **`spawn/rules/`** file that already covers the same topic — merge or revise that rule. If none fits, create a new kebab-case Markdown file.
-3. Add each file to **`spawn/navigation.yaml`** under **`read-required` → `rules`** or **`read-contextual` → `rules`** as the user chose. Row: **`path`** + short **`description`** (not hint-only). Never list the same path in both.
-4. Run **`spawn rules refresh`**.
+3. Prefer short code examples in each written rule when applicable (criterion 6).
+4. Add each file to **`spawn/navigation.yaml`** under **`read-required` → `rules`** or **`read-contextual` → `rules`** as the user chose. Row: **`path`** + short **`description`** (not hint-only). Never list the same path in both.
+5. Run **`spawn rules refresh`**.
 
 ---
 
