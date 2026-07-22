@@ -42,10 +42,10 @@
 ## Process Overview
 
 ```
-[1] spec created → [2] self spec review → [3] spec review (user) → [4] code implemented → [5] self code review → [6] code review / debugging (user) → [7] design documents updated
+[1] spec created → [2] self spec review → [3] spec review (user) → [4] code implemented → [5] self code review → [6] code review / debugging (user) → [7] design documents updated → (optional) pattern extract to spawn/rules/
 ```
 
-Mark each status [V] on completion. Prompt the user after steps 2, 5, and 6.
+Mark each status [V] on completion. Prompt the user after steps 2, 5, and 6. After Step 7, offer optional Pattern extract (not a Status checkbox).
 
 ---
 
@@ -153,6 +153,52 @@ Do not start Step 7 until **Code Review / Debugging passed** is marked (Step 6).
 6. If Source seed Path in overview is concrete and the listed spec/seeds file has linked task to this overview, rename it once with _DONE_ added.
 
 → set [V] "Design documents updated" — fill model name in brackets: `- [V] Design documents updated [model-name]`
+→ continue with **Optional: Pattern extract** below (same run when closing via Steps 6–7).
+
+---
+
+## Optional: Pattern extract (after Step 7)
+
+**Executor:** AI Agent (current context)
+
+After Step 7, optionally extract reusable approaches into **`spawn/rules/`** as project-standard candidates. Not a Status item. Skill: **spectask-extract-patterns**.
+
+Ask once after Step 7 unless already declined in this close-out.
+
+### Selection criteria (filter before asking)
+
+Propose only candidates that pass all of:
+
+1. **Reusable** — a pattern, approach, or recurring convention useful beyond this single task (not a one-off edit).
+2. **Actionable** — can become a short rule an agent can follow.
+3. **Standard candidate** — plausible as a lasting convention for this project.
+4. **Not already covered** — check existing **`spawn/rules/`**, **`spawn/navigation.yaml`** rule rows, and related Spawn reads / methodology files for duplicates or near-duplicates.
+
+Reject immediately (do not offer):
+
+- Task-specific wiring, ticket ids, temporary workarounds
+- Restatements of HLA, language defaults, or existing rules
+- Vague slogans without an enforceable rule
+- Low-value or speculative ideas (junk)
+
+If filtering leaves zero candidates: say so briefly and stop (do not invent fillers).
+
+### Ask (Embedded rule 9)
+
+Ask **one question per filtered candidate** (short title + one-line rationale). Options for each:
+
+- **Required** — `read-required`
+- **Optional** — `read-contextual`
+- **Decline** — skip this rule
+
+Wait for answers. Write only candidates marked Required or Optional, each with that scope. If every answer is Decline (or there were no candidates), write nothing.
+
+### Write
+
+1. Write under **`spawn/rules/`** (create the folder if missing).
+2. Prefer an existing **`spawn/rules/`** file that already covers the same topic — merge or revise that rule. If none fits, create a new kebab-case Markdown file.
+3. Add each file to **`spawn/navigation.yaml`** under **`read-required` → `rules`** or **`read-contextual` → `rules`** as the user chose. Row: **`path`** + short **`description`** (not hint-only). Never list the same path in both.
+4. Run **`spawn rules refresh`**.
 
 ---
 
