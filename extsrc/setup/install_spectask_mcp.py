@@ -67,12 +67,8 @@ def _run_interactive_setup(cwd: str) -> None:
 def main() -> int:
     cwd = _cwd()
     pkg = "spectask-mcp"
-    # cffi >= 2 dropped pre-built musl/Alpine wheels and requires a C compiler to build
-    # from source.  Pin to the last release that ships binary wheels so installs succeed
-    # on minimal Linux images (containers, CI) that have no compiler toolchain.
-    cffi_pin = "cffi<2"
-    _run_uv_best_effort(["uv", "tool", "install", pkg, "--with", cffi_pin], cwd)
-    _run_uv_best_effort(["uv", "tool", "upgrade", pkg, "--with", cffi_pin], cwd)
+    _run_uv_best_effort(["uv", "tool", "install", pkg], cwd)
+    _run_uv_best_effort(["uv", "tool", "upgrade", pkg], cwd)
     _run_interactive_setup(cwd)
     return 0
 
