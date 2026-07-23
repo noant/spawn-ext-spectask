@@ -212,7 +212,7 @@ Wait for answers. Write only candidates marked Required or Optional, each with i
 2. Prefer an existing **`spawn/rules/`** file on the same topic — merge or revise it. If none fits, create a new kebab-case Markdown file.
 3. Prefer short code examples in each rule when applicable (criterion 6).
 4. Add each file to **`spawn/navigation.yaml`** under **`read-required` → `rules`** or **`read-contextual` → `rules`** as the user chose. Row: **`path`** + short **`description`** (not hint-only). Never list the same path in both.
-5. Run **`spawn rules refresh`**.
+5. Run exactly **`spawn refresh`** in the terminal — this applies the new rules across skills and rule files.
 
 ---
 
