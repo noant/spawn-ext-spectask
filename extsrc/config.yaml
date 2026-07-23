@@ -1,10 +1,10 @@
 schema: 1
 name: spectask
-version: "1.8.3"
+version: "1.8.4"
 
 hints:
   global:
-    - Use the platform ask tool when available (rule 9 in spec/main.md); plain chat otherwise.
+    - Use the platform ask tool when available (R10-ask in spec/main.md); plain chat otherwise.
 
 folders:
   spec/tasks:

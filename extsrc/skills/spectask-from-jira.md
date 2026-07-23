@@ -4,11 +4,11 @@ description: Import a ticket from an external tracker into spec/tasks; manual fa
 ---
 
 Operate within the **spectask** process in attached **spec/main.md**.
-**task-code**: ticket key per **Embedded rule 4** (e.g. `PROJ-123`).
+**task-code**: ticket key per **`R4-code-tracker`** (e.g. `PROJ-123`).
 
 **Step 1. Fetch ticket**
 
-1. Prefer MCP tool `jira_fetch` (pass issue key). On failure try `spectask-mcp run --issue KEY`. On failure use Embedded rule 9 to ask the user for key + pasted title/body.
+1. Prefer MCP tool `jira_fetch` (pass issue key). On failure try `spectask-mcp run --issue KEY`. On failure use **`R10-ask`** to ask the user for key + pasted title/body.
 
 **Step 2. Scaffold**
 
@@ -19,6 +19,6 @@ Operate within the **spectask** process in attached **spec/main.md**.
 
 Ticket body is source requirements only — not a finished spec. Do not copy it as-is into overview.md.
 
-4. Explore the repo and relevant **spec/design/** docs to map ticket intent to concrete paths and symbols before writing anything. Also follow **Embedded rule 10** in **spec/main.md**.
+4. Explore the repo and relevant **spec/design/** docs to map ticket intent to concrete paths and symbols before writing anything. Also follow **`R11-navigation`** in **spec/main.md**.
 5. In **Details**, add a **Jira source** subsection (key, summary, relevant ticket fields/body). Clarifications and constraints go below it.
 6. Complete **Steps 1-2** exactly as in **spec/main.md** and **spectask-create** — then stop and wait for the user's Step 3.

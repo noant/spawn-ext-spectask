@@ -5,71 +5,89 @@
 - spec/main.md — this file.
 - spec/design.yaml — index of architecture documents (`path` + `description` per entry); optional but recommended when multiple design files exist.
 - spec/design/hla.md — project high-level architecture (required).
-- spec/design/{name}.md — other architecture documents (optional; ADRs, notes, etc.); register in **spec/design.yaml** and declare as readable paths for agents — typically by adding them under a Spawn extension’s `files:` (with appropriate reads) so they appear in `spawn/navigation.yaml`.
-- spec/tasks/{task-code}-{slug}/ — task folder (artifact tree). `{task-code}` identifies the task (often a serial code; may instead be a key from an external ticket/issue tracker). `{slug}` is a short descriptive name.
+- spec/design/{name}.md — other architecture documents (optional; ADRs, notes, etc.); register in **spec/design.yaml** and declare as readable paths for agents — typically via a Spawn extension's `files:` (with appropriate reads) so they appear in `spawn/navigation.yaml`.
+- spec/tasks/{task-code}-{slug}/ — task folder (artifact tree). `{task-code}` identifies the task (often a serial code; may instead be a key from an external tracker). `{slug}` is a short descriptive name.
 - spec/tasks/{task-code}-{slug}/overview.md — task overview (required).
 - spec/tasks/{task-code}-{slug}/{N}-{description}.md — subtask files (optional; required when `## Execution Scheme` defines 2+ steps).
 - spec/seeds/{X}-{slug}.md — seed file (artifact tree in this methodology pack).
 
 **Embedded rules:**
 
-1. Under `spec/`, only paths allowed by this Folder Structure; no other files.
-2. Do not create READMEs or extra docs under `spec/`.
-3. Numeric `task-code`: Suggest the next task number to the user (Embedded rule 9) and wait for their explicit reply before creating `spec/tasks/{task-code}-{slug}/`.
-4. `task-code` from external tracker: When the task is imported from an external ticket/issue tracker, `task-code` must be that ticket key (e.g. `PROJ-123`). Additional `-` segments may carry the slug as usual.
-5. New spec tasks: follow Step 1 and the overview template at the end of this file. Older `spec/tasks/_DONE_*` overviews may predate the template; do not copy their structure unless it already matches the template.
-6. Process: follow the workflow in this document — Steps 1–7, status marks, and user prompts as written.
-7. Concrete codebase targets: Every overview and subtask must name specific paths and symbols (packages/modules, classes, methods, functions) under change. In subtasks, each Code changes Before / After pair is a fenced minimal excerpt—real lines or the exact replacement—plus the short behavior line from the subtask file template. Prose-only or "change X to Y" without code is invalid. Specs are executable edits, not intentions. Self Spec Review treats missing targets, non-concrete Before/After, or template violations as defects before Step 3.
-8. Greenfield (new symbols): Same Before/After under Code changes. Before may be context-only (location/insertion—nothing to quote); After is fenced code + behavior line, like rule 7. Vague Before or non-concrete After → Self Spec Review defects before Step 3.
-9. **User questions** — When you must ask the user (clarifications, confirmations, choices), use the platform structured ask tool when available; do not rely on free-form chat alone. Prefer multiple-choice when the tool supports it. Plain chat only when no structured tool exists. Tools by platform:
-   - **Cursor:** AskQuestion / cursor/ask_question
-   - **VS Code/Copilot:** AskQuestions / vscode_askQuestions
-   - **Claude Code:** AskUserQuestion; MCP elicitation/create
-   - **Codex:** request_user_input
-   - **Other:** use IDE embedded tool for user interaction or installed MCP if exist. Fallback to text question.
-10. **Project rules (navigation)** — Before drafting a spec: open **`spawn/navigation.yaml`**, read all `read-required`, read task-relevant `read-contextual`, and apply them in the spec. Self Spec Review re-checks compliance; violations are defects.
+Every rule has a stable label `[R{n}-{slug}]`. Reference rules by label (e.g. `R10-ask`), not by number — the label survives renumbering.
+
+_Folder hygiene_
+
+1. **`R1-paths`** — Under `spec/`, only paths allowed by the Folder Structure are permitted; no other files.
+2. **`R2-no-clutter`** — Do not create READMEs or other extraneous docs under `spec/` (a special case of `R1-paths`).
+
+_Task identification_
+
+3. **`R3-code-num`** — Numeric `task-code`: suggest the next number (`R10-ask`) and wait for an explicit reply before creating `spec/tasks/{task-code}-{slug}/`. Next number = the highest existing `{task-code}` under `spec/tasks/` (including `_DONE_`) plus 1.
+4. **`R4-code-tracker`** — A `task-code` from an external tracker must be the ticket key (e.g. `PROJ-123`). Segments after the first `-` may carry the slug.
+
+_Task specs_
+
+5. **`R5-new-task`** — New spec tasks follow Step 1 and the overview template at the end of this file.
+6. **`R6-legacy-done`** — Older `spec/tasks/_DONE_*` overviews may predate the current template; do not copy their structure unless it matches the template.
+7. **`R7-process`** — Status marks `[V]` and user prompts must reproduce the wording from the corresponding Step exactly; Steps run in order unless the process explicitly allows otherwise.
+8. **`R8-concrete`** — Specs are executable edits, not intentions: every overview and subtask names concrete paths and symbols (packages/modules, classes, methods, functions) under change, and every Before / After pair in Code changes is a fenced minimal excerpt (real lines or the exact replacement) plus a behavior line. Prose-only or "change X to Y" without code is invalid. Self Spec Review treats missing concrete targets, non-concrete Before/After, or template violations as defects before Step 3.
+9. **`R9-greenfield`** — For new symbols, the same Before/After discipline as `R8-concrete`, with two differences: Before may be insertion-context only (nothing to quote); After is still fenced code plus a behavior line.
+
+_Interaction and context_
+
+10. **`R10-ask`** — When you must ask the user (clarifications, confirmations, choices), use the platform structured ask tool (see `R12-ask-tools`), preferring multiple choice. Fallback order: platform tool -> installed MCP (elicitation) -> plain chat question.
+11. **`R11-navigation`** — Before drafting a spec, open **`spawn/navigation.yaml`**, read all `read-required`, read task-relevant `read-contextual`, and apply them in the spec. If the file is absent, the rule is a no-op (proceed). Self Spec Review re-checks compliance; violations are defects.
+12. **`R12-ask-tools`** — User-question tools by platform (data for `R10-ask`):
+    - **Cursor:** AskQuestion / cursor/ask_question
+    - **VS Code/Copilot:** AskQuestions / vscode_askQuestions
+    - **Claude Code:** AskUserQuestion; MCP elicitation/create
+    - **Codex:** request_user_input
+    - **Other:** IDE embedded tool or installed MCP; fallback is a plain text question.
+13. **`R13-model-line`** — Every sub-agent prompt must include this line verbatim:
+    > End your final response with the line `My model: X` where X is your actual model identifier (e.g. `claude-sonnet-4-6`, `gpt-4o`) — write your actual model identifier in place of X.
+    When recording `[V]`/`[model-name]` after a sub-agent: read the last line of its response, extract the model name, and fill it in the brackets.
 
 ---
 
 ## Process Overview
 
 ```
-[1] spec created → [2] self spec review → [3] spec review (user) → [4] code implemented → [5] self code review → [6] code review / debugging (user) → [7] design documents updated → (optional) pattern extract to spawn/rules/
+[1] Spec created → [2] Self spec review → [3] Spec review (user) → [4] Code implemented → [5] Self code review → [6] Code review / Debugging (user) → [7] Design documents updated → (optional) pattern extract to spawn/rules/
 ```
 
 Mark each status [V] on completion. Prompt the user after steps 2, 5, and 6. After Step 7, offer optional Pattern extract (not a Status checkbox).
 
 ---
 
-## Step 1: Spec Created
+## Step 1: Spec created
 
 **Executor:** AI Agent (current context)
 
-1.1 **Project rules (navigation)** — **MANDATORY!** Follow Embedded rule 10 before writing any spec content.
-1.2 **Implementation clarifications** — **MANDATORY!** Before writing any spec content, identify ambiguous, optional, or convention-dependent aspects. Ask the user explicit questions (Embedded rule 9) and wait for answers. Record answers (or agreed defaults) in **Details**. Skip only if the task has a single obvious implementation path.
-1.3 **Design overview** — in task `overview.md`, add **Design overview** section: affected modules; concrete paths and symbols (Embedded rule 7); data flow changes; integration points.
-1.4 **Overview** — `spec/tasks/{task-code}-{slug}/overview.md` must follow overview.md template: sections through `## Details` (before/after and code examples go there); **Goal** = one sentence. Add `## Execution Scheme` only when work splits into 2+ steps.
-1.5 **Execution Plan** — If 2+ steps: `## Execution Scheme` step ids must match `{N}-{description}.md` from 1.6.
-1.6 **Decomposition** — create {N}-{description}.md per step: goal, approach, affected files (with named classes/methods/functions per path), code changes (before/after). You may launch a **New sub-agent** for read-only codebase analysis to determine accurate **Before** / **After** text, then merge its findings into the step files (analysis only; parent agent owns decomposition and the spec).
+1.1 **Project rules (navigation)** — **MANDATORY!** Follow `R11-navigation` before writing any spec content.
+1.2 **Implementation clarifications** — **MANDATORY!** Before writing any spec content, identify ambiguous, optional, or convention-dependent aspects. Ask the user explicit questions (`R10-ask`) and wait for answers. Record answers (or agreed defaults) in **Details**. Skip only when there is a single obvious implementation path.
+1.3 **Design overview** — in the task `overview.md`, add a **Design overview** section: affected modules; concrete paths and symbols (`R8-concrete`); data flow changes; integration points.
+1.4 **Overview** — `spec/tasks/{task-code}-{slug}/overview.md` follows the overview.md template: sections through `## Details` (before/after and code examples go there); **Goal** = one sentence. Add `## Execution Scheme` only when work splits into 2+ steps.
+1.5 **Execution Plan** — with 2+ steps: the step ids in `## Execution Scheme` must match the `{N}-{description}.md` filenames from 1.6.
+1.6 **Decomposition** — create {N}-{description}.md per step: goal, approach, affected files (with named classes/methods/functions per path), code changes (before/after). You may launch a **new sub-agent** for read-only codebase analysis to determine accurate **Before** / **After** text, then merge its findings into the step files (analysis only; the parent agent owns decomposition and the spec).
 
-→ set [V] "Spec created" — fill model name in brackets: `- [V] Spec created [model-name]`
+→ set [V] "Spec created" `[model-name]` (record the model per `R13-model-line`): `- [V] Spec created [model-name]`
 
 ---
 
-## Step 2: Self Spec Review
+## Step 2: Self spec review
 
-**Executor:** AI Agent (New sub-agent)
+**Executor:** AI Agent (new sub-agent)
 
-Sub-agent prompt must include: "End your final response with the line `My model: X` where X is your actual model identifier (e.g. `claude-sonnet-4-6`, `gpt-4o`) — write your actual model identifier in place of X."
+The sub-agent prompt must include the line from `R13-model-line`.
 
-Review the spec for: architectural impact, implementation errors, sequencing issues; verify every step and overview list concrete files, modules, and symbols (classes, methods, functions) per Embedded rule 7; verify compliance with Embedded rule 10. Fix if needed.
+Review the spec for: architectural impact, implementation errors, sequencing issues; verify every step and overview list concrete files, modules, and symbols (classes, methods, functions) per `R8-concrete`; verify compliance with `R11-navigation`. Fix if needed.
 
-→ set [V] "Self spec review passed" — read the last line of the sub-agent response, extract model name, fill in brackets: `- [V] Self spec review passed [model-name]`
+→ set [V] "Self spec review passed" `[model-name]` (record the model per `R13-model-line`): `- [V] Self spec review passed [model-name]`
 → prompt: "Self spec review passed — spec is ready for your review (Step 3). Reply 'spec review passed', 'lgtm', or 'ok' when satisfied."
 
 ---
 
-## Step 3: Spec Review
+## Step 3: Spec review
 
 **Executor:** User
 
@@ -79,39 +97,39 @@ On confirmation ("spec review passed", "lgtm", "ok"):
 
 ---
 
-## Step 4: Code Implemented
+## Step 4: Code implemented
 
 **Executor (coordination):**
-- **Same chat as Steps 1–2:** the agent that created the spec must **not** coordinate Steps 4–5 itself. On the user's implementation command, launch **one New sub-agent** that owns Steps 4–5 end-to-end (coordinator). The parent waits for that sub-agent, then waits for the user for Step 6. Do not open a separate chat manually.
-- **Fresh execute chat** (no Steps 1–2 in this context): current agent is the coordinator.
+- **Same chat as Steps 1–2:** the agent that created the spec must not coordinate Steps 4–5 itself. On the implementation command, launch **one new sub-agent** as the coordinator that owns Steps 4–5 end-to-end. The parent waits for the sub-agent, then waits for the user for Step 6. Do not open a separate chat manually.
+- **Fresh execute chat** (Steps 1–2 not in context): the current agent is the coordinator.
 
-**Coordinator** — follows Execution Scheme, launches one sub-agent per step, then Step 5.
-**Each step in the Execution Scheme:** AI Agent (New sub-agent) — child of the coordinator.
+**Coordinator** — follows the Execution Scheme, launches one sub-agent per step, then Step 5.
+**Each step in the Execution Scheme:** AI Agent (new sub-agent) — child of the coordinator.
 
 On "run it" / "implement" / "execute" / any direct instruction to start implementation:
-0. If "Spec review passed" is not yet marked, set [V] "Spec review passed" automatically — the user's implementation command implies approval.
-0a. If this chat already completed Steps 1–2 for this task: launch the Steps 4–5 coordinator sub-agent (see Executor above) and stop coordinating inline. Include in its prompt: follow Steps 4–5 of this document for `spec/tasks/{task-code}-{slug}/`; end with `My model: X` as below.
-1. MANDATORY! Launch a subagent per step — do NOT implement inline. No exceptions — even if a step seems trivial or small. Sub-agent prompt must include: "End your final response with the line `My model: X` where X is your actual model identifier (e.g. `claude-sonnet-4-6`, `gpt-4o`) — write your actual model identifier in place of X."
-2. Follow Execution Scheme: → sequential, || parallel.
+0. If "Spec review passed" is not yet marked, set [V] "Spec review passed" automatically — the implementation command implies approval.
+0a. If this chat already completed Steps 1–2 for the task: launch the Steps 4–5 coordinator sub-agent (see Executor above) and stop coordinating inline. Include in its prompt: follow Steps 4–5 for `spec/tasks/{task-code}-{slug}/`; the line from `R13-model-line`.
+1. MANDATORY! Launch a sub-agent for each step — do NOT implement inline. No exceptions, even if a step seems trivial. The sub-agent prompt must include the line from `R13-model-line`.
+2. Follow the Execution Scheme: → sequential, || parallel.
 
-→ set [V] "Code implemented" — fill coordinator model name in brackets: `- [V] Code implemented [model-name]`; rename done subtasks to _DONE_ and set `Status: Done | model: {model}` in each subtask file using the model name read from that sub-agent's last response line
+→ set [V] "Code implemented" `[model-name]` of the coordinator (record the model per `R13-model-line`): `- [V] Code implemented [model-name]`; rename completed subtasks to _DONE_ and set `Status: Done | model: {model}` in each subtask file, taking the model name from the corresponding sub-agent's response
 
 ---
 
-## Step 5: Self Code Review
+## Step 5: Self code review
 
-**Executor:** AI Agent (New sub-agent)
+**Executor:** AI Agent (new sub-agent)
 
-Sub-agent prompt must include: "End your final response with the line `My model: X` where X is your actual model identifier (e.g. `claude-sonnet-4-6`, `gpt-4o`) — write your actual model identifier in place of X."
+The sub-agent prompt must include the line from `R13-model-line`.
 
 Review all changes: inconsistencies, naming, missing imports, broken contracts. Fix if needed.
 
-→ set [V] "Self code review passed" — read the last line of the sub-agent response, extract model name, fill in brackets: `- [V] Self code review passed [model-name]`
+→ set [V] "Self code review passed" `[model-name]` (record the model per `R13-model-line`): `- [V] Self code review passed [model-name]`
 → prompt: "Self review done. Reply 'code review passed' to proceed."
 
 ---
 
-## Step 6: Code Review / Debugging
+## Step 6: Code review / Debugging
 
 **Executor:** User
 
@@ -126,7 +144,7 @@ On confirmation ("code review passed", "lgtm", "ok"):
 If the user requests rework or fixes after Step 4:
 
 1. Carry out the changes.
-2. Ask via Embedded rule 9: "Do you want to update the specifications of the current task?"
+2. Ask via `R10-ask`: "Do you want to update the specifications of the current task?"
    - Yes: edit the affected subtask files and/or `overview.md` to match the actual state; do not re-run the spec cycle.
    - No: proceed without changes.
 
@@ -138,14 +156,14 @@ If the user requests rework or fixes after Step 4:
 
 Do not start Step 7 until **Code Review / Debugging passed** is marked (Step 6).
 
-1. **Index** — Read **spec/design.yaml**. If missing, only **spec/design/hla.md** applies (Folder Structure); add **spec/design.yaml** when you register more than one path under **spec/design/**.
-2. **Scope** — From subtasks, Execution Scheme, and files changed or added in this task, choose which `path` rows need updates; update all that matter, skip the rest.
-3. **Write** — For each chosen path, align the markdown with the repo after this task; create the file if it is listed but missing.
+1. **Index** — read **spec/design.yaml**. If missing, only **spec/design/hla.md** applies (Folder Structure); add **spec/design.yaml** when you register more than one path under **spec/design/**.
+2. **Scope** — from subtasks, the Execution Scheme, and the files changed/added in this task, choose the `path` rows to update; update those that matter, skip the rest.
+3. **Write** — for each chosen path, align the markdown with the repo after this task; create the file if it is listed but missing.
 4. If the task introduced or renamed architecture docs under **spec/design/**, update **spec/design.yaml** (`path` + `description` for each).
-5. Rename folder to _DONE_{task-code}-{name}.
-6. If Source seed Path in overview is concrete and the listed spec/seeds file has linked task to this overview, rename it once with _DONE_ added.
+5. Rename the folder to _DONE_{task-code}-{name}.
+6. If the Source seed Path in the overview is concrete and the listed spec/seeds file is linked to this overview, rename it once with _DONE_ added.
 
-→ set [V] "Design documents updated" — fill model name in brackets: `- [V] Design documents updated [model-name]`
+→ set [V] "Design documents updated" — fill the model name in brackets: `- [V] Design documents updated [model-name]`
 → continue with **Optional: Pattern extract** below (same run when closing via Steps 6–7).
 
 ---
@@ -162,12 +180,12 @@ Ask once after Step 7 unless already declined in this close-out.
 
 Propose only candidates that pass all of:
 
-1. **Reusable** — a pattern, approach, or recurring convention useful beyond this single task (not a one-off edit).
+1. **Reusable** — a pattern, approach, or convention useful beyond this single task (not a one-off edit).
 2. **Actionable** — can become a short rule an agent can follow.
 3. **Standard candidate** — plausible as a lasting convention for this project.
 4. **Not already covered** — check existing **`spawn/rules/`**, **`spawn/navigation.yaml`** rule rows, and related Spawn reads / methodology files for duplicates or near-duplicates.
-5. **Pre-existing code OK** — If the pattern already exists in the codebase from before this task but is not yet captured in rules, it remains a valid candidate. Do not reject only because this task did not introduce it; discovery during close-out is enough to propose it.
-6. **Code examples** — Prefer short real (or minimal realistic) code excerpts that show the pattern. Prose-only is acceptable when applicable.
+5. **Pre-existing code OK** — a pattern already present in the codebase before this task but not yet captured in rules remains a valid candidate. Do not reject it only because this task did not introduce it; discovery during close-out is enough.
+6. **Code examples** — prefer short real (or minimally realistic) excerpts that show the pattern. Prose-only when necessary.
 
 Reject immediately (do not offer):
 
@@ -178,7 +196,7 @@ Reject immediately (do not offer):
 
 If filtering leaves zero candidates: say so briefly and stop (do not invent fillers).
 
-### Ask (Embedded rule 9)
+### Ask (`R10-ask`)
 
 Ask **one question per filtered candidate** (short title + one-line rationale). Options for each:
 
@@ -186,13 +204,13 @@ Ask **one question per filtered candidate** (short title + one-line rationale). 
 - **Optional** — `read-contextual`
 - **Decline** — skip this rule
 
-Wait for answers. Write only candidates marked Required or Optional, each with that scope. If every answer is Decline (or there were no candidates), write nothing.
+Wait for answers. Write only candidates marked Required or Optional, each with its scope. If every answer is Decline (or there were no candidates), write nothing.
 
 ### Write
 
 1. Write under **`spawn/rules/`** (create the folder if missing).
-2. Prefer an existing **`spawn/rules/`** file that already covers the same topic — merge or revise that rule. If none fits, create a new kebab-case Markdown file.
-3. Prefer short code examples in each written rule when applicable (criterion 6).
+2. Prefer an existing **`spawn/rules/`** file on the same topic — merge or revise it. If none fits, create a new kebab-case Markdown file.
+3. Prefer short code examples in each rule when applicable (criterion 6).
 4. Add each file to **`spawn/navigation.yaml`** under **`read-required` → `rules`** or **`read-contextual` → `rules`** as the user chose. Row: **`path`** + short **`description`** (not hint-only). Never list the same path in both.
 5. Run **`spawn rules refresh`**.
 
@@ -241,7 +259,7 @@ Wait for answers. Write only candidates marked Required or Optional, each with t
 - Phase 3 (sequential): step review — inspect all changes, fix inconsistencies
 ```
 
-Omit `## Execution Scheme` if no decomposition (single-file spec).
+Omit `## Execution Scheme` if there is no decomposition (single-file spec).
 
 ---
 
