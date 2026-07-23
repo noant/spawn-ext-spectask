@@ -26,16 +26,8 @@
    - **VS Code/Copilot:** AskQuestions / vscode_askQuestions
    - **Claude Code:** AskUserQuestion; MCP elicitation/create
    - **Codex:** request_user_input
-   - **Continue:** AskQuestion
-   - **Roo / Kilo:** ask_followup_question
-   - **Cline:** ask_question
-   - **Zed:** no native; ACP clients + elicitation WIP
-   - **JetBrains:** no native; chat text / Cline ACP
-   - **Windsurf:** Plan mode UI (no public tool name)
-   - **Factory Droid:** Spec mode chat; MCP interactive_clarify
-   - **LangGraph:** interrupt() / HumanInterrupt
-   - **MCP (generic):** elicitation/create
-   - **ACP (generic):** elicitation/create + vendor extensions
+   - **Other:** use IDE embedded tool for user interaction or installed MCP if exist. Fallback to text question.
+10. **Project rules (navigation)** — Before drafting a spec: open **`spawn/navigation.yaml`**, read all `read-required`, read task-relevant `read-contextual`, and apply them in the spec. Self Spec Review re-checks compliance; violations are defects.
 
 ---
 
@@ -53,11 +45,12 @@ Mark each status [V] on completion. Prompt the user after steps 2, 5, and 6. Aft
 
 **Executor:** AI Agent (current context)
 
-1.1 **Implementation clarifications** — **MANDATORY!** Before writing any spec content, identify ambiguous, optional, or convention-dependent aspects. Ask the user explicit questions (Embedded rule 9) and wait for answers. Record answers (or agreed defaults) in **Details**. Skip only if the task has a single obvious implementation path.
-1.2 **Design overview** — in task `overview.md`, add **Design overview** section: affected modules; concrete paths and symbols (Embedded rule 7); data flow changes; integration points.
-1.3 **Overview** — `spec/tasks/{task-code}-{slug}/overview.md` must follow overview.md template: sections through `## Details` (before/after and code examples go there); **Goal** = one sentence. Add `## Execution Scheme` only when work splits into 2+ steps.
-1.4 **Execution Plan** — If 2+ steps: `## Execution Scheme` step ids must match `{N}-{description}.md` from 1.5.
-1.5 **Decomposition** — create {N}-{description}.md per step: goal, approach, affected files (with named classes/methods/functions per path), code changes (before/after). You may launch a **New sub-agent** for read-only codebase analysis to determine accurate **Before** / **After** text, then merge its findings into the step files (analysis only; parent agent owns decomposition and the spec).
+1.1 **Project rules (navigation)** — **MANDATORY!** Follow Embedded rule 10 before writing any spec content.
+1.2 **Implementation clarifications** — **MANDATORY!** Before writing any spec content, identify ambiguous, optional, or convention-dependent aspects. Ask the user explicit questions (Embedded rule 9) and wait for answers. Record answers (or agreed defaults) in **Details**. Skip only if the task has a single obvious implementation path.
+1.3 **Design overview** — in task `overview.md`, add **Design overview** section: affected modules; concrete paths and symbols (Embedded rule 7); data flow changes; integration points.
+1.4 **Overview** — `spec/tasks/{task-code}-{slug}/overview.md` must follow overview.md template: sections through `## Details` (before/after and code examples go there); **Goal** = one sentence. Add `## Execution Scheme` only when work splits into 2+ steps.
+1.5 **Execution Plan** — If 2+ steps: `## Execution Scheme` step ids must match `{N}-{description}.md` from 1.6.
+1.6 **Decomposition** — create {N}-{description}.md per step: goal, approach, affected files (with named classes/methods/functions per path), code changes (before/after). You may launch a **New sub-agent** for read-only codebase analysis to determine accurate **Before** / **After** text, then merge its findings into the step files (analysis only; parent agent owns decomposition and the spec).
 
 → set [V] "Spec created" — fill model name in brackets: `- [V] Spec created [model-name]`
 
@@ -69,7 +62,7 @@ Mark each status [V] on completion. Prompt the user after steps 2, 5, and 6. Aft
 
 Sub-agent prompt must include: "End your final response with the line `My model: X` where X is your actual model identifier (e.g. `claude-sonnet-4-6`, `gpt-4o`) — write your actual model identifier in place of X."
 
-Review the spec for: architectural impact, implementation errors, sequencing issues; verify every step and overview list concrete files, modules, and symbols (classes, methods, functions) per Embedded rule 7. Fix if needed.
+Review the spec for: architectural impact, implementation errors, sequencing issues; verify every step and overview list concrete files, modules, and symbols (classes, methods, functions) per Embedded rule 7; verify compliance with Embedded rule 10. Fix if needed.
 
 → set [V] "Self spec review passed" — read the last line of the sub-agent response, extract model name, fill in brackets: `- [V] Self spec review passed [model-name]`
 → prompt: "Self spec review passed — spec is ready for your review (Step 3). Reply 'spec review passed', 'lgtm', or 'ok' when satisfied."

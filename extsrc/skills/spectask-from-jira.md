@@ -19,6 +19,6 @@ Operate within the **spectask** process in attached **spec/main.md**.
 
 Ticket body is source requirements only — not a finished spec. Do not copy it as-is into overview.md.
 
-4. Explore the repo and relevant **spec/design/** docs to map ticket intent to concrete paths and symbols before writing anything.
+4. Explore the repo and relevant **spec/design/** docs to map ticket intent to concrete paths and symbols before writing anything. Also follow **Embedded rule 10** in **spec/main.md**.
 5. In **Details**, add a **Jira source** subsection (key, summary, relevant ticket fields/body). Clarifications and constraints go below it.
 6. Complete **Steps 1-2** exactly as in **spec/main.md** and **spectask-create** — then stop and wait for the user's Step 3.
