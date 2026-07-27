@@ -87,7 +87,7 @@ After **Code Review / Debugging** (Step 6), Step 7 renames the task folder to `_
 
 **Architecture lives in the repo.** The baseline is `spec/design/hla.md` — a living overview updated after every task — but you can keep ADRs and other write-ups as additional `spec/design/{name}.md` files listed in `spec/design.yaml`.
 
-**Concrete specs.** Every overview and subtask names concrete paths and symbols (packages/modules, classes, methods, functions) under change, and every Before/After pair is a fenced minimal code excerpt plus a behavior line. Prose-only or "change X to Y" without code is invalid.
+**Concrete specs.** Every overview and subtask names concrete paths and symbols (packages/modules, classes, methods, functions) under change, and every Before/After pair is a fenced minimal code excerpt plus a behavior line.
 
 **Structured questions.** When the agent must ask you (clarifications, confirmations, choices), it uses the platform's structured ask tool (multiple choice where possible) rather than plain chat. Fallback order: platform tool -> installed MCP -> plain text.
 
