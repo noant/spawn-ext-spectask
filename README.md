@@ -49,10 +49,12 @@ The full cycle:
 1. Agent drafts the specification and asks clarifying questions if anything is ambiguous — invoke skill `spectask-create`
 2. Agent self-reviews the spec in a **dedicated subagent** (architectural impact, correctness, sequencing) — a separate context window focuses the review and usually catches more than an inline pass in the same thread
 3. **You approve the plan** — "ok" / "lgtm" / "spec review passed" or invoke skill `spectask-spec-review-passed`
-4. Agent implements following the **Execution Scheme** in the spec — sequential and parallel phases — with one dedicated subagent per step — invoke skill `spectask-execute` (all steps in one run) or `spectask-execute-step-by-step` (one subtask per run, wait for you between steps)
+4. Agent implements following the **Execution Scheme** in the spec — sequential and parallel phases — with one dedicated subagent per step. If the same chat produced Steps 1-2, the agent launches a **coordinator sub-agent** that owns Steps 4-5 end-to-end (not inline). In a fresh execute chat the current agent is the coordinator. Invoke skill `spectask-execute` (all steps in one run) or `spectask-execute-step-by-step` (one subtask per run, wait for you between steps)
 5. Agent self-reviews the code in a **dedicated subagent** (naming, imports, alignment with the spec), because a separate context window keeps the focus on the changes and the spec instead of the implementation thread that wrote them, which usually surfaces inconsistencies before your review
 6. **Code Review / Debugging** — "ok" / "lgtm" / "code review passed" or invoke skill `spectask-code-review-passed`
-7. Agent updates `spec/design/hla.md`, reconciles `spec/design.yaml` if needed, and marks the task as done
+7. Agent updates `spec/design/hla.md`, reconciles `spec/design.yaml` if needed, renames the task folder to `_DONE_`, closes any linked seed, and marks the task as done. After Step 7 the agent optionally offers to extract reusable patterns into `spawn/rules/`.
+
+If you request rework or fixes after Step 4 (before Step 6 is marked), the agent carries out the changes and asks whether to update the specification to match the actual state — no re-run of the spec cycle.
 
 Agent-executed steps record the **LLM model name** in `overview.md` status lines (for example `- [V] Spec created [claude-sonnet-4-6]`) and in each subtask file (`Status: Done | model: {model}`). User-confirmed checkpoints (Steps 3 and 6) stay plain checkboxes.
 
@@ -85,6 +87,10 @@ After **Code Review / Debugging** (Step 6), Step 7 renames the task folder to `_
 
 **Architecture lives in the repo.** The baseline is `spec/design/hla.md` — a living overview updated after every task — but you can keep ADRs and other write-ups as additional `spec/design/{name}.md` files listed in `spec/design.yaml`.
 
+**Concrete specs.** Every overview and subtask names concrete paths and symbols (packages/modules, classes, methods, functions) under change, and every Before/After pair is a fenced minimal code excerpt plus a behavior line. Prose-only or "change X to Y" without code is invalid.
+
+**Structured questions.** When the agent must ask you (clarifications, confirmations, choices), it uses the platform's structured ask tool (multiple choice where possible) rather than plain chat. Fallback order: platform tool -> installed MCP -> plain text.
+
 ## Seeds
 
 **Seeds** are optional Markdown files under `spec/seeds/` for capturing an idea quickly — informal notes, not a full Spectask specification. The full Steps 1–7 workflow does not require a seed unless you deliberately start there.
@@ -103,15 +109,16 @@ After install, invoke methodology steps using these **skills** by name; Spawn re
 | **spectask-create** | Draft a new task spec only — **Steps 1–2** in `spec/main.md` (no implementation, no HLA update). |
 | **spectask-spec-review-passed** | Step 3: **Spec review passed** in `overview.md` + Step 3 prompt. |
 | **spectask-execute** | **Steps 4–5** in `spec/main.md` (implement all Execution Scheme steps + self code review); then wait for the user — **Step 6**. |
-| **spectask-execute-step-by-step** | **Step 4** only — one Execution Scheme subtask per run; wait for you between steps; self code review (Step 5) when all subtasks are done. |
-| **spectask-code-review-passed** | Step 6: **Code Review / Debugging passed** in `overview.md` + Step 6 prompt; then **Step 7** in `spec/main.md`. |
+| **spectask-execute-step-by-step** | **Step 4** only — one Execution Scheme subtask per run with per-step self-review; auto Step 5 when all subtasks are done. |
+| **spectask-code-review-passed** | Step 6: **Code Review / Debugging passed** in `overview.md` + Step 6 prompt; then **Step 7** and optional pattern extract in `spec/main.md`. |
 | **spectask-design** | Register architecture files in `spec/design.yaml` or draft `spec/design/*.md`. |
 | **spectask-seed-create** | Capture a rough idea as `spec/seeds/{X}-{slug}.md`; offer **spectask-create** when the user promotes. |
 | **spectask-from-jira** | Import a Jira issue into `spec/tasks/{task-code}-{slug}/` (MCP or CLI, with manual fallback); explore the codebase and complete Steps 1–2 before waiting for Step 3. |
+| **spectask-extract-patterns** | After Step 7 — optional extract of reusable patterns into `spawn/rules/` and `spawn/navigation.yaml`. Filters candidates against selection criteria, asks per candidate (Required/Optional/Decline), writes rules and runs `spawn refresh`. |
 
 ## Jira integration and MCP
 
-This extension ships MCP server entries under `extsrc/mcp/` (per platform). After you install the pack with Spawn, those definitions are merged into your workspace; your IDE typically lists the **spectask-mcp-jira** server from that merge so you do not maintain a separate MCP JSON snippet for this tool. The server runs **spectask-mcp** via **uvx** in stdio mode (`uvx spectask-mcp serve`), resolving the latest PyPI release on each MCP start; **uv** must be on PATH. The same PyPI package also exposes a small **CLI** for non-MCP use (`spectask-mcp run`, `spectask-mcp interactive`), installed by the after-install hook with `uv tool install` / `uv tool upgrade`.
+This extension ships MCP server entries under `extsrc/mcp/` (per platform). After you install the pack with Spawn, those definitions are merged into your workspace; your IDE typically lists the **spectask-mcp-jira** server from that merge so you do not maintain a separate MCP JSON snippet for this tool. The server runs **spectask-mcp** via **uvx** in stdio mode (`uvx spectask-mcp serve`), resolving the latest PyPI release on each MCP start; **uv** must be on PATH. The same PyPI package also exposes a small **CLI** for non-MCP use.
 
 On extension install, the **after-install** hook (`extsrc/setup/install_spectask_mcp.py`) runs `uv tool install` / `uv tool upgrade` for the `spectask-mcp` PyPI package, then optionally launches **interactive setup** (`spectask-mcp interactive --setup`) when stdin is a TTY. You can run that command again anytime from the repo root.
 
@@ -144,15 +151,21 @@ proxy:
 **MCP tool `jira_fetch`** (available only when config is valid):
 
 - Omit `issue_key`, or pass a key that does not resolve: returns the five most recently created unresolved issues as `key<TAB>summary` lines.
-- Valid key: returns key, summary, and a JSON `fields` block (comments are not included).
+- Valid key: returns key, summary, description, labels, and up to 70 comments (author: body per line).
 
 If `spec/.config/config.yaml` is missing or invalid, the MCP server still starts but registers no Jira tools until you configure credentials.
 
-**CLI** (`spectask-mcp run`):
+**CLI** (`spectask-mcp`):
 
-- Without `--issue`: same open-issue listing as above.
-- With `--issue KEY`: fetch one issue bundle.
-- `--verbose` / `-v`: log each Jira HTTP response (method, URL, status, body) to stderr.
+| Command | Description |
+|---------|-------------|
+| `spectask-mcp run` | Fetch Jira issue or list open issues once. |
+| `spectask-mcp run --issue KEY` | Fetch one issue bundle (fields, numbered comments). |
+| `spectask-mcp run --issue KEY --verbose` | Same, with HTTP response logging to stderr. |
+| `spectask-mcp interactive` | Write `spec/.config/config.yaml` via interactive prompts. |
+| `spectask-mcp serve` | Run stdio MCP server (used by IDE integration). |
+
+Exit codes for `spectask-mcp run`: 0 = success, 1 = usage/misc error, 2 = missing config, 3 = Jira unreachable.
 
 Deployment type (`atlassian_cloud` vs `self_hosted`) selects REST API version and search endpoints end-to-end; see `spec/design/hla.md` after install for details.
 
