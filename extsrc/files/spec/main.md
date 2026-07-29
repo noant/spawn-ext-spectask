@@ -67,8 +67,8 @@ Mark each status [V] on completion. Prompt the user after steps 2, 5, and 6. Aft
 1.2 **Implementation clarifications** — **MANDATORY!** Before writing any spec content, identify ambiguous, optional, or convention-dependent aspects. Ask the user explicit questions (`R10-ask`) and wait for answers. Record answers (or agreed defaults) in **Details**. Skip only when there is a single obvious implementation path.
 1.3 **Design overview** — in the task `overview.md`, add a **Design overview** section: affected modules; concrete paths and symbols (`R8-concrete`); data flow changes; integration points.
 1.4 **Overview** — `spec/tasks/{task-code}-{slug}/overview.md` follows the overview.md template: sections through `## Details` (before/after and code examples go there); **Goal** = one sentence. Add `## Execution Scheme` only when work splits into 2+ steps.
-1.5 **Execution Plan** — with 2+ steps: the step ids in `## Execution Scheme` must match the `{N}-{description}.md` filenames from 1.6.
-1.6 **Decomposition** — create {N}-{description}.md per step: goal, approach, affected files (with named classes/methods/functions per path), code changes (before/after). You may launch a **new sub-agent** for read-only codebase analysis to determine accurate **Before** / **After** text, then merge its findings into the step files (analysis only; the parent agent owns decomposition and the spec).
+1.5 **Execution Plan** — with 2+ steps: the step ids in `## Execution Scheme` must match the `{N}-{description}.md` filenames from 1.6. Set `Suggested coordinator model` in the scheme.
+1.6 **Decomposition** — create {N}-{description}.md per step: goal, approach, affected files (with named classes/methods/functions per path), code changes (before/after). Set `Suggested model` for the step; leave `Used model` empty. You may launch a **new sub-agent** for read-only codebase analysis to determine accurate **Before** / **After** text, then merge its findings into the step files (analysis only; the parent agent owns decomposition and the spec).
 
 → set [V] "Spec created" `[model-name]` (record the model per `R13-model-line`): `- [V] Spec created [model-name]`
 
@@ -100,7 +100,7 @@ On confirmation ("spec review passed", "lgtm", "ok"):
 ## Step 4: Code implemented
 
 **Executor (coordination):**
-- **Same chat as Steps 1–2:** the agent that created the spec must not coordinate Steps 4–5 itself. On the implementation command, launch **one new sub-agent** as the coordinator that owns Steps 4–5 end-to-end. The parent waits for the sub-agent, then waits for the user for Step 6. Do not open a separate chat manually.
+- **Same chat as Steps 1–2:** the agent that created the spec must not coordinate Steps 4–5 itself. On the implementation command, launch **one new sub-agent** as the coordinator that owns Steps 4–5 end-to-end. Prefer `Suggested coordinator model` from `## Execution Scheme` (Task `model` when supported; else prompt + nearest slug). The parent waits for the sub-agent, then waits for the user for Step 6. Do not open a separate chat manually.
 - **Fresh execute chat** (Steps 1–2 not in context): the current agent is the coordinator.
 
 **Coordinator** — follows the Execution Scheme, launches one sub-agent per step, then Step 5.
@@ -108,11 +108,11 @@ On confirmation ("spec review passed", "lgtm", "ok"):
 
 On "run it" / "implement" / "execute" / any direct instruction to start implementation:
 0. If "Spec review passed" is not yet marked, set [V] "Spec review passed" automatically — the implementation command implies approval.
-0a. If this chat already completed Steps 1–2 for the task: launch the Steps 4–5 coordinator sub-agent (see Executor above) and stop coordinating inline. Include in its prompt: follow Steps 4–5 for `spec/tasks/{task-code}-{slug}/`; the line from `R13-model-line`.
-1. MANDATORY! Launch a sub-agent for each step — do NOT implement inline. No exceptions, even if a step seems trivial. The sub-agent prompt must include the line from `R13-model-line`.
+0a. If this chat already completed Steps 1–2 for the task: launch the Steps 4–5 coordinator sub-agent (see Executor above) and stop coordinating inline. Prefer `Suggested coordinator model`. Include in its prompt: follow Steps 4–5 for `spec/tasks/{task-code}-{slug}/`; the line from `R13-model-line`.
+1. MANDATORY! Launch a sub-agent for each step — do NOT implement inline. No exceptions, even if a step seems trivial. Prefer the subtask `Suggested model`: pass it as the platform Task/sub-agent `model` when supported; otherwise name it in the prompt and use the nearest available slug. The sub-agent prompt must include the line from `R13-model-line`.
 2. Follow the Execution Scheme: → sequential, || parallel.
 
-→ set [V] "Code implemented" `[model-name]` of the coordinator (record the model per `R13-model-line`): `- [V] Code implemented [model-name]`; rename completed subtasks to _DONE_ and set `Status: Done | model: {model}` in each subtask file, taking the model name from the corresponding sub-agent's response
+→ set [V] "Code implemented" `[model-name]` of the coordinator (record the model per `R13-model-line`): `- [V] Code implemented [model-name]`; rename completed subtasks to _DONE_; set `Status: Done` and `Used model: {model}` from that sub-agent's `My model:` line (`Suggested model` unchanged)
 
 ---
 
@@ -252,6 +252,7 @@ Wait for answers. Write only candidates marked Required or Optional, each with i
 {Clarifying details, code examples, constraints.}
 
 ## Execution Scheme
+Suggested coordinator model: {model}
 > Each step id is the subtask filename (e.g. `1-abstractions`).
 > MANDATORY! Each step is executed by a dedicated subagent (Task tool). Do NOT implement inline. No exceptions — even if a step seems trivial or small.
 - Phase 1 (sequential): step {N}-{description} → step {N}-{description}
@@ -270,7 +271,9 @@ Filename must match the step id from `## Execution Scheme` (e.g. `1-abstractions
 ````markdown
 # Step {N}: {Short title}
 
-Status: Not implemented | model: {model}
+Status: Not implemented
+Suggested model: {model}
+Used model:
 
 ## Goal
 {One sentence — outcome of this step.}

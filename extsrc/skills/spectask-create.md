@@ -13,4 +13,7 @@ Under this skill, writing implementation code without an approved specification 
 
 If work began from **`spec/seeds/`**, tie the seed to the new task in **Step 1** (**`linked task:`** + **Source seed** in **`overview.md`**) and close it in **Step 7** item **6**, per **`spec/main.md`**.
 
+On each subtask (Step 1.6): set `Suggested model`; leave `Used model` empty.
+With `## Execution Scheme`: set `Suggested coordinator model`.
+
 When launching the Step 2 sub-agent, include the line from **`R13-model-line`** in the prompt. Use the returned model name when filling `- [V] Self spec review passed [model-name]`.
