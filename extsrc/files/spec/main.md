@@ -46,6 +46,7 @@ _Interaction and context_
 13. **`R13-model-line`** — Every sub-agent prompt must include this line verbatim:
     > End your final response with the line `My model: X` where X is your actual model identifier (e.g. `claude-sonnet-4-6`, `gpt-4o`) — write your actual model identifier in place of X.
     When recording `[V]`/`[model-name]` after a sub-agent: read the last line of its response, extract the model name, and fill it in the brackets.
+14. **`R14-changed-files`** — After finishing a create/edit batch, list every created or edited path for the user (repo-relative, complete, no omissions). Applies to Step 1 (spec), Steps 4–5 (code), Step 7 (design), and any user-requested edits. Renames and deletes count as changed paths.
 
 ---
 
@@ -64,13 +65,14 @@ Mark each status [V] on completion. Prompt the user after steps 2, 5, and 6. Aft
 **Executor:** AI Agent (current context)
 
 1.1 **Project rules (navigation)** — **MANDATORY!** Follow `R11-navigation` before writing any spec content.
-1.2 **Implementation clarifications** — **MANDATORY!** Before writing any spec content, identify ambiguous, optional, or convention-dependent aspects. Ask the user explicit questions (`R10-ask`) and wait for answers. Record answers (or agreed defaults) in **Details**. Skip only when there is a single obvious implementation path.
+1.2 **Implementation clarifications** — **MANDATORY!** Before writing any spec content, identify ambiguous, optional, or convention-dependent aspects. Ask the user explicit questions (`R10-ask`) and wait for answers. Record answers (or agreed defaults) in **Details**. Skip only when there is a single obvious implementation path. If the user's request does not make the **motivation** for the change clear, ask via `R10-ask` with multiple-choice options (e.g. bug fix, new feature, refactor / tech debt, UX, performance, other — adapt to context). Put the chosen motivation in **`## Motivation`** (after **Goal**).
 1.3 **Design overview** — in the task `overview.md`, add a **Design overview** section: affected modules; concrete paths and symbols (`R8-concrete`); data flow changes; integration points.
-1.4 **Overview** — `spec/tasks/{task-code}-{slug}/overview.md` follows the overview.md template: sections through `## Details` (before/after and code examples go there); **Goal** = one sentence. Add `## Execution Scheme` only when work splits into 2+ steps.
+1.4 **Overview** — `spec/tasks/{task-code}-{slug}/overview.md` follows the overview.md template: sections through `## Details` (before/after and code examples go there); **Goal** = one sentence; **Motivation** immediately after **Goal**. Add `## Execution Scheme` only when work splits into 2+ steps.
 1.5 **Execution Plan** — with 2+ steps: the step ids in `## Execution Scheme` must match the `{N}-{description}.md` filenames from 1.6. Set `Suggested coordinator model` in the scheme.
 1.6 **Decomposition** — create {N}-{description}.md per step: goal, approach, affected files (with named classes/methods/functions per path), code changes (before/after). Set `Suggested model` for the step; leave `Used model` empty. You may launch a **new sub-agent** for read-only codebase analysis to determine accurate **Before** / **After** text, then merge its findings into the step files (analysis only; the parent agent owns decomposition and the spec).
 
 → set [V] "Spec created" `[model-name]` (record the model per `R13-model-line`): `- [V] Spec created [model-name]`
+→ list changed files per `R14-changed-files`
 
 ---
 
@@ -83,6 +85,7 @@ The sub-agent prompt must include the line from `R13-model-line`.
 Review the spec for: architectural impact, implementation errors, sequencing issues; verify every step and overview list concrete files, modules, and symbols (classes, methods, functions) per `R8-concrete`; verify compliance with `R11-navigation`. Fix if needed.
 
 → set [V] "Self spec review passed" `[model-name]` (record the model per `R13-model-line`): `- [V] Self spec review passed [model-name]`
+→ list changed files per `R14-changed-files` if any files were edited
 → prompt: "Self spec review passed — spec is ready for your review (Step 3). Reply 'spec review passed', 'lgtm', or 'ok' when satisfied."
 
 ---
@@ -113,6 +116,7 @@ On "run it" / "implement" / "execute" / any direct instruction to start implemen
 2. Follow the Execution Scheme: → sequential, || parallel.
 
 → set [V] "Code implemented" `[model-name]` of the coordinator (record the model per `R13-model-line`): `- [V] Code implemented [model-name]`; rename completed subtasks to _DONE_; set `Status: Done` and `Used model: {model}` from that sub-agent's `My model:` line (`Suggested model` unchanged)
+→ list changed files per `R14-changed-files`
 
 ---
 
@@ -125,6 +129,7 @@ The sub-agent prompt must include the line from `R13-model-line`.
 Review all changes: inconsistencies, naming, missing imports, broken contracts. Fix if needed.
 
 → set [V] "Self code review passed" `[model-name]` (record the model per `R13-model-line`): `- [V] Self code review passed [model-name]`
+→ list changed files per `R14-changed-files` if any files were edited
 → prompt: "Self review done. Reply 'code review passed' to proceed."
 
 ---
@@ -143,9 +148,9 @@ On confirmation ("code review passed", "lgtm", "ok"):
 
 If the user requests rework or fixes after Step 4:
 
-1. Carry out the changes.
+1. Carry out the changes. List changed files per `R14-changed-files`.
 2. Ask via `R10-ask`: "Do you want to update the specifications of the current task?"
-   - Yes: edit the affected subtask files and/or `overview.md` to match the actual state; do not re-run the spec cycle.
+   - Yes: edit the affected subtask files and/or `overview.md` to match the actual state; do not re-run the spec cycle. List changed files per `R14-changed-files`.
    - No: proceed without changes.
 
 ---
@@ -164,6 +169,7 @@ Do not start Step 7 until **Code Review / Debugging passed** is marked (Step 6).
 6. If the Source seed Path in the overview is concrete and the listed spec/seeds file is linked to this overview, rename it once with _DONE_ added.
 
 → set [V] "Design documents updated" — fill the model name in brackets: `- [V] Design documents updated [model-name]`
+→ list changed files per `R14-changed-files`
 → continue with **Optional: Pattern extract** below (same run when closing via Steps 6–7).
 
 ---
@@ -235,6 +241,9 @@ Wait for answers. Write only candidates marked Required or Optional, each with i
 
 ## Goal
 {One concise sentence.}
+
+## Motivation
+{Why this change — from the user request, or from the clarification answer.}
 
 ## Design overview
 - Affected modules: {list}
