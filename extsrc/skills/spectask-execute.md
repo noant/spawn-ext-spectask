@@ -9,6 +9,6 @@ Operate within the **spectask** process defined in attached **spec/main.md**.
 
 **Fresh execute chat:** you are the coordinator — complete **Steps 4–5** yourself. Then wait for the user for **Step 6**.
 
-Step 4: prefer each subtask `Suggested model` (Task `model` when supported; else prompt + nearest slug). Include **`R13-model-line`**. On done: `Status: Done`, `Used model: {model}` from `My model:`.
+Step 4: prefer each subtask `Suggested model` (Task `model` when supported; else prompt + nearest slug). Include **`R13-model-line`**. On done, **coordinator** sets `Status: Done` and `Used model` per **`R13-model-line`** (tool `model` param if passed; else `My model:`). Sub-agent must not write `Used model`.
 
-Step 5: include **`R13-model-line`**; fill `- [V] Self code review passed [model-name]`.
+Step 5: include **`R13-model-line`**; fill `- [V] Self code review passed [model-name]` per **`R13-model-line`**.
