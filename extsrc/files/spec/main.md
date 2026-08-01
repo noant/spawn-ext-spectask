@@ -46,7 +46,7 @@ _Interaction and context_
 13. **`R13-model-line`** — Every sub-agent prompt must include this line verbatim:
     > End your final response with the line `My model: X` where X is your actual model identifier (e.g. `claude-sonnet-4-6`, `gpt-4o`) — write your actual model identifier in place of X.
     **Recording the model used by a sub-agent:** if the platform tool lets you pass an explicit sub-agent `model`, record that call parameter; if there is no model-selection parameter, read `My model:` from the sub-agent response and record that. The **coordinator** (parent) writes `Used model` and overview `[model-name]` brackets — the sub-agent must not edit those fields.
-14. **`R14-changed-files`** — After finishing a create/edit batch, list every created or edited path for the user (repo-relative, complete, no omissions). Applies to Step 1 (spec), Steps 4–5 (code), Step 7 (design), and any user-requested edits. Renames and deletes count as changed paths.
+14. **`R14-changed-files`** — After finishing a create/edit batch, list every created or edited path (repo-relative, complete, no omissions). Renames and deletes count. Applies to Step 1 (spec), Steps 4–5 (code), Step 7 (design), and any user-requested edits. **Propagation:** the executor sub-agent includes the full list in its final response; the coordinator aggregates lists from child sub-agents and forwards the complete set to the user (and to its parent when the coordinator itself is a sub-agent). Do not drop or summarize away paths.
 
 ---
 
@@ -112,11 +112,11 @@ On confirmation ("spec review passed", "lgtm", "ok"):
 On "run it" / "implement" / "execute" / any direct instruction to start implementation:
 0. If "Spec review passed" is not yet marked, set [V] "Spec review passed" automatically — the implementation command implies approval.
 0a. If this chat already completed Steps 1–2 for the task: launch the Steps 4–5 coordinator sub-agent (see Executor above) and stop coordinating inline. Prefer `Suggested coordinator model`. Include in its prompt: follow Steps 4–5 for `spec/tasks/{task-code}-{slug}/`; the line from `R13-model-line`.
-1. MANDATORY! Launch a sub-agent for each step — do NOT implement inline. No exceptions, even if a step seems trivial. Prefer the subtask `Suggested model`: pass it as the platform Task/sub-agent `model` when supported; otherwise name it in the prompt and use the nearest available slug. The sub-agent prompt must include the line from `R13-model-line`.
+1. MANDATORY! Launch a sub-agent for each step — do NOT implement inline. No exceptions, even if a step seems trivial. Prefer the subtask `Suggested model`: pass it as the platform Task/sub-agent `model` when supported; otherwise name it in the prompt and use the nearest available slug. The sub-agent prompt must include the line from `R13-model-line` and require a changed-files list per `R14-changed-files`.
 2. Follow the Execution Scheme: → sequential, || parallel.
 
 → set [V] "Code implemented" `[model-name]` of the coordinator (record the model per `R13-model-line`): `- [V] Code implemented [model-name]`; rename completed subtasks to _DONE_; the **coordinator** sets `Status: Done` and `Used model: {model}` per `R13-model-line` (`Suggested model` unchanged; sub-agent must not write `Used model`)
-→ list changed files per `R14-changed-files`
+→ forward the aggregated changed-files list to the user per `R14-changed-files`
 
 ---
 
