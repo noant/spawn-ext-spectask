@@ -9,6 +9,6 @@ Operate within the **spectask** process defined in attached **spec/main.md**.
 
 **Fresh execute chat:** you are the coordinator — complete **Steps 4–5** yourself. Then wait for the user for **Step 6**.
 
-Step 4: prefer each subtask `Suggested model` (Task `model` when supported; else prompt + nearest slug). Include **`R13-model-line`** and require **`R14-changed-files`** in the sub-agent reply. On done, **coordinator** sets `Status: Done` and `Used model` per **`R13-model-line`**; aggregates changed-file lists and forwards them to the user per **`R14-changed-files`**.
+Step 4: prefer each subtask `Suggested model` (Task `model` when supported; else prompt + nearest slug). Include **`R13-model-line`** and require **`R14-changed-files`** in the sub-agent reply. After each subtask, mark done per **`R15-done-marking`**. Aggregate changed-file lists and forward them per **`R14-changed-files`**.
 
 Step 5: include **`R13-model-line`**; fill `- [V] Self code review passed [model-name]` per **`R13-model-line`**; forward any further changed files per **`R14-changed-files`**.
