@@ -6,7 +6,7 @@ description: Capture a rough idea as spec/seeds/{X}-{slug}.md (not a full task);
 
 Operate within the **spectask** process defined in attached **spec/main.md**.
 
-**task-code** for **spec/tasks/** (separate from seed numeric **X**): **Embedded rules** 3-4 in **spec/main.md**.
+**task-code** for **spec/tasks/** (separate from seed numeric **X**): rules **`R3-code-num`** / **`R4-code-tracker`** in **spec/main.md**.
 
 Follow the short **Seed** paragraph and **[Seed file template (header)](#seed-file-template-header)** in **spec/main.md**.
 
@@ -15,7 +15,7 @@ Pick a kebab-case **slug** and the next **`X`** under **`spec/seeds/`** (default
 Suggest **spectask-create** when the user promotes; **Step 1** and **Step 7** item **6** covering seed wiring live there.
 
 Hints:
-- Use the platform ask tool when available (rule 9 in spec/main.md); plain chat otherwise.
+- Use the platform ask tool when available (R10-ask in spec/main.md); otherwise, stop and request input from the user.
 - No emojis or exotic Unicode in code, logs, documentation, or messages; plain ASCII where practical.
 - User-facing replies, documentation, and task descriptions: concise wording; minimal markdown (avoid decorative bold/italic); explain with lists and structure; short, clear sentences.
 - Specifications, code comments, and project documentation must be written in English.

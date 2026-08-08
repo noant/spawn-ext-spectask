@@ -6,15 +6,17 @@ description: Steps 4–5 in spec/main.md; then wait for user Step 6.
 
 Operate within the **spectask** process defined in attached **spec/main.md**.
 
-**Same chat as Steps 1–2:** do not run Steps 4–5 in this agent. Launch **one** sub-agent that completes Steps 4–5 as coordinator (per **spec/main.md** Step 4 Executor); that sub-agent launches child sub-agents per Execution Scheme. After it finishes, wait here for the user for **Step 6**.
+**Same chat as Steps 1–2:** do not run Steps 4–5 in this agent. Launch **one** coordinator sub-agent for Steps 4–5; prefer `Suggested coordinator model` (Task `model` when supported; else prompt + nearest slug). After it finishes, wait here for **Step 6**.
 
 **Fresh execute chat:** you are the coordinator — complete **Steps 4–5** yourself. Then wait for the user for **Step 6**.
 
-When launching sub-agents in Step 4 (one per Execution Scheme step) and Step 5 (self code review), include this in each prompt: "End your final response with the line `My model: X` where X is your actual model identifier (e.g. `claude-sonnet-4-6`, `gpt-4o`) — write your actual model identifier in place of X." Use each returned model name when filling subtask `Status:` lines (Step 4) and `- [V] Self code review passed [model-name]` (Step 5).
+Step 4: prefer each subtask `Suggested model` (Task `model` when supported; else prompt + nearest slug). Include **`R13-model-line`**, **`R14-changed-files`**, and Step 4 **Sub-agent protocol** (worker sets `Status: Done`; does not rename). After each subtask, mark done per **`R15-done-marking`** (rename + `Used model`). Aggregate changed-file lists and forward them per **`R14-changed-files`**.
+
+Step 5: include **`R13-model-line`**; fill `- [V] Self code review passed [model-name]` per **`R13-model-line`**; forward any further changed files per **`R14-changed-files`**.
 
 
 Hints:
-- Use the platform ask tool when available (rule 9 in spec/main.md); plain chat otherwise.
+- Use the platform ask tool when available (R10-ask in spec/main.md); otherwise, stop and request input from the user.
 - No emojis or exotic Unicode in code, logs, documentation, or messages; plain ASCII where practical.
 - User-facing replies, documentation, and task descriptions: concise wording; minimal markdown (avoid decorative bold/italic); explain with lists and structure; short, clear sentences.
 - Specifications, code comments, and project documentation must be written in English.

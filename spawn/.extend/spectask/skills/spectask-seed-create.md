@@ -5,7 +5,7 @@ description: Optional — capture an idea under spec/seeds/; see Seed file templ
 
 Operate within the **spectask** process defined in attached **spec/main.md**.
 
-**task-code** for **spec/tasks/** (separate from seed numeric **X**): **Embedded rules** 3-4 in **spec/main.md**.
+**task-code** for **spec/tasks/** (separate from seed numeric **X**): rules **`R3-code-num`** / **`R4-code-tracker`** in **spec/main.md**.
 
 Follow the short **Seed** paragraph and **[Seed file template (header)](#seed-file-template-header)** in **spec/main.md**.
 
