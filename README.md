@@ -89,7 +89,7 @@ After **Code Review / Debugging** (Step 6), Step 7 renames the task folder to `_
 
 **Concrete specs.** Every overview and subtask names concrete paths and symbols (packages/modules, classes, methods, functions) under change, and every Before/After pair is a fenced minimal code excerpt plus a behavior line.
 
-**Structured questions.** When the agent must ask you (clarifications, confirmations, choices), it uses the platform's structured ask tool (multiple choice where possible) rather than plain chat. Fallback order: platform tool -> installed MCP -> plain text.
+**Structured questions.** When the agent must ask you (clarifications, confirmations, choices), it stops and requests from you via the platform ask tool (multiple choice where possible), else a direct request in its reply — never via Task or a sub-agent. It waits for your answer before continuing.
 
 ## Seeds
 
