@@ -35,14 +35,14 @@ _Task specs_
 
 _Interaction and context_
 
-10. **`R10-ask`** — When you must ask the user (clarifications, confirmations, choices), use the platform structured ask tool (see `R12-ask-tools`), preferring multiple choice. Fallback order: platform tool -> installed MCP (elicitation) -> plain chat question.
+10. **`R10-ask`** — When you must ask the user (clarifications, confirmations, choices), **stop and ask** — do not continue the workflow until the user answers. Prefer the platform structured ask tool (see `R12-ask-tools`), multiple choice when possible. Fallback order: platform tool -> installed MCP (elicitation) -> **plain chat question in the current conversation**. "Ask" means only those channels. **Never** treat asking as launching a Task / sub-agent / other agent; those tools are not ask tools. If no platform ask tool is available, stop and write the question in chat, then wait.
 11. **`R11-navigation`** — Before drafting a spec, open **`spawn/navigation.yaml`**, read all `read-required`, read task-relevant `read-contextual`, and apply them in the spec. If the file is absent, the rule is a no-op (proceed). Self Spec Review re-checks compliance; violations are defects.
-12. **`R12-ask-tools`** — User-question tools by platform (data for `R10-ask`):
+12. **`R12-ask-tools`** — User-question tools by platform (data for `R10-ask` only; not Task / sub-agent tools):
     - **Cursor:** AskQuestion / cursor/ask_question
     - **VS Code/Copilot:** AskQuestions / vscode_askQuestions
     - **Claude Code:** AskUserQuestion; MCP elicitation/create
     - **Codex:** request_user_input
-    - **Other:** IDE embedded tool or installed MCP; fallback is a plain text question.
+    - **Other:** IDE embedded ask/elicitation tool or installed MCP; if none, plain text question in chat (`R10-ask`).
 13. **`R13-model-line`** — Every sub-agent prompt must include this line verbatim:
     > End your final response with the line `My model: X` where X is your actual model identifier (e.g. `claude-sonnet-4-6`, `gpt-4o`) — write your actual model identifier in place of X.
     **Recording the model used by a sub-agent:** if the platform tool lets you pass an explicit sub-agent `model`, record that call parameter; if there is no model-selection parameter, read `My model:` from the sub-agent response and record that. The **coordinator** (parent) writes `Used model` and overview `[model-name]` brackets — the sub-agent must not edit those fields.
