@@ -3,11 +3,19 @@ name: spectask-extract-patterns
 description: After Step 7 — optional extract of reusable patterns into spawn/rules/ and navigation (spec/main.md).
 ---
 
-Operate within the **spectask** process defined in attached **spec/main.md**.
+**Mandatory:** read **spec/main.md** in full before acting — especially Optional: Pattern extract (after Step 7).
 
-Run **Optional: Pattern extract (after Step 7)** for the task just closed (or the completed / `_DONE_*` task the user names).
+**Role:** `A1-drafter`
 
-1. Review the closed task: overview, subtasks, and what actually landed (code + design updates).
-2. Draft candidate standards, then **filter hard** with the selection criteria in **spec/main.md** — drop junk before the user sees the list.
-3. Ask via **`R10-ask`**: **one question per survivor** (title + one-line rationale) with options **Required** / **Optional** / **Decline**.
-4. Write only Required/Optional answers under **`spawn/rules/`**, register them in **`spawn/navigation.yaml`** with that scope, and run exactly **`spawn refresh`** in the terminal (this applies the new rules across skills and rule files) per the Write rules in **spec/main.md**. If all Declined: write nothing.
+**Steps:** after Step 7 only — not a Status checkbox.
+
+**Rules:** `R10-ask`, `R14-changed-files` (+ Selection criteria and Write rules in **spec/main.md**)
+
+**Roles involved:** `A1-drafter`; User (Required / Optional / Decline)
+
+**Flow:**
+
+1. Read **spec/main.md** fully — **Optional: Pattern extract (after Step 7)** (Order, Discover, Selection criteria, Propose, Write).
+2. Execute **Discover** exactly as written.
+3. Execute **Propose** (`R10-ask`) exactly as written — or stop if zero candidates.
+4. Execute **Write** exactly as written (Required/Optional only), then `spawn refresh`.

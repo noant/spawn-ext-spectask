@@ -3,12 +3,20 @@ name: spectask-execute
 description: Steps 4–5 in spec/main.md; then wait for user Step 6.
 ---
 
-Operate within the **spectask** process defined in attached **spec/main.md**.
+**Mandatory:** read **spec/main.md** in full before acting — especially Steps 4–5, Coder protocol, Subagent run protocol.
 
-**Same chat as Steps 1–2:** do not run Steps 4–5 in this agent. Launch **one** coordinator sub-agent for Steps 4–5; prefer `Suggested coordinator model` (Task `model` when supported; else prompt + nearest slug). After it finishes, wait here for **Step 6**.
+**Role:** `A5-coordinator`
 
-**Fresh execute chat:** you are the coordinator — complete **Steps 4–5** yourself. Then wait for the user for **Step 6**.
+**Steps:** 4–5 — then wait for user Step 6.
 
-Step 4: prefer each subtask `Suggested model` (Task `model` when supported; else prompt + nearest slug). Include **`R13-model-line`**, **`R14-changed-files`**, and Step 4 **Sub-agent protocol** (worker sets `Status: Done`; does not rename). After each subtask, mark done per **`R15-done-marking`** (rename + `Used model`). Aggregate changed-file lists and forward them per **`R14-changed-files`**.
+**Rules:** `R7-process`, `R10-ask`, `R13-model-line`, `R14-changed-files`, `R15-done-marking`, `R16-ambient`
 
-Step 5: include **`R13-model-line`**; fill `- [V] Self code review passed [model-name]` per **`R13-model-line`**; forward any further changed files per **`R14-changed-files`**.
+**Roles involved:** `A5-coordinator`, `A4-coder` (per step), `A3-reviewer` (Step 5). Same chat as Steps 1–2: `A1-drafter` must not be coordinator — launch a new `A5-coordinator` sub-agent.
+
+**Flow:**
+
+1. Read **spec/main.md** fully — Roles, Subagent run protocol, **Step 4: Code implementation**, **Step 5: Code self-review**, Coder protocol, `R13`–`R16`.
+2. Assume coordinator role per Step 4 Executor rules (same-chat → launch `A5-coordinator` sub-agent; fresh chat → current agent is coordinator).
+3. Execute **Step 4** exactly as written in **spec/main.md**.
+4. Execute **Step 5** exactly as written in **spec/main.md**.
+5. Stop — wait for user Step 6. Do not start Step 7.

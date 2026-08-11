@@ -14,23 +14,10 @@ Under this skill, writing implementation code without an approved specification 
 
 If work began from **`spec/seeds/`**, tie the seed to the new task in **Step 1** (**`linked task:`** + **Source seed** in **`overview.md`**) and close it in **Step 7** item **6**, per **`spec/main.md`**.
 
+Ambient context (`R16-ambient`): if not set in this chat, clarify via **`R10-ask`** before any sub-agent launch. `Ambient context: none` means set — do not ask.
+
 On each subtask (Step 1.6): set `Suggested model`; leave `Used model` empty.
 With `## Execution Scheme`: set `Suggested coordinator model`.
 If motivation is unclear from the request: ask via **`R10-ask`** (multiple choice); put the answer in **`## Motivation`** after **Goal**.
 
-When launching the Step 2 sub-agent, include the line from **`R13-model-line`** in the prompt. Use the returned model name when filling `- [V] Self spec review passed [model-name]`.
-
-Hints:
-- Use the platform ask tool when available (R10-ask in spec/main.md); otherwise, stop and request input from the user.
-- No emojis or exotic Unicode in code, logs, documentation, or messages; plain ASCII where practical.
-- User-facing replies, documentation, and task descriptions: concise wording; minimal markdown (avoid decorative bold/italic); explain with lists and structure; short, clear sentences.
-- Specifications, code comments, and project documentation must be written in English.
-- If the user only asked a question, answer first; do not edit files unless changes are clearly needed.
-
-Mandatory reads:
-- `spec/main.md` - Spec-Tasks methodology — folder structure, seven-step process, overview template.
-- `spec/design.yaml` - Index of architecture documents under spec/design/ — path and description per entry.
-- `spawn/navigation.yaml` - Merged Spawn navigation (read-required, read-contextual).
-
-Contextual reads:
-- `spec/design/hla.md` - Project high-level architecture; updated in Step 7.
+When launching any sub-agent (Explorer, Step 2 Reviewer, etc.): follow **Subagent run protocol** — Ambient block first (`R16-ambient`), then the line from **`R13-model-line`**. Use the returned model name when filling `- [V] Spec self-review [model-name]`.

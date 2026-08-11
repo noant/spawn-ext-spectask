@@ -1,10 +1,21 @@
 ---
 name: spectask-code-review-passed
-description: After user confirms Code Review / Debugging — Steps 6–7 then optional pattern extract (spec/main.md).
+description: After user confirms code review / debugging — Steps 6–7 then optional pattern extract (spec/main.md).
 ---
 
-Operate within the **spectask** process defined in attached **spec/main.md**.
+**Mandatory:** read **spec/main.md** in full before acting — especially Steps 6–7 and Optional: Pattern extract.
 
-On the active `spec/tasks/{X}-{name}/overview.md`, finish **Step 6** (mark **Code Review / Debugging passed** and the Step 6 prompt), then complete **Step 7** through **Design documents updated** in the same run. If **`overview.md`** ties a **`spec/seeds/`** file to this task, run **Step 7** item **6** (seed `_DONE_` rename) per **`spec/main.md`**. If which task is unclear, use **`R10-ask`** to ask.
+**Role:** `A1-drafter`
 
-After Step 7, run **Optional: Pattern extract (after Step 7)** per **`spec/main.md`** (same procedure as skill **spectask-extract-patterns**): filter candidates, then ask per candidate **Required** / **Optional** / **Decline**. Do not write under **`spawn/rules/`** or edit **`spawn/navigation.yaml`** until the user answers.
+**Steps:** 6 → 7 → optional Pattern extract (same run).
+
+**Rules:** `R1-paths`, `R2-no-clutter`, `R7-process`, `R10-ask`, `R13-model-line`, `R14-changed-files`
+
+**Roles involved:** User (Step 6 confirmation); `A1-drafter` (mark 6, run 7, pattern extract)
+
+**Flow:**
+
+1. Read **spec/main.md** fully — **Step 6: Code review / debugging**, **Step 7: Design document update**, **Optional: Pattern extract (after Step 7)**.
+2. Execute **Step 6** exactly as written (mark `[V]` and prompt).
+3. Execute **Step 7** exactly as written.
+4. Execute **Optional: Pattern extract** exactly as written (or via **spectask-extract-patterns**).
