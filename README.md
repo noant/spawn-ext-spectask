@@ -52,7 +52,7 @@ The full cycle:
 4. Agent implements following the **Execution Scheme** in the spec — sequential and parallel phases — with one dedicated subagent per step. If the same chat produced Steps 1-2, the agent launches a **coordinator sub-agent** that owns Steps 4-5 end-to-end (not inline). In a fresh execute chat the current agent is the coordinator. Invoke skill `spectask-execute` (all steps in one run) or `spectask-execute-step-by-step` (one subtask per run, wait for you between steps)
 5. Agent self-reviews the code in a **dedicated subagent** (naming, imports, alignment with the spec), because a separate context window keeps the focus on the changes and the spec instead of the implementation thread that wrote them, which usually surfaces inconsistencies before your review
 6. **Code Review / Debugging** — "ok" / "lgtm" / "code review passed" or invoke skill `spectask-code-review-passed`
-7. Agent updates `spec/design/hla.md`, reconciles `spec/design.yaml` if needed, renames the task folder to `_DONE_`, closes any linked seed, and marks the task as done. After Step 7 the agent optionally offers to extract reusable patterns into `spawn/rules/`.
+7. Agent updates `spec/design/hla.md`, reconciles `spec/design.yaml` if needed, renames the task folder to `_DONE_`, closes any linked seed, and marks the task as done. After Step 7 the agent optionally extracts reusable patterns into `spawn/rules/`: it filters candidates and presents the entire filtered list to the user in one message in the same run (no per-candidate preliminary questions), then waits for the user's per-candidate Required/Optional/Decline answer before writing anything.
 
 If you request rework or fixes after Step 4 (before Step 6 is marked), the agent carries out the changes and asks whether to update the specification to match the actual state — no re-run of the spec cycle.
 
@@ -110,11 +110,11 @@ After install, invoke methodology steps using these **skills** by name; Spawn re
 | **spectask-spec-review-passed** | Step 3: **Spec review passed** in `overview.md` + Step 3 prompt. |
 | **spectask-execute** | **Steps 4–5** in `spec/main.md` (implement all Execution Scheme steps + self code review); then wait for the user — **Step 6**. |
 | **spectask-execute-step-by-step** | **Step 4** only — one Execution Scheme subtask per run with per-step self-review; auto Step 5 when all subtasks are done. |
-| **spectask-code-review-passed** | Step 6: **Code Review / Debugging passed** in `overview.md` + Step 6 prompt; then **Step 7** and optional pattern extract in `spec/main.md`. |
+| **spectask-code-review-passed** | Step 6: **Code Review / Debugging passed** in `overview.md` + Step 6 prompt; then **Step 7** and optional pattern extract in `spec/main.md`. The pattern extract step presents a single filtered list to the user (no per-candidate preliminary questions) and waits for the user's per-candidate decision. |
 | **spectask-design** | Register architecture files in `spec/design.yaml` or draft `spec/design/*.md`. |
 | **spectask-seed-create** | Capture a rough idea as `spec/seeds/{X}-{slug}.md`; offer **spectask-create** when the user promotes. |
 | **spectask-from-jira** | Import a Jira issue into `spec/tasks/{task-code}-{slug}/` (MCP or CLI, with manual fallback); explore the codebase and complete Steps 1–2 before waiting for Step 3. |
-| **spectask-extract-patterns** | After Step 7 — optional extract of reusable patterns into `spawn/rules/` and `spawn/navigation.yaml`. Filters candidates against selection criteria, asks per candidate (Required/Optional/Decline), writes rules and runs `spawn refresh`. |
+| **spectask-extract-patterns** | After Step 7 — optional extract of reusable patterns into `spawn/rules/` and `spawn/navigation.yaml`. Filters candidates against selection criteria, then presents the entire filtered list to the user in one message (no `R10-ask`, no per-candidate tool questions), waits for the user's per-candidate decision, writes rules and runs `spawn refresh`. |
 
 ## Jira integration and MCP
 

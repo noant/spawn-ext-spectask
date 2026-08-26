@@ -349,30 +349,33 @@ If the user requests rework or fixes after Step 4:
 
 After Step 7, optionally extract reusable approaches into **`spawn/rules/`** as project-standard candidates. Not a Status item. Skill: **spectask-extract-patterns**.
 
+The agent filters candidates, presents the final list to the user in this run (no preliminary per-candidate questions), and waits for one per-candidate reply.
+
 **Order (mandatory):**
 
-1. **Discover** — find and filter reusable candidates (agent only; no user ask yet).
-2. **Propose** — offer filtered candidates via `R10-ask`; user may decline each or all.
-3. **Write** — only candidates marked Required or Optional.
+1. **Discover** — find and filter reusable candidates (agent only).
+2. **Present** — show the filtered list to the user in one message right after Step 7 (title + one-line rationale + suggested scope per survivor).
+3. **Wait** — for the user's per-candidate reply.
+4. **Write** — only candidates the user accepted as Required or Optional.
 
-Ask once after Step 7 unless the user already declined pattern extract in this close-out.
+Skip the whole step only if the user already declined in this close-out. If Discover leaves zero candidates, say so briefly and stop.
 
-### Discover (before asking)
+### Discover (before presenting)
 
 - review this task's changes, subtasks, Execution Scheme, and relevant codebase for reusable patterns
 - apply **Selection criteria** below; reject junk immediately
-- if zero candidates remain: say so briefly and stop — do not ask; do not invent fillers
+- if zero candidates remain: say so briefly and stop — do not present; do not invent fillers
 
 ### Selection criteria
 
 Propose only candidates that pass all of:
 
-- **Reusable** — a pattern, approach, or convention useful beyond this single task (not a one-off edit)
+- **Reusable** — useful beyond this single task
 - **Actionable** — can become a short rule an agent can follow
-- **Standard candidate** — plausible as a lasting convention for this project
-- **Not already covered** — check existing **`spawn/rules/`**, **`spawn/navigation.yaml`** rule rows, and related Spawn reads / methodology files for duplicates or near-duplicates
-- **Pre-existing code OK** — a pattern already present in the codebase before this task but not yet captured in rules remains a valid candidate; discovery during close-out is enough
-- **Code examples** — prefer short real (or minimally realistic) excerpts that show the pattern; prose-only when necessary
+- **Standard candidate** — plausible as a lasting convention
+- **Not already covered** — check **`spawn/rules/`**, **`spawn/navigation.yaml`**, and related Spawn reads for duplicates
+- **Pre-existing code OK** — a pattern already in the codebase but not yet in rules remains valid
+- **Code examples** — prefer short real excerpts; prose-only when necessary
 
 Reject immediately (do not offer):
 
@@ -381,23 +384,27 @@ Reject immediately (do not offer):
 - vague slogans without an enforceable rule
 - low-value or speculative ideas (junk)
 
-### Ask (`R10-ask`) — Propose (after Discover)
+### Present (after Discover)
 
 - run only when Discover left one or more candidates
-- ask **one question per filtered candidate** (short title + one-line rationale); options for each:
-  - **Required** — `read-required`
-  - **Optional** — `read-contextual`
-  - **Decline** — skip this rule
-- wait for answers; user may decline every candidate — write nothing in that case
-- write only candidates marked Required or Optional, each with its scope
+- present the entire list in **one message**, right after Step 7 — **no `R10-ask`, no per-candidate tool questions, no pauses**
+- for each survivor: short title, one-line rationale, suggested scope (Required = `read-required`, Optional = `read-contextual`)
+- end the message with a reply request: per-candidate Required/Optional/Decline, or "decline all"
+- then wait — do not write rules, do not run `spawn refresh`, do not start the next task
+
+### Apply the user's answer (after the reply)
+
+- write only Required/Optional candidates
+- if all Declined (or "decline all"): write nothing
+- candidates not addressed default to **Decline** (do not invent consent)
 
 ### Write
 
 1. Write under **`spawn/rules/`** (create the folder if missing).
-2. Prefer an existing **`spawn/rules/`** file on the same topic — merge or revise it. If none fits, create a new kebab-case Markdown file.
+2. Prefer an existing **`spawn/rules/`** file on the same topic — merge or revise. If none fits, create a new kebab-case Markdown file.
 3. Prefer short code examples in each rule when applicable (criterion 6).
-4. Add each file to **`spawn/navigation.yaml`** under **`read-required` → `rules`** or **`read-contextual` → `rules`** as the user chose. Row: **`path`** + short **`description`** (not hint-only). Never list the same path in both.
-5. Run exactly **`spawn refresh`** in the terminal — this applies the new rules across skills and rule files.
+4. Add each file to **`spawn/navigation.yaml`** under **`read-required` → `rules`** or **`read-contextual` → `rules`** as the user chose. Row: **`path`** + short **`description`**. Never list the same path in both.
+5. Run exactly **`spawn refresh`** in the terminal.
 
 ---
 

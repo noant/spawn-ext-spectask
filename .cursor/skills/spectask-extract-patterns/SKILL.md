@@ -1,6 +1,6 @@
 ---
 name: spectask-extract-patterns
-description: After Step 7 — optional extract of reusable patterns into spawn/rules/ and navigation (spec/main.md).
+description: After Step 7 — present reusable patterns as a single list to the user (no preliminary questions), then write per user's per-candidate decision.
 ---
 
 
@@ -10,8 +10,10 @@ Run **Optional: Pattern extract (after Step 7)** for the task just closed (or th
 
 1. Review the closed task: overview, subtasks, and what actually landed (code + design updates).
 2. Draft candidate standards, then **filter hard** with the selection criteria in **spec/main.md** — drop junk before the user sees the list.
-3. Ask via **`R10-ask`**: **one question per survivor** (title + one-line rationale) with options **Required** / **Optional** / **Decline**.
-4. Write only Required/Optional answers under **`spawn/rules/`**, register them in **`spawn/navigation.yaml`** with that scope, and run exactly **`spawn refresh`** in the terminal (this applies the new rules across skills and rule files) per the Write rules in **spec/main.md**. If all Declined: write nothing.
+3. If filtering leaves zero candidates, say so briefly and stop (do not ask, do not present, do not invent fillers).
+4. Otherwise **Present the filtered list to the user in one message**, in this run, right after Step 7 — **no `R10-ask`, no per-candidate tool questions, no pauses**. For each survivor: short title + one-line rationale + suggested scope (Required = `read-required`, Optional = `read-contextual`). End the message with an explicit reply request: tell the user how to respond (per-candidate Required/Optional/Decline, or "decline all" to skip everything).
+5. **Wait** for the user's reply. Do not write rules yet, do not run `spawn refresh`, do not start the next task.
+6. After the reply, apply the user's answer: write only Required/Optional candidates under **`spawn/rules/`**, register them in **`spawn/navigation.yaml`** with that scope, and run exactly **`spawn refresh`** in the terminal per the Write rules in **spec/main.md**. Candidates not addressed in the reply default to **Decline**. If every candidate is Declined, write nothing.
 
 
 Hints:
