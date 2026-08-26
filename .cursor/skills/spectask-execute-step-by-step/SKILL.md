@@ -4,14 +4,36 @@ description: Step 4 — one Execution Scheme subtask per run with per-step self-
 ---
 
 
-Operate within the **spectask** process defined in attached **spec/main.md**.
+**Mandatory:** read **spec/main.md** in full before acting — especially Steps 4–5, Coder protocol, Subagent run protocol.
 
-Run **Step 4** one subtask at a time. If which task is unclear, use **`R10-ask`** to ask.
+**Role:** `A5-coordinator`
 
-1. Open `overview.md` and `## Execution Scheme`; set **Spec review** if not yet marked.
-2. Pick the next pending step (subtask file without `_DONE_` prefix). Respect sequential phases.
-3. Launch **one** sub-agent for that step — do NOT implement inline. Prefer `Suggested model` (Task `model` when supported; else prompt + nearest slug). Include **Subagent run protocol** (`R16-ambient`: resolve Ambient / clarify if missing; Ambient block first), **`R13-model-line`**, **`R14-changed-files`**, and Step 4 **Coder protocol** (worker sets `Status: Done`; does not rename).
-4. Mark done per **`R15-done-marking`** (rename + `Used model`). Forward changed-file list per **`R14-changed-files`**.
-5. In the same run, launch **one** self-review sub-agent scoped to this step only — its changes and its subtask file; not other steps. Criteria as **spec/main.md** Step 5 (inconsistencies, naming, missing imports, broken contracts); fix if needed. Same **Subagent run protocol** / **`R13-model-line`** / **`R14-changed-files`**. Do not mark overview **Code self-review** here.
-6. If steps remain: stop — prompt: "Step `{step-id}` done (implemented + self-reviewed). Reply to run the next step." Include the forwarded changed-file list.
-7. If all steps done: set `[V] Code implementation [model]`, then run **Step 5** automatically (full code self-review sub-agent per **spec/main.md**); set `[V] Code self-review [model]`; forward aggregated changed files; prompt for user Step 6.
+**Steps:** Step 4 one subtask per run (+ scoped self-review); when all done → full Step 5; then wait for Step 6.
+
+**Rules:** `R7-process`, `R10-ask`, `R13-model-line`, `R14-changed-files`, `R15-done-marking`, `R16-ambient`
+
+**Roles involved:** `A5-coordinator`, `A4-coder`, `A3-reviewer` (per-step scoped, then full Step 5)
+
+**Flow:**
+
+1. Read **spec/main.md** fully — **Step 4**, **Step 5**, Coder protocol, Subagent run protocol, `R13`–`R16`.
+2. Execute **one** pending Execution Scheme subtask under Step 4 (`A4-coder` → `R15-done-marking`); `R10-ask` if the task is unclear.
+3. Run a scoped Step 5-style self-review for that step only (`A3-reviewer`) — do not mark overview **Code self-review** yet.
+4. If steps remain: stop and prompt for the next step.
+5. If all steps done: mark Code implementation, then execute full **Step 5** exactly as in **spec/main.md**; stop — wait for user Step 6.
+
+
+Hints:
+- Use the platform ask tool when available (R10-ask in spec/main.md); otherwise, stop and request input from the user.
+- No emojis or exotic Unicode in code, logs, documentation, or messages; plain ASCII where practical.
+- User-facing replies, documentation, and task descriptions: concise wording; minimal markdown (avoid decorative bold/italic); explain with lists and structure; short, clear sentences.
+- Specifications, code comments, and project documentation must be written in English.
+- If the user only asked a question, answer first; do not edit files unless changes are clearly needed.
+
+Mandatory reads:
+- `spec/main.md` - Spec-Tasks methodology — folder structure, seven-step process, overview template.
+- `spec/design.yaml` - Index of architecture documents under spec/design/ — path and description per entry.
+- `spawn/navigation.yaml` - Merged Spawn navigation (read-required, read-contextual).
+
+Contextual reads:
+- `spec/design/hla.md` - Project high-level architecture; updated in Step 7.

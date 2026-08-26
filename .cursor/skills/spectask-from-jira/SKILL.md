@@ -4,25 +4,26 @@ description: Import Jira tickets into spec/tasks/{task-code}-{slug}/; codebase a
 ---
 
 
-Operate within the **spectask** process in attached **spec/main.md**.
-**task-code**: ticket key per **`R4-code-tracker`** (e.g. `PROJ-123`).
+**Mandatory:** read **spec/main.md** in full before acting. Do not invent procedure beyond that file.
 
-**Step 1. Fetch ticket**
+**Role:** `A1-drafter`
 
-1. Prefer MCP tool `jira_fetch` (pass issue key). On failure try `spectask-mcp run --issue KEY`. On failure use **`R10-ask`** to ask the user for key + pasted title/body.
+**Steps:** fetch → scaffold → Steps 1–2 — then stop for user Step 3.
 
-**Step 2. Scaffold**
+**Rules:** `R4-code-tracker`, `R5-new-task`, `R7-process`, `R8-concrete`, `R9-greenfield`, `R10-ask`, `R11-navigation`, `R13-model-line`, `R14-changed-files`, `R16-ambient`
 
-2. Derive a kebab-case slug from the ticket summary.
-3. Create `spec/tasks/{task-code}-{slug}/`.
+**Roles involved:** `A1-drafter`, optional `A2-explorer`, `A3-reviewer` (Step 2)
 
-**Step 3. Spec (Steps 1-2 per spec/main.md)**
+**Flow:**
 
-Ticket body is source requirements only — not a finished spec. Do not copy it as-is into overview.md.
-
-4. Explore the repo and relevant **spec/design/** docs to map ticket intent to concrete paths and symbols before writing anything. Also follow **`R11-navigation`** in **spec/main.md**.
-5. In **Details**, add a **Jira source** subsection (key, summary, relevant ticket fields/body). Clarifications and constraints go below it.
-6. Complete **Steps 1-2** exactly as in **spec/main.md** and **spectask-create** — then stop and wait for the user's Step 3.
+1. Read **spec/main.md** fully — especially `R4-code-tracker`, Step 1–2, overview template — then follow this skill’s import steps below.
+2. **Fetch ticket** — Prefer MCP tool `jira_fetch` (pass issue key). On failure try `spectask-mcp run --issue KEY`. On failure use **`R10-ask`** to ask the user for key + pasted title/body.
+3. **Scaffold** — Derive a kebab-case slug from the ticket summary. Create `spec/tasks/{task-code}-{slug}/`.
+4. **Spec (Steps 1–2)** — Ticket body is source requirements only — not a finished spec. Do not copy it as-is into overview.md.
+   - Explore the repo and relevant **spec/design/** docs to map ticket intent to concrete paths and symbols before writing anything. Also follow **`R11-navigation`** in **spec/main.md**.
+   - In **Details**, add a **Jira source** subsection (key, summary, relevant ticket fields/body). Clarifications and constraints go below it.
+   - Execute **Step 1** and **Step 2** exactly as in **spec/main.md** and **spectask-create**.
+5. Stop — wait for the user’s Step 3. Do not start Steps 4–7.
 
 
 Hints:
