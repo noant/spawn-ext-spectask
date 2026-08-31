@@ -523,3 +523,53 @@ linked task: {task path or none}
 
 {idea content}
 ```
+
+---
+
+## HLA Template
+
+`spec/design/hla.md` describes the project high-level architecture and interaction of abstractions. It is the single source of truth for how components, services, and implementations relate to each other. The shipped file is a skeleton; fill it in following this structure.
+
+```markdown
+# High-Level Architecture (HLA)
+
+This document describes the high-level architecture and interaction of abstractions in the project.
+
+## Project Overview
+
+- Technologies: {list of core technologies}
+- Infrastructure services: {list of infrastructure services, e.g. DB, message broker, cache}
+- Frameworks: {list of frameworks and major libraries}
+
+## Entry Points
+
+### {Entry point name} (Frontend / UI / Console / CLI / Worker)
+
+- Used API / service entrypoints: {list of service or API endpoints this entry point calls}
+
+## Services & API Endpoints
+
+### {Service or API endpoint}
+
+- Used service abstractions: {list of interfaces/abstractions consumed}
+- Used concrete implementations: {list of concrete implementations wired to the abstractions}
+
+## Service Implementations
+
+### {Service implementation}
+
+- Used service abstractions: {list of interfaces/abstractions consumed}
+- Used concrete implementations: {list of concrete implementations wired to the abstractions}
+
+## Data Flow
+
+{description of how data flows through the system: entry points → services → implementations → infrastructure}
+```
+
+HLA update rules (Step 7):
+
+- Follow the template structure exactly; do not invent new top-level sections; keep the fixed order of the five sections.
+- Add or remove `###` blocks within a section as components change; never reorder the five top-level sections.
+- Every `###` block must carry the fields listed for its section (no empty blocks, no missing fields).
+- Update HLA in Step 7 based on the task's changed/added files and symbols; keep it in sync with the repo.
+- If a component is removed, delete its `###` block; if renamed, rename the block and update its fields.
