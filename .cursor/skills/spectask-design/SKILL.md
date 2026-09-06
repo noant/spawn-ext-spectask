@@ -1,6 +1,6 @@
 ---
 name: spectask-design
-description: Use when registering architecture files in spec/design.yaml or drafting/updating spec/design/*.md, including the HLA document.
+description: Use when registering architecture files in spec/design.yaml or drafting spec/design/*.md.
 ---
 
 

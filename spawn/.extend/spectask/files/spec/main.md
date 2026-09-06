@@ -49,7 +49,6 @@ _Task specs_
   - every overview and subtask names concrete paths and symbols (packages/modules, classes, methods, functions) under change
   - every Before / After pair in Code changes is a fenced minimal excerpt (real lines or the exact replacement) plus a behavior line
   - prose-only or "change X to Y" without code is invalid
-  - Spec self-review treats missing concrete targets, non-concrete Before/After, or template violations as defects before Step 3
 - **`R9-greenfield`**
   - for new symbols, same Before/After discipline as `R8-concrete`, with two differences:
   - Before may be insertion-context only (nothing to quote)
@@ -65,6 +64,7 @@ _Interaction and context_
   - "Ask" / "request from the user" means only those channels
   - **never** treat asking as launching a Task / sub-agent / other agent; those tools are not ask tools
   - if no platform ask tool is available, stop, request from the user, then wait
+  - do not ask when the answer is clear from context; ask only when the answer materially changes the next action
 - **`R11-navigation`**
   - before drafting a spec, open **`spawn/navigation.yaml`**
   - read all `read-required`
@@ -85,68 +85,103 @@ _Interaction and context_
   - recording the model used by a sub-agent:
     - if the platform tool lets you pass an explicit sub-agent `model`, record that call parameter
     - if there is no model-selection parameter, read `My model:` from the sub-agent response and record that
-  - the **coordinator** (`A5-coordinator`) writes `Used model` and overview `[model-name]` brackets — the sub-agent (`A4-coder` / `A3-reviewer` / `A2-explorer`) must not edit those fields
+  - who writes `Used model` / `[model-name]`: see `R15-done-marking`
 - **`R14-changed-files`**
   - after finishing a create/edit batch, list every created or edited path (repo-relative, complete, no omissions)
   - renames and deletes count
   - applies to Step 1 (spec), Steps 4–5 (code), Step 7 (design), and any user-requested edits
   - **Propagation:** the executor sub-agent includes the full list in its final response
-  - the coordinator (`A5-coordinator`) aggregates lists from child sub-agents and forwards the complete set to the user (and to its parent when the coordinator itself is a sub-agent)
+  - the coordinator (`A6-coordinator`) aggregates lists from child sub-agents and forwards the complete set to the user (and to its parent when the coordinator itself is a sub-agent)
   - do not drop or summarize away paths
 - **`R15-done-marking`**
-  - after a Coder (`A4-coder`) replies, the coordinator (`A5-coordinator`) marks the subtask done:
+  - after a Coder (`A5-coder`) replies, the coordinator (`A6-coordinator`) marks the subtask done:
     - rename: `{N}-{description}.md` → `_DONE_{N}-{description}.md`
     - set: `Used model: {model}` from `R13-model-line`; `Suggested model` unchanged
-  - only the coordinator (`A5-coordinator`) renames and writes `Used model` — the worker (`A4-coder`) must not
+  - only the coordinator (`A6-coordinator`) renames and writes `Used model` — the worker (`A5-coder`) must not
   - the worker sets `Status: Done` per Step 4 Coder protocol
   - mark immediately; do not defer
 - **`R16-ambient`**
   - **Ambient context** is session/environment facts for sub-agents (repository name, session, and similar) — not coding conventions or task design rules
-  - format when present: header `Ambient rules:` then one numbered item per line (`1) …`, `2) …`)
+  - format when present: header `Ambient rules:` then one numbered item per line (`1) …`, `2) …`):
+    ```
+    Ambient rules:
+    1) repository: {name}
+    2) session: {id}
+    ```
   - explicit empty: `Ambient context: none` — ambient **is** set; do **not** ask
   - if Ambient context is missing (neither an `Ambient rules:` block nor `Ambient context: none`), the agent **must** clarify via `R10-ask` before launching any sub-agent — mandatory
   - every sub-agent launch must put the resolved Ambient block at the start of the prompt per **Subagent run protocol**
   - each agent passes the block to child sub-agents unchanged
+
+_Subagent governance_
+
+- **`R17-classify`**
+  - at the start of any spectask request, classify it as:
+    - **[A] Question** — the user asks (wants an answer), not a "do" request
+    - **[B] Initiative / task** — the user sets a task, an explicit "do", or asks to draft a spec
+  - if unclear, ask via `R10-ask` and wait
+  - [A] -> answer directly (light mode, no `spec/tasks/` artifacts); optionally launch `A2-researcher`/`A3-explorer` for read-only facts
+  - [B] -> proceed to Step 1 (Spec drafting)
+- **`R18-subagent-depth`**
+  - limits subagent nesting — who may create whom:
+  - `A1-drafter` — may launch `A2-researcher`, `A3-explorer`, `A4-reviewer`
+  - `A2-researcher` — must not create subagents (works independently)
+  - `A3-explorer` — may create only `A2-researcher`
+  - `A4-reviewer` — may launch `A2-researcher` / `A3-explorer` (to verify findings); no deeper
+  - `A5-coder` — must not create subagents (performs one subtask)
+  - `A6-coordinator` — may launch `A5-coder` and `A4-reviewer`
+  - violating this rule is a defect: a subagent that created a forbidden descendant must stop and return an error to the parent
+- **`R19-no-ask-tool`**
+  - subagents (`A2-researcher`, `A3-explorer`, `A4-reviewer`, `A5-coder`, `A6-coordinator`) are forbidden to ask questions via the ASK tool or any platform ask tool (AskQuestion, ask_question, AskUserQuestion, request_user_input, etc.)
+  - a subagent asks questions only in text in its response to the parent
+  - only the main chat (the agent coordinating the user, `A1-drafter` in current context) may use the ask tool for questions to the user
+- **`R20-ask-if-unclear`**
+  - a subagent may ask the parent a question if something in its task/direction is unclear
+  - the question is asked only in text in the subagent's response (`R19-no-ask-tool`)
+  - the subagent does not block indefinitely: if the answer is critical, it stops and returns the question to the parent; otherwise it proceeds with a stated assumption
+- **`R21-navigate`**
+  - after finishing a task/subtask, navigate the user to created/changed files via the platform navigate tool
+  - navigate to each such file with a short description (chip label)
+  - use line ranges (`from_line`/`to_line`) to point to the exact changed region when relevant
+  - for git files pass the git session id; for ws docs omit it
+  - never use navigate to read contents — only to show files in the UI
 
 **Roles:**
 
 Every role has a stable label `[A{n}-{slug}]`. Reference roles by label (e.g. `A1-drafter`), not by number — the label survives renumbering. One agent instance plays one role at a time.
 
 - **`A1-drafter`** (Drafter)
-  - researches the codebase alone or via `A2-explorer`
+  - main chat coordinator
+  - researches the codebase alone or via `A2-researcher` / `A3-explorer`
   - writes the task specification (`overview.md`, subtasks, Execution Scheme)
   - owns Step 1 (Spec drafting); may also close Step 7 / Pattern extract in current context
-- **`A2-explorer`** (Explorer)
-  - read-only study of the codebase
+- **`A2-researcher`** (Researcher)
+  - general open-ended research (web, docs, codebase, hypothesis checking)
+  - read-only except the research file
+  - no subagents
+- **`A3-explorer`** (Explorer)
+  - coordinating researcher; decomposes research into sub-lines
+  - may create only `A2-researcher`
   - supplies accurate Before / After context, paths, and symbols
-  - does not write the final spec or implement product code
-- **`A3-reviewer`** (Reviewer)
+- **`A4-reviewer`** (Reviewer)
+  - reviews spec / code / research
   - reviews at Spec self-review (Step 2) and Code self-review (Step 5)
+  - may launch `A2-researcher` / `A3-explorer`; no deeper
   - may fix defects found in that review; then stops and prompts the user
-- **`A4-coder`** (Coder)
+- **`A5-coder`** (Coder)
   - executes one Execution Scheme subtask
-  - implements code for that subtask only; lists changed files per `R14-changed-files`
+  - performs that subtask only (code, docs, config, rules); lists changed files per `R14-changed-files`
   - sets `Status: Done` in the subtask file; does not rename to `_DONE_` or write `Used model`
-- **`A5-coordinator`** (Coordinator)
-  - coordinates Coders (`A4-coder`) per the Execution Scheme
+  - no subagents
+- **`A6-coordinator`** (Coordinator)
+  - coordinates Coders (`A5-coder`) per the Execution Scheme
   - owns Steps 4–5 end-to-end: launch Coders, `R15-done-marking`, launch Reviewer for Step 5
-  - must not be the same agent instance that drafted the spec when Steps 1–2 already ran in this chat
-
-**Ambient rules**
-
-- Session/environment facts shared with every sub-agent for this run (e.g. repository name, session identifier).
-- If not yet set: clarify via `R10-ask` before any sub-agent launch. `Ambient context: none` counts as set.
-- Shape when present:
-  ```
-  Ambient rules:
-  1) repository: {name}
-  2) session: {id}
-  ```
-- Explicit empty: `Ambient context: none`
+  - may launch `A5-coder` and `A4-reviewer`
+  - must not be the same agent instance as `A1-drafter`
 
 **Subagent run protocol**
 
-Applies to every sub-agent launch for any role (`A2-explorer`, `A3-reviewer`, `A4-coder`, `A5-coordinator`, and any further nesting).
+Applies to every sub-agent launch for any role (`A2-researcher`, `A3-explorer`, `A4-reviewer`, `A5-coder`, `A6-coordinator`, and any further nesting).
 
 1. Resolve Ambient context per `R16-ambient` (clarify if missing; do not ask when `Ambient context: none`).
 2. Put the resolved Ambient block at the very start of the sub-agent prompt (verbatim `Ambient rules: …` or `Ambient context: none`).
@@ -158,7 +193,8 @@ Applies to every sub-agent launch for any role (`A2-explorer`, `A3-reviewer`, `A
 ## Process Overview
 
 ```
-[1] Spec drafting
+[0] Request classification (Question -> answer | Initiative -> Step 1)
+→ [1] Spec drafting
 → [2] Spec self-review
 → [3] Spec review (user)
 → [4] Code implementation
@@ -168,13 +204,45 @@ Applies to every sub-agent launch for any role (`A2-explorer`, `A3-reviewer`, `A
 → (optional) pattern extract to spawn/rules/
 ```
 
-Mark each status [V] on completion. Prompt the user after steps 2, 5, and 6. After Step 7, offer optional Pattern extract (not a Status checkbox).
+Mark each status [V] on completion. Prompt the user after steps 2, 5, and 6. Step 0 is a gate, not a status step — it has no status checkbox. After Step 7, offer optional Pattern extract (not a Status checkbox).
+
+---
+
+## Step 0: Request classification
+
+**Executor:** `A1-drafter` (current context)
+
+0.1 Classify the request per `R17-classify`:
+  - [A] Question -> answer directly (light mode); no `spec/tasks/` folder, no status checkboxes; optionally launch `A2-researcher`/`A3-explorer` (Subagent run protocol, `R13-model-line`) for accurate facts; if the answer reveals a real task, propose Step 1.
+  - [B] Initiative / task -> proceed to Step 1 (Spec drafting).
+0.2 If the type is unclear, ask via `R10-ask` and wait.
 
 ---
 
 ## Step 1: Spec drafting
 
 **Executor:** `A1-drafter`
+
+1.0 **Research (optional)** — for non-trivial tasks where the implementation path is not yet obvious, run a research loop before drafting the spec. Skip for trivial tasks.
+
+1.0.1 **Research depth selection** — ask the user (`R10-ask`) whether research is needed and at what depth:
+  - [inline] — no subagents; the drafter researches in-chat (trivial, one-off questions)
+  - [medium] — launch a single `A3-explorer` (or `A2-researcher` for a narrow single-line question) subagent (default)
+  - [high] — launch several directed `A3-explorer` subagents, one per direction line
+  - [skip] — no research needed; proceed directly to spec drafting
+  Default to [medium] if the user does not specify. If the task is trivial and the implementation path is obvious, offer [skip] first.
+
+1.0.2 **Research loop** — run research in a loop, up to 3 waves:
+  1.0.2.1 Decompose — split research into independent direction lines (high = several, medium = one)
+  1.0.2.2 Launch — launch `A3-explorer`/`A2-researcher` subagents, one per line (Subagent run protocol `R16-ambient`, `R13-model-line`)
+  1.0.2.3 Collect — collect findings, synthesize into a `## Research summary` section in `overview.md`
+  1.0.2.4 Review — launch `A4-reviewer` to review the research (Subagent run protocol)
+  1.0.2.5 Decide — gaps remain -> another wave (up to 3 total), return to 1.0.2.1; complete -> proceed to 1.0.3
+
+1.0.3 **User research review** — show the research summary, ask the user (`R10-ask`):
+  - [Proceed] — research sufficient, move to spec drafting
+  - [Refine] — needs refinement, user points out what to clarify, return to 1.0.2 (another wave, up to 3)
+  - [Stop] — stop here (finish or move to a separate chat with a prompt)
 
 1.1 **Project rules (navigation)** — **MANDATORY!** Follow `R11-navigation` before writing any spec content.
 
@@ -224,7 +292,7 @@ Mark each status [V] on completion. Prompt the user after steps 2, 5, and 6. Aft
   - affected files (named classes/methods/functions per path)
   - code changes (before/after)
 - set `Suggested model` for the step; leave `Used model` empty
-- optional: launch `A2-explorer` (new sub-agent) for read-only codebase analysis to determine accurate **Before** / **After** text, then merge findings into the step files (`A2-explorer` analysis only; `A1-drafter` owns decomposition and the spec); follow **Subagent run protocol** (`R16-ambient`)
+- optional: launch `A3-explorer` (or `A2-researcher`) as a new sub-agent for read-only research / codebase analysis to determine accurate **Before** / **After** text, then merge findings into the step files (research / analysis only; `A1-drafter` owns decomposition and the spec); follow **Subagent run protocol** (`R16-ambient`)
 
 - set [V] "Spec drafting" `[model-name]` (record the model per `R13-model-line`): `- [V] Spec drafting [model-name]`
 - list changed files per `R14-changed-files`
@@ -233,7 +301,7 @@ Mark each status [V] on completion. Prompt the user after steps 2, 5, and 6. Aft
 
 ## Step 2: Spec self-review
 
-**Executor:** `A3-reviewer`
+**Executor:** `A4-reviewer`
 
 - sub-agent prompt: **Subagent run protocol** first (`R16-ambient`), then the line from `R13-model-line`
 - review the spec for:
@@ -259,24 +327,24 @@ Mark each status [V] on completion. Prompt the user after steps 2, 5, and 6. Aft
 
 ## Step 4: Code implementation
 
-**Executor (coordination):** `A5-coordinator`
+**Executor (coordination):** `A6-coordinator`
 - **Same chat as Steps 1–2:**
-  - `A1-drafter` must not act as `A5-coordinator` for Steps 4–5
-  - on the implementation command, launch **one new sub-agent** as `A5-coordinator` for Steps 4–5 end-to-end
+  - `A1-drafter` must not act as `A6-coordinator` for Steps 4–5
+  - on the implementation command, launch **one new sub-agent** as `A6-coordinator` for Steps 4–5 end-to-end
   - prefer `Suggested coordinator model` from `## Execution Scheme` (Task `model` when supported; else prompt + nearest slug)
   - parent waits for the coordinator, then waits for the user for Step 6
-- **Fresh execute chat** (Steps 1–2 not in context): the current agent is `A5-coordinator`
+- **Fresh execute chat** (Steps 1–2 not in context): the current agent is `A6-coordinator`
 
-**`A5-coordinator`** — follows the Execution Scheme, launches one `A4-coder` per step, then Step 5 (`A3-reviewer`).
-**Each step in the Execution Scheme:** `A4-coder` (new sub-agent) — child of the coordinator.
+**`A6-coordinator`** — follows the Execution Scheme, launches one `A5-coder` per step, then Step 5 (`A4-reviewer`).
+**Each step in the Execution Scheme:** `A5-coder` (new sub-agent) — child of the coordinator.
 
 - on "run it" / "implement" / "execute" / any direct instruction to start implementation:
   - if "Spec review" is not yet marked, set [V] "Spec review" automatically (implementation command implies approval)
   - if this chat already completed Steps 1–2 for the task:
-    - launch the Steps 4–5 `A5-coordinator` sub-agent (see Executor above) and stop coordinating inline
+    - launch the Steps 4–5 `A6-coordinator` sub-agent (see Executor above) and stop coordinating inline
     - prefer `Suggested coordinator model`
-    - include in prompt: **Subagent run protocol** (`R16-ambient`); follow Steps 4–5 for `spec/tasks/{task-code}-{slug}/` as `A5-coordinator`; the line from `R13-model-line`
-  - **MANDATORY!** launch an `A4-coder` sub-agent for each step — do NOT implement inline; no exceptions, even if a step seems trivial
+    - include in prompt: **Subagent run protocol** (`R16-ambient`); follow Steps 4–5 for `spec/tasks/{task-code}-{slug}/` as `A6-coordinator`; the line from `R13-model-line`
+  - **MANDATORY!** launch an `A5-coder` sub-agent for each step — do NOT implement inline; no exceptions, even if a step seems trivial
     - prefer subtask `Suggested model`: pass as Task/sub-agent `model` when supported; else name in prompt and use nearest slug
     - Coder prompt must include: **Subagent run protocol** (`R16-ambient`), line from `R13-model-line`, changed-files list per `R14-changed-files`, **Coder protocol** below
   - follow the Execution Scheme: sequential (→), parallel (||)
@@ -285,7 +353,7 @@ Mark each status [V] on completion. Prompt the user after steps 2, 5, and 6. Aft
 - when all subtasks done and Step 5 complete: set [V] "Code implementation" `[model-name]` (coordinator model, per `R13-model-line`): `- [V] Code implementation [model-name]`
 - forward the aggregated changed-files list to the user per `R14-changed-files`
 
-**Coder protocol** (`A4-coder`, each Execution Scheme step):
+**Coder protocol** (`A5-coder`, each Execution Scheme step):
 - Implement the subtask; list changed files per `R14-changed-files`.
 - At the end, set `Status: Done` in the subtask file.
 - End the reply with the `My model:` line from `R13-model-line`.
@@ -294,7 +362,7 @@ Mark each status [V] on completion. Prompt the user after steps 2, 5, and 6. Aft
 
 ## Step 5: Code self-review
 
-**Executor:** `A3-reviewer` (new sub-agent; launched by `A5-coordinator`)
+**Executor:** `A4-reviewer` (new sub-agent; launched by `A6-coordinator`)
 
 - sub-agent prompt: **Subagent run protocol** first (`R16-ambient`), then the line from `R13-model-line`
 - review all changes: inconsistencies, naming, missing imports, broken contracts; respect Ambient context when present
@@ -319,7 +387,7 @@ Mark each status [V] on completion. Prompt the user after steps 2, 5, and 6. Aft
 
 If the user requests rework or fixes after Step 4:
 
-- carry out the changes (as `A4-coder` or current context); list changed files per `R14-changed-files`
+- carry out the changes (as `A5-coder` or current context); list changed files per `R14-changed-files`
 - ask via `R10-ask`: "Do you want to update the specifications of the current task?"
   - Yes: `A1-drafter` (or current context) edits the affected subtask files and/or `overview.md` to match the actual state; do not re-run the spec cycle; list changed files per `R14-changed-files`
   - No: proceed without changes
@@ -417,6 +485,9 @@ Reject immediately (do not offer):
 - Path: {seed path or none}
 
 ## Status
+- [ ] Research [model]           (optional — only when Step 1.0 ran)
+- [ ] Research review [model]    (optional)
+- [ ] User research review       (optional)
 - [ ] Spec drafting [model]
 - [ ] Spec self-review [model]
 - [ ] Spec review
@@ -430,6 +501,9 @@ Reject immediately (do not offer):
 
 ## Motivation
 {Why this change — from the user request, or from the clarification answer.}
+
+## Research summary
+{Optional — synthesized research findings with links to research files. Present only when the research phase (Step 1.0) ran.}
 
 ## Design overview
 - Affected modules: {list}
@@ -449,7 +523,7 @@ Reject immediately (do not offer):
 ## Execution Scheme
 Suggested coordinator model: {model}
 > Each step id is the subtask filename (e.g. `1-abstractions`).
-> MANDATORY! Each step is executed by a dedicated `A4-coder` subagent (Task tool). Do NOT implement inline. No exceptions — even if a step seems trivial or small.
+> Each step is executed by a dedicated `A5-coder` subagent (see Step 4).
 - Phase 1 (sequential): step {N}-{description} → step {N}-{description}
 - Phase 2 (parallel):   step {N}-{description} || step {N}-{description}
 - Phase 3 (sequential): step review — inspect all changes, fix inconsistencies
@@ -528,7 +602,7 @@ linked task: {task path or none}
 
 ## HLA Template
 
-`spec/design/hla.md` describes the project high-level architecture and interaction of abstractions. It is the single source of truth for how components, services, and implementations relate to each other. The shipped file is a skeleton; fill it in following this structure.
+`spec/design/hla.md` describes the project high-level architecture and interaction of abstractions. It is the single source of truth for how components, services, and implementations relate to each other.
 
 ```markdown
 # High-Level Architecture (HLA)
@@ -565,11 +639,3 @@ This document describes the high-level architecture and interaction of abstracti
 
 {description of how data flows through the system: entry points → services → implementations → infrastructure}
 ```
-
-HLA update rules (Step 7):
-
-- Follow the template structure exactly; do not invent new top-level sections; keep the fixed order of the five sections.
-- Add or remove `###` blocks within a section as components change; never reorder the five top-level sections.
-- Every `###` block must carry the fields listed for its section (no empty blocks, no missing fields).
-- Update HLA in Step 7 based on the task's changed/added files and symbols; keep it in sync with the repo.
-- If a component is removed, delete its `###` block; if renamed, rename the block and update its fields.

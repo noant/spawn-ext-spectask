@@ -12,7 +12,7 @@ description: Step 3 — spec approved (spec/main.md).
 
 **Rules:** `R7-process`, `R10-ask`
 
-**Roles involved:** User (confirmation); later Steps 4–5 → `A5-coordinator` via execute skills
+**Roles involved:** User (confirmation); later Steps 4–5 → `A6-coordinator` via execute skills
 
 **Flow:**
 

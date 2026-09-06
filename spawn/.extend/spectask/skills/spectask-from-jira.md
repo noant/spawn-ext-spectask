@@ -11,7 +11,7 @@ description: Import Jira tickets into spec/tasks/{task-code}-{slug}/; codebase a
 
 **Rules:** `R4-code-tracker`, `R5-new-task`, `R7-process`, `R8-concrete`, `R9-greenfield`, `R10-ask`, `R11-navigation`, `R13-model-line`, `R14-changed-files`, `R16-ambient`
 
-**Roles involved:** `A1-drafter`, optional `A2-explorer`, `A3-reviewer` (Step 2)
+**Roles involved:** `A1-drafter`, optional `A3-explorer`/`A2-researcher`, `A4-reviewer` (Step 2)
 
 **Flow:**
 
