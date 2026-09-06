@@ -223,7 +223,7 @@ Mark each status [V] on completion. Prompt the user after steps 2, 5, and 6. Ste
 
 **Executor:** `A1-drafter`
 
-1.0 **Research (optional)** — for non-trivial tasks where the implementation path is not yet obvious, run a research loop before drafting the spec. Skip for trivial tasks.
+1.0 **Research** — run a research loop before drafting the spec when the implementation path is not yet obvious. Skip for trivial tasks.
 
 1.0.1 **Research depth selection** — ask the user (`R10-ask`) whether research is needed and at what depth:
   - [inline] — no subagents; the drafter researches in-chat (trivial, one-off questions)
@@ -235,7 +235,7 @@ Mark each status [V] on completion. Prompt the user after steps 2, 5, and 6. Ste
 1.0.2 **Research loop** — run research in a loop, up to 3 waves:
   1.0.2.1 Decompose — split research into independent direction lines (high = several, medium = one)
   1.0.2.2 Launch — launch `A3-explorer`/`A2-researcher` subagents, one per line (Subagent run protocol `R16-ambient`, `R13-model-line`)
-  1.0.2.3 Collect — collect findings, synthesize into a `## Research summary` section in `overview.md`
+  1.0.2.3 Collect — record findings into the `## Research summary` section of `overview.md`.
   1.0.2.4 Review — launch `A4-reviewer` to review the research (Subagent run protocol)
   1.0.2.5 Decide — gaps remain -> another wave (up to 3 total), return to 1.0.2.1; complete -> proceed to 1.0.3
 
@@ -485,9 +485,9 @@ Reject immediately (do not offer):
 - Path: {seed path or none}
 
 ## Status
-- [ ] Research [model]           (optional — only when Step 1.0 ran)
-- [ ] Research review [model]    (optional)
-- [ ] User research review       (optional)
+- [ ] Research [model]
+- [ ] Research review [model]
+- [ ] User research review
 - [ ] Spec drafting [model]
 - [ ] Spec self-review [model]
 - [ ] Spec review
@@ -503,7 +503,7 @@ Reject immediately (do not offer):
 {Why this change — from the user request, or from the clarification answer.}
 
 ## Research summary
-{Optional — synthesized research findings with links to research files. Present only when the research phase (Step 1.0) ran.}
+{Synthesized research findings with links to research files. Present only when the research phase (Step 1.0) ran.}
 
 ## Design overview
 - Affected modules: {list}
