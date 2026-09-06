@@ -1,6 +1,6 @@
 schema: 1
 name: spectask
-version: "1.18.2"
+version: "1.19.0"
 
 hints:
   global:
@@ -70,12 +70,12 @@ skills:
       - spec/main.md
   spectask-code-review-passed.md:
     name: spectask-code-review-passed
-    description: "After user confirms code review / debugging — Steps 7–8 then optional pattern extract (spec/main.md)."
+    description: "After user confirms code review / debugging — Steps 7–8 then pattern extract (spec/main.md)."
     required-read:
       - spec/main.md
   spectask-extract-patterns.md:
     name: spectask-extract-patterns
-    description: "After Step 8 — optional extract of reusable patterns into spawn/rules/ and navigation (spec/main.md)."
+    description: "After Step 8 — extract reusable patterns into spawn/rules/ and navigation (spec/main.md)."
     required-read:
       - spec/main.md
   spectask-design.md:
