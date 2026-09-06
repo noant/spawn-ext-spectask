@@ -7,18 +7,19 @@ description: Use when drafting a new spectask (specification only, per spec/main
 
 **Role:** `A1-drafter`
 
-**Steps:** 1–3 only — then stop for user Step 4.
+**Steps:** 1–3 only (Research, Spec drafting, Spec self-review) — then stop for user Step 4.
 
 **Rules:** `R3-code-num`, `R4-code-tracker`, `R5-new-task`, `R7-process`, `R8-concrete`, `R9-greenfield`, `R10-ask`, `R11-navigation`, `R13-model-line`, `R14-changed-files`, `R16-ambient`
 
-**Roles involved:** `A1-drafter`, optional `A3-explorer`/`A2-researcher` (2.6), `A4-reviewer` (Step 3)
+**Roles involved:** `A1-drafter`, optional `A3-explorer`/`A2-researcher` (Step 1, 2.6), `A4-reviewer` (Steps 1.2.4, 3)
 
 **Flow:**
 
 0. Classify the request per `R17-classify`: `[A]` Question → answer directly (no Steps 1–3); `[B]` Initiative → continue below.
 1. Read **spec/main.md** fully — Folder Structure, Embedded rules, Roles, Subagent run protocol, Process Overview, overview and subtask templates.
-2. Execute **Step 2: Spec drafting** as `A1-drafter` (items 2.1–2.6) exactly as written in **spec/main.md**.
-3. Execute **Step 3: Spec self-review** via `A4-reviewer` exactly as written in **spec/main.md**.
-4. Stop — wait for user Step 4. Do not start Steps 5–8.
+2. Execute **Step 1: Research** as `A1-drafter` (items 1.1–1.3) exactly as written in **spec/main.md** — select research depth, run the research loop, then get user research review.
+3. Execute **Step 2: Spec drafting** as `A1-drafter` (items 2.1–2.6) exactly as written in **spec/main.md**.
+4. Execute **Step 3: Spec self-review** via `A4-reviewer` exactly as written in **spec/main.md**.
+5. Stop — wait for user Step 4. Do not start Steps 5–8.
 
 **Constraint:** no product implementation until spec review passes.
