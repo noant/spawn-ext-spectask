@@ -49,7 +49,6 @@ _Task specs_
   - every overview and subtask names concrete paths and symbols (packages/modules, classes, methods, functions) under change
   - every Before / After pair in Code changes is a fenced minimal excerpt (real lines or the exact replacement) plus a behavior line
   - prose-only or "change X to Y" without code is invalid
-  - Spec self-review treats missing concrete targets, non-concrete Before/After, or template violations as defects before Step 3
 - **`R9-greenfield`**
   - for new symbols, same Before/After discipline as `R8-concrete`, with two differences:
   - Before may be insertion-context only (nothing to quote)
@@ -86,7 +85,7 @@ _Interaction and context_
   - recording the model used by a sub-agent:
     - if the platform tool lets you pass an explicit sub-agent `model`, record that call parameter
     - if there is no model-selection parameter, read `My model:` from the sub-agent response and record that
-  - the **coordinator** (`A6-coordinator`) writes `Used model` and overview `[model-name]` brackets — the sub-agent (`A5-coder` / `A4-reviewer` / `A2-researcher` / `A3-explorer`) must not edit those fields
+  - who writes `Used model` / `[model-name]`: see `R15-done-marking`
 - **`R14-changed-files`**
   - after finishing a create/edit batch, list every created or edited path (repo-relative, complete, no omissions)
   - renames and deletes count
@@ -103,7 +102,12 @@ _Interaction and context_
   - mark immediately; do not defer
 - **`R16-ambient`**
   - **Ambient context** is session/environment facts for sub-agents (repository name, session, and similar) — not coding conventions or task design rules
-  - format when present: header `Ambient rules:` then one numbered item per line (`1) …`, `2) …`)
+  - format when present: header `Ambient rules:` then one numbered item per line (`1) …`, `2) …`):
+    ```
+    Ambient rules:
+    1) repository: {name}
+    2) session: {id}
+    ```
   - explicit empty: `Ambient context: none` — ambient **is** set; do **not** ask
   - if Ambient context is missing (neither an `Ambient rules:` block nor `Ambient context: none`), the agent **must** clarify via `R10-ask` before launching any sub-agent — mandatory
   - every sub-agent launch must put the resolved Ambient block at the start of the prompt per **Subagent run protocol**
@@ -174,18 +178,6 @@ Every role has a stable label `[A{n}-{slug}]`. Reference roles by label (e.g. `A
   - owns Steps 4–5 end-to-end: launch Coders, `R15-done-marking`, launch Reviewer for Step 5
   - may launch `A5-coder` and `A4-reviewer`
   - must not be the same agent instance as `A1-drafter`
-
-**Ambient rules**
-
-- Session/environment facts shared with every sub-agent for this run (e.g. repository name, session identifier).
-- If not yet set: clarify via `R10-ask` before any sub-agent launch. `Ambient context: none` counts as set.
-- Shape when present:
-  ```
-  Ambient rules:
-  1) repository: {name}
-  2) session: {id}
-  ```
-- Explicit empty: `Ambient context: none`
 
 **Subagent run protocol**
 
@@ -531,7 +523,7 @@ Reject immediately (do not offer):
 ## Execution Scheme
 Suggested coordinator model: {model}
 > Each step id is the subtask filename (e.g. `1-abstractions`).
-> MANDATORY! Each step is executed by a dedicated `A5-coder` subagent (Task tool). Do NOT implement inline. No exceptions — even if a step seems trivial or small.
+> Each step is executed by a dedicated `A5-coder` subagent (see Step 4).
 - Phase 1 (sequential): step {N}-{description} → step {N}-{description}
 - Phase 2 (parallel):   step {N}-{description} || step {N}-{description}
 - Phase 3 (sequential): step review — inspect all changes, fix inconsistencies
