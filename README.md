@@ -49,14 +49,14 @@ The full cycle:
 1. Agent drafts the specification and asks clarifying questions if anything is ambiguous — invoke skill `spectask-create`
 2. Agent self-reviews the spec in a **dedicated subagent** (architectural impact, correctness, sequencing) — a separate context window focuses the review and usually catches more than an inline pass in the same thread
 3. **You approve the plan** — "ok" / "lgtm" / "spec review passed" or invoke skill `spectask-spec-review-passed`
-4. Agent implements following the **Execution Scheme** in the spec — sequential and parallel phases — with one dedicated subagent per step. If the same chat produced Steps 1-2, the agent launches a **coordinator sub-agent** that owns Steps 4-5 end-to-end (not inline). In a fresh execute chat the current agent is the coordinator. Invoke skill `spectask-execute` (all steps in one run) or `spectask-execute-step-by-step` (one subtask per run, wait for you between steps)
+4. Agent implements following the **Execution Scheme** in the spec — sequential and parallel phases — with one dedicated subagent per step. If the same chat produced Steps 1-3, the agent launches a **coordinator sub-agent** that owns Steps 5-6 end-to-end (not inline). In a fresh execute chat the current agent is the coordinator. Invoke skill `spectask-execute` (all steps in one run) or `spectask-execute-step-by-step` (one subtask per run, wait for you between steps)
 5. Agent self-reviews the code in a **dedicated subagent** (naming, imports, alignment with the spec), because a separate context window keeps the focus on the changes and the spec instead of the implementation thread that wrote them, which usually surfaces inconsistencies before your review
 6. **Code Review / Debugging** — "ok" / "lgtm" / "code review passed" or invoke skill `spectask-code-review-passed`
-7. Agent updates `spec/design/hla.md`, reconciles `spec/design.yaml` if needed, renames the task folder to `_DONE_`, closes any linked seed, and marks the task as done. After Step 7 the agent optionally extracts reusable patterns into `spawn/rules/`: it filters candidates and presents the entire filtered list to the user in one message in the same run (no per-candidate preliminary questions), then waits for the user's per-candidate Required/Optional/Decline answer before writing anything.
+7. Agent updates `spec/design/hla.md`, reconciles `spec/design.yaml` if needed, renames the task folder to `_DONE_`, closes any linked seed, and marks the task as done. After Step 8 the agent optionally extracts reusable patterns into `spawn/rules/`: it filters candidates and presents the entire filtered list to the user in one message in the same run (no per-candidate preliminary questions), then waits for the user's per-candidate Required/Optional/Decline answer before writing anything.
 
-If you request rework or fixes after Step 4 (before Step 6 is marked), the agent carries out the changes and asks whether to update the specification to match the actual state — no re-run of the spec cycle.
+If you request rework or fixes after Step 5 (before Step 7 is marked), the agent carries out the changes and asks whether to update the specification to match the actual state — no re-run of the spec cycle.
 
-Agent-executed steps record the **LLM model name** in `overview.md` status lines (for example `- [V] Spec created [claude-sonnet-4-6]`) and in each subtask file (`Status: Done | model: {model}`). User-confirmed checkpoints (Steps 3 and 6) stay plain checkboxes.
+Agent-executed steps record the **LLM model name** in `overview.md` status lines (for example `- [V] Spec created [claude-sonnet-4-6]`) and in each subtask file (`Status: Done | model: {model}`). User-confirmed checkpoints (Steps 4 and 7) stay plain checkboxes.
 
 ## The `spec/` layout
 
@@ -71,7 +71,7 @@ All significant methodology layout lives under `spec/` as defined in the shipped
 - `spec/seeds/{X}-{slug}.md` — optional rough ideas before a full task; see [Seeds](#seeds)
 - `spec/.config/config.yaml` — local Jira and proxy settings; git-ignored (see [Jira integration and MCP](#jira-integration-and-mcp))
 
-After **Code Review / Debugging** (Step 6), Step 7 renames the task folder to `_DONE_{X}-{name}` — not before. That keeps history readable in the repository.
+After **Code Review / Debugging** (Step 7), Step 8 renames the task folder to `_DONE_{X}-{name}` — not before. That keeps history readable in the repository.
 
 ## Core principles
 
@@ -79,7 +79,7 @@ After **Code Review / Debugging** (Step 6), Step 7 renames the task folder to `_
 
 **Agent self-review.** Before asking you, the agent re-reads the specification and the changes it made. Small issues are caught before they reach you.
 
-**Model audit trail.** Agent-executed steps (1, 2, 4, 5, 7) and subtask files record which model performed the work, so you can trace who did what across long-running tasks.
+**Model audit trail.** Agent-executed steps (1, 2, 3, 5, 6, 8) and subtask files record which model performed the work, so you can trace who did what across long-running tasks.
 
 **Shared context via Spawn.** Org-wide rules and extra readable paths usually arrive through **additional Spawn extensions** (or extra `files:` entries in your own pack): declare them in `extsrc/config.yaml` with the right `globalRead` / `localRead` so they appear in merged **`spawn/navigation.yaml`** — same idea as registering extra `spec/design/{name}.md` files.
 
@@ -93,10 +93,10 @@ After **Code Review / Debugging** (Step 6), Step 7 renames the task folder to `_
 
 ## Seeds
 
-**Seeds** are optional Markdown files under `spec/seeds/` for capturing an idea quickly — informal notes, not a full Spectask specification. The full Steps 1–7 workflow does not require a seed unless you deliberately start there.
+**Seeds** are optional Markdown files under `spec/seeds/` for capturing an idea quickly — informal notes, not a full Spectask specification. The full Steps 1–8 workflow does not require a seed unless you deliberately start there.
 
 - Use the **`spectask-seed-create`** skill (or equivalent prompt) so the agent follows the **Seed** section and **Seed file template (header)** in `spec/main.md`: pick a kebab-case slug and the next numeric prefix `X`, create `spec/seeds/{X}-{slug}.md` with `linked task: none` until it binds to a task.
-- When you promote the idea into real work, run **`spectask-create`** and link the seed from `overview.md` (**Source seed** in the template). Step 7 includes renaming the linked seed with `_DONE_` when the task closes.
+- When you promote the idea into real work, run **`spectask-create`** and link the seed from `overview.md` (**Source seed** in the template). Step 8 includes renaming the linked seed with `_DONE_` when the task closes.
 
 This extension declares `spec/seeds/` as an **artifact** folder in `extsrc/config.yaml`, so seed files are project-owned and are not overwritten on extension updates.
 
@@ -106,15 +106,15 @@ After install, invoke methodology steps using these **skills** by name; Spawn re
 
 | Skill | Purpose |
 |--------|--------|
-| **spectask-create** | Draft a new task spec only — **Steps 1–2** in `spec/main.md` (no implementation, no HLA update). |
-| **spectask-spec-review-passed** | Step 3: **Spec review passed** in `overview.md` + Step 3 prompt. |
-| **spectask-execute** | **Steps 4–5** in `spec/main.md` (implement all Execution Scheme steps + self code review); then wait for the user — **Step 6**. |
-| **spectask-execute-step-by-step** | **Step 4** only — one Execution Scheme subtask per run with per-step self-review; auto Step 5 when all subtasks are done. |
-| **spectask-code-review-passed** | Step 6: **Code Review / Debugging passed** in `overview.md` + Step 6 prompt; then **Step 7** and optional pattern extract in `spec/main.md`. The pattern extract step presents a single filtered list to the user (no per-candidate preliminary questions) and waits for the user's per-candidate decision. |
+| **spectask-create** | Draft a new task spec only — **Steps 1–3** in `spec/main.md` (no implementation, no HLA update). |
+| **spectask-spec-review-passed** | Step 4: **Spec review passed** in `overview.md` + Step 4 prompt. |
+| **spectask-execute** | **Steps 5–6** in `spec/main.md` (implement all Execution Scheme steps + self code review); then wait for the user — **Step 7**. |
+| **spectask-execute-step-by-step** | **Step 5** only — one Execution Scheme subtask per run with per-step self-review; auto Step 6 when all subtasks are done. |
+| **spectask-code-review-passed** | Step 7: **Code Review / Debugging passed** in `overview.md` + Step 7 prompt; then **Step 8** and optional pattern extract in `spec/main.md`. The pattern extract step presents a single filtered list to the user (no per-candidate preliminary questions) and waits for the user's per-candidate decision. |
 | **spectask-design** | Register architecture files in `spec/design.yaml` or draft `spec/design/*.md`. |
 | **spectask-seed-create** | Capture a rough idea as `spec/seeds/{X}-{slug}.md`; offer **spectask-create** when the user promotes. |
-| **spectask-from-jira** | Import a Jira issue into `spec/tasks/{task-code}-{slug}/` (MCP or CLI, with manual fallback); explore the codebase and complete Steps 1–2 before waiting for Step 3. |
-| **spectask-extract-patterns** | After Step 7 — optional extract of reusable patterns into `spawn/rules/` and `spawn/navigation.yaml`. Filters candidates against selection criteria, then presents the entire filtered list to the user in one message (no `R10-ask`, no per-candidate tool questions), waits for the user's per-candidate decision, writes rules and runs `spawn refresh`. |
+| **spectask-from-jira** | Import a Jira issue into `spec/tasks/{task-code}-{slug}/` (MCP or CLI, with manual fallback); explore the codebase and complete Steps 2–3 before waiting for Step 4. |
+| **spectask-extract-patterns** | After Step 8 — optional extract of reusable patterns into `spawn/rules/` and `spawn/navigation.yaml`. Filters candidates against selection criteria, then presents the entire filtered list to the user in one message (no `R10-ask`, no per-candidate tool questions), waits for the user's per-candidate decision, writes rules and runs `spawn refresh`. |
 
 ## Jira integration and MCP
 
@@ -169,7 +169,7 @@ Exit codes for `spectask-mcp run`: 0 = success, 1 = usage/misc error, 2 = missin
 
 Deployment type (`atlassian_cloud` vs `self_hosted`) selects REST API version and search endpoints end-to-end; see `spec/design/hla.md` after install for details.
 
-To **import a Jira ticket into a Spectask folder**, use the **spectask-from-jira** skill so the agent follows the workflow (prefer MCP tool `jira_fetch`, else CLI, else pasted content). The skill scaffolds the task folder, maps ticket intent to concrete codebase paths, and completes Steps 1–2 before waiting for your Step 3 approval.
+To **import a Jira ticket into a Spectask folder**, use the **spectask-from-jira** skill so the agent follows the workflow (prefer MCP tool `jira_fetch`, else CLI, else pasted content). The skill scaffolds the task folder, maps ticket intent to concrete codebase paths, and completes Steps 2–3 before waiting for your Step 4 approval.
 
 ## Navigation and reads
 

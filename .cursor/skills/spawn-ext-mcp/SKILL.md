@@ -45,6 +45,6 @@ Contextual reads:
 - `spawn-ext-guide/ai/config-yaml.md` - Machine schema for config.yaml — keys, files/folders/skills modes, reads, ignores, setup, annotated example.
 - `spawn-ext-guide/ai/skill-sources.md` - Machine rules for extsrc/skills/*.md — frontmatter, name/description resolution, rendered skill shape, example.
 - `spawn-ext-guide/ai/cli.md` - Machine CLI reference — spawn init/extension/build commands, extensions.yaml bundle shape, authoring checklist.
-- `spec/main.md` - Spec-Tasks methodology — folder structure, seven-step process, overview template.
-- `spec/design/hla.md` - Project high-level architecture; updated in Step 7.
+- `spec/main.md` - Spec-Tasks methodology — folder structure, eight-step process, overview template.
+- `spec/design/hla.md` - Project high-level architecture; updated in Step 8.
 - `spec/design.yaml` - Index of architecture documents under spec/design/ — path and description per entry.
