@@ -202,10 +202,10 @@ Applies to every sub-agent launch for any role (`A2-researcher`, `A3-explorer`, 
 → [6] Code self-review
 → [7] Code review / debugging (user)
 → [8] Design document update
-→ (optional) pattern extract to spawn/rules/
+→ pattern extract to spawn/rules/
 ```
 
-Mark each status [V] on completion. Prompt the user after steps 3, 6, and 7. Step 0 is a gate, not a status step — it has no status checkbox. After Step 8, offer optional Pattern extract (not a Status checkbox).
+Mark each status [V] on completion. Prompt the user after steps 3, 6, and 7. Step 0 is a gate, not a status step — it has no status checkbox. After Step 8, run Pattern extract (not a Status checkbox).
 
 ---
 
@@ -415,26 +415,26 @@ If the user requests rework or fixes after Step 5:
 - if the Source seed Path in the overview is concrete and the listed spec/seeds file is linked to this overview, rename it once with _DONE_ added
 - set [V] "Design document update" — fill the model name in brackets: `- [V] Design document update [model-name]`
 - list changed files per `R14-changed-files`
-- continue with **Optional: Pattern extract** below (same run when closing via Steps 7–8)
+- continue with **Pattern extract** below (same run when closing via Steps 7–8)
 
 ---
 
-## Optional: Pattern extract (after Step 8)
+## Pattern extract (after Step 8)
 
 **Executor:** `A1-drafter` (current context)
 
-After Step 8, optionally extract reusable approaches into **`spawn/rules/`** as project-standard candidates. Not a Status item. Skill: **spectask-extract-patterns**.
+After Step 8, extract reusable approaches into **`spawn/rules/`** as project-standard candidates. Skill: **spectask-extract-patterns**.
 
-The agent filters candidates, presents the final list to the user in this run (no preliminary per-candidate questions), and waits for one per-candidate reply.
+The agent filters candidates, presents the final list to the user in this run, then asks per-candidate acceptance via the ask tool (`R10-ask`).
 
 **Order (mandatory):**
 
 1. **Discover** — find and filter reusable candidates (agent only).
 2. **Present** — show the filtered list to the user in one message right after Step 8 (title + one-line rationale + suggested scope per survivor).
-3. **Wait** — for the user's per-candidate reply.
+3. **Ask** — ask per-candidate acceptance via the ask tool (`R10-ask`); wait for the user's answer.
 4. **Write** — only candidates the user accepted as Required or Optional.
 
-Skip the whole step only if the user already declined in this close-out. If Discover leaves zero candidates, say so briefly and stop.
+This step always runs after Step 8. If Discover leaves zero candidates, say so briefly and stop.
 
 ### Discover (before presenting)
 
@@ -463,12 +463,12 @@ Reject immediately (do not offer):
 ### Present (after Discover)
 
 - run only when Discover left one or more candidates
-- present the entire list in **one message**, right after Step 8 — **no `R10-ask`, no per-candidate tool questions, no pauses**
+- present the entire list in **one message**, right after Step 8
 - for each survivor: short title, one-line rationale, suggested scope (Required = `read-required`, Optional = `read-contextual`)
-- end the message with a reply request: per-candidate Required/Optional/Decline, or "decline all"
+- then ask via the ask tool (`R10-ask`): per-candidate Required/Optional/Decline, plus a "decline all" option
 - then wait — do not write rules, do not run `spawn refresh`, do not start the next task
 
-### Apply the user's answer (after the reply)
+### Apply the user's answer (after the ask)
 
 - write only Required/Optional candidates
 - if all Declined (or "decline all"): write nothing
