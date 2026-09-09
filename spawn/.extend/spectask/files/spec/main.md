@@ -273,6 +273,11 @@ Mark each status [V] on completion. Prompt the user after steps 3, 6, and 7. Ste
   - deprecation / migration — sunset or replace legacy behavior
   - other — name the driver in one sentence
 - Put the chosen motivation in **`## Motivation`** (after **Goal**).
+- Ask the user to choose an **invasiveness level** (`R10-ask`, multiple choice) — the edit scope the spec must respect:
+  - **minimally-invasive** — edits confined to a single layer or library; all other layers/libraries are left untouched, even if the solution is a workaround (crutch).
+  - **medium-invasive** — edits may span several adjacent layers or domains, e.g. backend + frontend, or domain1 + domain2.
+  - **maximally-invasive** — edits may span all layers and all domains; the LLM follows the principle of deep rework over a superficial fix with compromises.
+- Record the chosen level in **`## Invasiveness level`** (after **`## Motivation`**). Every affected file/symbol in the spec must stay within the chosen scope.
 
 2.3 **Design overview**
 - In the task `overview.md`, add a **Design overview** section:
@@ -508,6 +513,9 @@ Reject immediately (do not offer):
 
 ## Motivation
 {Why this change — from the user request, or from the clarification answer.}
+
+## Invasiveness level
+{minimally-invasive | medium-invasive | maximally-invasive — chosen in Step 2.2; constrains the edit scope of the spec.}
 
 ## Research summary
 {Synthesized research findings with links to research files. Present only when the research phase (Step 1) ran.}
