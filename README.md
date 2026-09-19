@@ -1,6 +1,6 @@
 # Spectask (Spawn extension)
 
-Spectask is a methodology and structured workflow that enforces specification before implementation in AI-assisted development. This repository packages Spectask as a **Spawn extension**: methodology files, agent skills, MCP descriptors, and folder modes (`static` vs `artifact`) are declared in `extsrc/config.yaml` and installed into your project with the Spawn CLI.
+Spectask is a methodology and harness — a structured workflow that enforces specification before implementation in AI-assisted development. This repository packages Spectask as a **Spawn extension**: methodology files, agent skills, MCP descriptors, and folder modes (`static` vs `artifact`) are declared in `extsrc/config.yaml` and installed into your project with the Spawn CLI.
 
 ## Install
 
