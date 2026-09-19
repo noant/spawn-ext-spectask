@@ -145,6 +145,9 @@ _Subagent governance_
   - use line ranges (`from_line`/`to_line`) to point to the exact changed region when relevant
   - for git files pass the git session id; for ws docs omit it
   - never use navigate to read contents — only to show files in the UI
+- **`R22-agents-md`**
+  - sub-agents load `AGENTS.md` and auto-loaded rule sets automatically
+  - do not restate those rules in a sub-agent prompt; reference them by label or add only role-specific instructions and Ambient context (`R16-ambient`)
 
 **Roles:**
 
@@ -185,7 +188,7 @@ Applies to every sub-agent launch for any role (`A2-researcher`, `A3-explorer`, 
 
 1. Resolve Ambient context per `R16-ambient` (clarify if missing; do not ask when `Ambient context: none`).
 2. Put the resolved Ambient block at the very start of the sub-agent prompt (verbatim `Ambient rules: …` or `Ambient context: none`).
-3. Then add role-specific instructions (`R13-model-line`, `R14-changed-files`, Coder protocol, etc.).
+3. Then add role-specific instructions (`R13-model-line`, `R14-changed-files`, Coder protocol, etc.). Do not restate rules already in `AGENTS.md` — reference them by label per `R22-agents-md`.
 4. Every agent that received Ambient context passes it to each child sub-agent unchanged — same wording, same order; do not drop, summarize, or rewrite.
 
 ---
