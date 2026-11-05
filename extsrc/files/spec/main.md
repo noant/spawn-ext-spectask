@@ -271,7 +271,7 @@ After Step 8, run Pattern extract (not a Status checkbox).
 - **Research review scheme** — single (one model) or cross (two models) — for Step 1.2.4 (`R23-review-scheme`)
 - **Spec review scheme** — single (one model) or cross (two models) — for Step 3 (`R23-review-scheme`)
 - **Code review scheme** — single (one model) or cross (two models) — for Step 6 (`R23-review-scheme`)
-- **Motivation** (2.2; if unclear) — multiple choice; adapt to context:
+- **Motivation** (used in 2.2; if unclear) — multiple choice; adapt to context:
   - bug fix — restore correct behavior, regression, or broken promise
   - new feature — new user-visible capability, use case, or revenue path
   - UX — usability, accessibility, clarity, workflow friction
@@ -283,10 +283,11 @@ After Step 8, run Pattern extract (not a Status checkbox).
   - experiment — hypothesis test or MVP slice
   - deprecation / migration — sunset or replace legacy behavior
   - other — name the driver in one sentence
-- **Invasiveness level** (2.2) — the edit scope the spec must respect:
+- **Invasiveness level** (used in 2.2) — the edit scope the spec must respect:
   - minimally-invasive — edits confined to a single layer or library; other layers untouched, even if the solution is a workaround (crutch)
   - medium-invasive — edits may span several adjacent layers or domains (e.g. backend + frontend, domain1 + domain2)
   - maximally-invasive — edits may span all layers and domains; deep rework over a superficial fix with compromises
+  - every affected file/symbol in the spec must stay within the chosen scope
 - **Task code** confirmation (`R3-code-num`), when applicable
 - **Ambient context** (`R16-ambient`), when not already set
 
@@ -320,7 +321,6 @@ Record all answers; Steps 1.2, 2.2, 3, and 6 reuse them without re-asking.
 2.1 **Project rules (navigation)** — **MANDATORY!** Follow `R11-navigation` before writing any spec content.
 
 2.2 **Implementation clarifications** — **MANDATORY!**:
-- Questions already answered in the Step 1.1 combined ask batch are NOT asked again — reuse the recorded answers (Motivation -> `## Motivation` after **Goal**; Invasiveness level -> `## Invasiveness level`; every affected file/symbol must stay within the chosen scope).
 - Before writing any spec content, identify remaining ambiguous, optional, or convention-dependent aspects.
 - Ask the user explicit questions (`R10-ask`) and wait for answers.
 - Record answers (or agreed defaults) in **Details**.
