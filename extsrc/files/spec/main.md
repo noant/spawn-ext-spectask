@@ -320,15 +320,11 @@ Record all answers; Steps 1.2, 2.2, 3, and 6 reuse them without re-asking.
 2.1 **Project rules (navigation)** — **MANDATORY!** Follow `R11-navigation` before writing any spec content.
 
 2.2 **Implementation clarifications** — **MANDATORY!**:
-- Questions already answered in the Step 1.1 combined ask batch (motivation, invasiveness level, review schemes, task code, Ambient context) are NOT asked again here — reuse the recorded answers.
+- Questions already answered in the Step 1.1 combined ask batch are NOT asked again — reuse the recorded answers (Motivation -> `## Motivation` after **Goal**; Invasiveness level -> `## Invasiveness level`; every affected file/symbol must stay within the chosen scope).
 - Before writing any spec content, identify remaining ambiguous, optional, or convention-dependent aspects.
 - Ask the user explicit questions (`R10-ask`) and wait for answers.
 - Record answers (or agreed defaults) in **Details**.
 - Skip only when there is a single obvious implementation path.
-- If **Ambient context** is not already set in this chat, ask via `R10-ask` (repository, session, and similar); accept a list or explicit `Ambient context: none` (`R16-ambient`).
-- **Motivation** — reuse the Step 1.1 answer; put it in **`## Motivation`** (after **Goal**).
-- **Invasiveness level** — reuse the Step 1.1 answer; record it in **`## Invasiveness level`** (after **`## Motivation`**).
-- Every affected file/symbol in the spec must stay within the chosen scope.
 
 2.3 **Design overview**
 - In the task `overview.md`, add a **Design overview** section:
