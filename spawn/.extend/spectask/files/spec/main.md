@@ -271,8 +271,22 @@ After Step 8, run Pattern extract (not a Status checkbox).
 - **Research review scheme** — single (one model) or cross (two models) — for Step 1.2.4 (`R23-review-scheme`)
 - **Spec review scheme** — single (one model) or cross (two models) — for Step 3 (`R23-review-scheme`)
 - **Code review scheme** — single (one model) or cross (two models) — for Step 6 (`R23-review-scheme`)
-- **Motivation** (2.2; if unclear)
-- **Invasiveness level** (2.2)
+- **Motivation** (2.2; if unclear) — multiple choice; adapt to context:
+  - bug fix — restore correct behavior, regression, or broken promise
+  - new feature — new user-visible capability, use case, or revenue path
+  - UX — usability, accessibility, clarity, workflow friction
+  - performance — speed, scale, or perceived responsiveness
+  - refactor / tech debt — internal quality and maintainability, usually no user-visible change
+  - security / compliance — vulnerability, regulatory obligation, data protection
+  - reliability / ops — stability, observability, downtime, support burden
+  - integration — external APIs, partners, cross-system workflow
+  - experiment — hypothesis test or MVP slice
+  - deprecation / migration — sunset or replace legacy behavior
+  - other — name the driver in one sentence
+- **Invasiveness level** (2.2) — the edit scope the spec must respect:
+  - minimally-invasive — edits confined to a single layer or library; other layers untouched, even if the solution is a workaround (crutch)
+  - medium-invasive — edits may span several adjacent layers or domains (e.g. backend + frontend, domain1 + domain2)
+  - maximally-invasive — edits may span all layers and domains; deep rework over a superficial fix with compromises
 - **Task code** confirmation (`R3-code-num`), when applicable
 - **Ambient context** (`R16-ambient`), when not already set
 
@@ -312,24 +326,8 @@ Record all answers; Steps 1.2, 2.2, 3, and 6 reuse them without re-asking.
 - Record answers (or agreed defaults) in **Details**.
 - Skip only when there is a single obvious implementation path.
 - If **Ambient context** is not already set in this chat, ask via `R10-ask` (repository, session, and similar); accept a list or explicit `Ambient context: none` (`R16-ambient`).
-- If **motivation** is unclear, ask via `R10-ask` (multiple choice; adapt to context):
-  - bug fix — restore correct behavior, regression, or broken promise
-  - new feature — new user-visible capability, use case, or revenue path
-  - UX — usability, accessibility, clarity, workflow friction
-  - performance — speed, scale, or perceived responsiveness
-  - refactor / tech debt — internal quality and maintainability, usually no user-visible change
-  - security / compliance — vulnerability, regulatory obligation, data protection
-  - reliability / ops — stability, observability, downtime, support burden
-  - integration — external APIs, partners, cross-system workflow
-  - experiment — hypothesis test or MVP slice
-  - deprecation / migration — sunset or replace legacy behavior
-  - other — name the driver in one sentence
-- Put the chosen motivation in **`## Motivation`** (after **Goal**).
-- Ask the user to choose an **invasiveness level** (`R10-ask`, multiple choice) — the edit scope the spec must respect:
-  - **minimally-invasive** — edits confined to a single layer or library; all other layers/libraries are left untouched, even if the solution is a workaround (crutch).
-  - **medium-invasive** — edits may span several adjacent layers or domains, e.g. backend + frontend, or domain1 + domain2.
-  - **maximally-invasive** — edits may span all layers and all domains; the LLM follows the principle of deep rework over a superficial fix with compromises.
-- Record the chosen level in **`## Invasiveness level`** (after **`## Motivation`**).
+- **Motivation** — reuse the Step 1.1 answer; put it in **`## Motivation`** (after **Goal**).
+- **Invasiveness level** — reuse the Step 1.1 answer; record it in **`## Invasiveness level`** (after **`## Motivation`**).
 - Every affected file/symbol in the spec must stay within the chosen scope.
 
 2.3 **Design overview**
