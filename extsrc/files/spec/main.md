@@ -121,7 +121,7 @@ _Interaction and context_
 - **`R23-review-scheme`**
   - review schemes (research review, spec review, code review) are chosen ONCE at the start of the task (Step 1.1 combined ask)
   - record them in `## Review models` of `overview.md`
-  - format per line: `single agent: {model}` or `cross-review: {model1}, {model2}`
+  - format per line: `single agent: {model}` or `cross-review: {model1}, {model2}`; optional `fallback: {model}` — used when a chosen model is unavailable
   - cross-review = TWO `A4-reviewer` subagents of DIFFERENT model families run IN PARALLEL on the same artifact
   - the coordinator merges verdicts
   - conflicting verdicts are escalated to the user (`R10-ask`)
@@ -276,6 +276,7 @@ After Step 8, run Pattern extract (not a Status checkbox).
   Default to [medium] if unspecified.
   Offer [skip] first when the task is trivial and the implementation path is obvious.
 - **Cross model menu** — two platform models for the cross pair (different families), plus a "not needed" option; always included in the batch, applied only when a cross depth was chosen
+- **Fallback model** — fallback per chosen model if the primary is unavailable; default: nearest available model of another family; one common fallback is acceptable; record in `## Review models` as `fallback: {model}`
 - **Research review scheme** — single (one model) or cross (two models) — for Step 1.2.4 (`R23-review-scheme`)
 - **Spec review scheme** — single (one model) or cross (two models) — for Step 3 (`R23-review-scheme`)
 - **Code review scheme** — single (one model) or cross (two models) — for Step 6 (`R23-review-scheme`)
