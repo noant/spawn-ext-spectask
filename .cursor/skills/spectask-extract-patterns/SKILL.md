@@ -1,7 +1,8 @@
 ---
 name: spectask-extract-patterns
-description: After Step 8 - present reusable patterns as a single list, ask per-candidate via the ask tool, then write per the user's decision.
+description: After Step 8 — extract reusable patterns into spawn/rules/ and navigation (spec/main.md).
 ---
+
 
 **Mandatory:** read **spec/main.md** in full — **Pattern extract (after Step 8)**.
 

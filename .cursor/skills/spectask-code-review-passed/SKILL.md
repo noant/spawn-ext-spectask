@@ -1,7 +1,8 @@
 ---
 name: spectask-code-review-passed
-description: Interactive Steps 7-8 then pattern extract (spec/main.md). Step 7 is skipped in auto run mode.
+description: After user confirms code review / debugging — Steps 7–8 then pattern extract (spec/main.md).
 ---
+
 
 **Mandatory:** read **spec/main.md** in full — Steps 7-8 and Pattern extract.
 

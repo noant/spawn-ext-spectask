@@ -6,5 +6,6 @@ spawn/.extend/**
 # spawn:ext:start
 spec/seeds/_DONE_*.md
 spec/tasks/**/_DONE_*/_DONE_*.md
+spec/tasks/__history/**
 spec/.config/**
 # spawn:ext:end
