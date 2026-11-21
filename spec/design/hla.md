@@ -19,3 +19,7 @@ Both CLI and MCP share issue loading via `fetch_issue_bundle_via_jira` in `http_
 CLI `spectask-mcp run --verbose` passes an optional HTTP trace callback into `query_jira`, then `backend_from_config` and `connect_jira_client`, which registers a `requests` response hook on the Jira session. Each response is traced with method, URL, status code, and response body on stderr (no request headers logged); MCP `serve` calls `query_jira_for_mcp` with no trace by default.
 
 Spawn ships stdio MCP descriptors under `extsrc/mcp/` (`windows.json`, `linux.json`, `macos.json`) for server `spectask-mcp-jira`. Each platform runs `uvx spectask-mcp serve` so MCP resolves the latest PyPI release on start (requires `uv` on PATH). The after-install hook still runs `uv tool install` / `uv tool upgrade` for CLI commands (`spectask-mcp run`, `spectask-mcp interactive`); MCP and CLI may run different package versions until the user upgrades the tool.
+
+## Spec-Tasks helper scripts
+
+`spec/scripts/rotate_history.py` (shipped as a static extension file) keeps only the newest 10 numeric `_DONE_*` task folders in `spec/tasks/` and moves older ones into `spec/tasks/__history/` (agent-ignored, git-tracked). The agent runs it at Step 8 of `spec/main.md` after closing a task: `py spec/scripts/rotate_history.py` (Windows) or `python3 spec/scripts/rotate_history.py` (Linux/macOS); `--dry-run` prints the plan without moving.

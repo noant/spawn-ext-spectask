@@ -12,7 +12,7 @@
 - [V] Code implementation [glm-5.3]
 - [V] Code self-review [glm-5.3 + deepseek-v4-pro]
 - [V] Code review / debugging
-- [ ] Design document update [model]
+- [V] Design document update [glm-5.3]
 
 ## Goal
 Add a Python rotation script that moves all but the newest 10 done task folders into `spec/tasks/__history/`, run automatically by the agent right after task close (Step 8), with the history folder added to the extension's agent-ignore.
