@@ -15,23 +15,14 @@ Goal: before editing YAML heavily, decide what the methodology teaches and where
 7. **Version:** If namespaces, static vs artifact split, or read surfaces change shipped methodology, **prompt** the author to bump **`version`** via **`spawn-ext-increment-version`** before consumers upgrade.
 
 
-Hints:
-- Use the platform ask tool when available (R10-ask in spec/main.md); otherwise, stop and request input from the user.
-- No emojis or exotic Unicode in code, logs, documentation, or messages; plain ASCII where practical.
-- User-facing replies, documentation, and task descriptions: concise wording; minimal markdown (avoid decorative bold/italic); explain with lists and structure; short, clear sentences.
-- Specifications, code comments, and project documentation must be written in English.
-- If the user only asked a question, answer first; do not edit files unless changes are clearly needed.
+Before this skill, if the Spawn block instructions from `AGENTS.md` are not in context, read `AGENTS.md` first.
 
 Mandatory reads:
 - `spawn-ext-guide/ai/core.md` - Machine baseline — terms, extsrc tree rules, static vs artifact, name and uniqueness, install outputs.
 - `spawn-ext-guide/ai/config-yaml.md` - Machine schema for config.yaml — keys, files/folders/skills modes, reads, ignores, setup, annotated example.
 - `spawn-ext-guide/user-guide.md` - Human-readable standalone guide — narrative for all authoring topics.
-- `spawn/navigation.yaml` - Merged Spawn navigation (read-required, read-contextual).
 
 Contextual reads:
 - `spawn-ext-guide/ai/skill-sources.md` - Machine rules for extsrc/skills/*.md — frontmatter, name/description resolution, rendered skill shape, example.
 - `spawn-ext-guide/ai/mcp-json.md` - Machine schema for extsrc/mcp/windows.json, linux.json, macos.json — servers, OS selection, aligned name sets, transport, spawn_stdio_proxy (stdio IDE proxy), env, capabilities, validation against check, JSON examples.
 - `spawn-ext-guide/ai/cli.md` - Machine CLI reference — spawn init/extension/build commands, extensions.yaml bundle shape, authoring checklist.
-- `spec/main.md` - Spec-Tasks methodology — folder structure, eight-step process, overview template.
-- `spec/design/hla.md` - Project high-level architecture; updated in Step 8.
-- `spec/design.yaml` - Index of architecture documents under spec/design/ — path and description per entry.
