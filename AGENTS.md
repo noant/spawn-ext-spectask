@@ -6,7 +6,6 @@
 - If the user only asked a question, answer first; do not edit files unless changes are clearly needed.
 
 Read every file listed under `Mandatory reads`.
-Mandatory reads:
 
 Inspect `Contextual reads` descriptions and read only files relevant to the current task.
 Contextual reads:
