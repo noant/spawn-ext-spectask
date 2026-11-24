@@ -2,7 +2,7 @@
 document: spawn-extension-skill-sources
 audience: machine
 encoding: utf-8
-prerequisite: spawn-ext-guide/ai/core.md; spawn-ext-guide/ai/config-yaml.md for skills map and required-read merge
+prerequisite: spawn/ext-creator/ai/core.md; spawn/ext-creator/ai/config-yaml.md for skills map and required-read merge
 ---
 
 # Skill sources — `extsrc/skills/*.md`
@@ -50,12 +50,12 @@ rendering:
 logical_rendered_markdown_shape (conceptual order):
 
 1. YAML frontmatter `name`, `description`
-2. Spawn-injected instruction to read **`spawn/navigation.yaml`** first (authors do **not** configure this path anywhere in extension **`config.yaml`** or templates — see **`spawn_navigation_yaml_authoring_rule`** in `spawn-ext-guide/ai/config-yaml.md`).
+2. Spawn-injected instruction to read **`spawn/navigation.yaml`** first (authors do **not** configure this path anywhere in extension **`config.yaml`** or templates — see **`spawn_navigation_yaml_authoring_rule`** in `spawn/ext-creator/ai/config-yaml.md`).
 3. Mandatory reads (paths + descriptions)
 4. Contextual reads if any
 5. skill body from source
 
-authoring_hint: keep body short procedural; long reference → `extsrc/files/` via globalRead/localRead/required-read (see `spawn-ext-guide/ai/config-yaml.md`). Do **not** mention `spawn/navigation.yaml` in extension configuration — it is generated and read automatically. Do **not** introduce a separate repo navigation index file; tune **`globalRead`** / **`localRead`** in **`config.yaml`** so Spawn builds navigation for you.
+authoring_hint: keep body short procedural; long reference → `extsrc/files/` via globalRead/localRead/required-read (see `spawn/ext-creator/ai/config-yaml.md`). Do **not** mention `spawn/navigation.yaml` in extension configuration — it is generated and read automatically. Do **not** introduce a separate repo navigation index file; tune **`globalRead`** / **`localRead`** in **`config.yaml`** so Spawn builds navigation for you.
 
 ## skill_file.example.reference_only
 

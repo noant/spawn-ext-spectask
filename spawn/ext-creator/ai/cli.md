@@ -2,7 +2,7 @@
 document: spawn-extension-cli
 audience: machine
 encoding: utf-8
-prerequisite: spawn-ext-guide/ai/core.md for install outputs and layout
+prerequisite: spawn/ext-creator/ai/core.md for install outputs and layout
 ---
 
 # Spawn CLI and distribution

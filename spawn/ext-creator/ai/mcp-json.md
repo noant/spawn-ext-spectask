@@ -2,7 +2,7 @@
 document: spawn-extension-mcp-json
 audience: machine
 encoding: utf-8
-prerequisite: spawn-ext-guide/ai/core.md (global uniqueness of server names)
+prerequisite: spawn/ext-creator/ai/core.md (global uniqueness of server names)
 ---
 
 # extsrc/mcp/*.json — machine schema (per platform)

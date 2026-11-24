@@ -70,8 +70,8 @@ exact IDE paths/formats: adapter-dependent; derived only from `config.yaml`, ski
 
 ## sibling_machine_docs
 
-- `spawn-ext-guide/ai/config-yaml.md` — full `config.yaml` schema, annotated example.
-- `spawn-ext-guide/ai/skill-sources.md` — `extsrc/skills/*.md` format, frontmatter, rendering.
-- `spawn-ext-guide/ai/mcp-json.md` — `extsrc/mcp/*.json` schema and examples.
-- `spawn-ext-guide/ai/cli.md` — Spawn CLI, `extensions.yaml`, authoring checklist.
-- `spawn-ext-guide/user-guide.md` — human-readable narrative (same topics).
+- `spawn/ext-creator/ai/config-yaml.md` — full `config.yaml` schema, annotated example.
+- `spawn/ext-creator/ai/skill-sources.md` — `extsrc/skills/*.md` format, frontmatter, rendering.
+- `spawn/ext-creator/ai/mcp-json.md` — `extsrc/mcp/*.json` schema and examples.
+- `spawn/ext-creator/ai/cli.md` — Spawn CLI, `extensions.yaml`, authoring checklist.
+- `spawn/ext-creator/user-guide.md` — human-readable narrative (same topics).

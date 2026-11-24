@@ -2,7 +2,7 @@
 document: spawn-extension-config-yaml
 audience: machine
 encoding: utf-8
-prerequisite: spawn-ext-guide/ai/core.md (vocabulary, static vs artifact, layout constraints)
+prerequisite: spawn/ext-creator/ai/core.md (vocabulary, static vs artifact, layout constraints)
 ---
 
 # config.yaml — machine schema
@@ -110,7 +110,7 @@ value_fields:
 | description | string optional | overrides frontmatter |
 | required-read | list[string] | target-relative paths mandatory for this skill (additive); MUST obey **`spawn_navigation_yaml_authoring_rule`** — never list `spawn/navigation.yaml`. |
 
-skill body format: see `spawn-ext-guide/ai/skill-sources.md`.
+skill body format: see `spawn/ext-creator/ai/skill-sources.md`.
 
 ## config_yaml.agent_ignore_and_git_ignore
 
@@ -195,4 +195,4 @@ matching_extsrc_paths:
 - `extsrc/files/spec/design/notes.md`
 - `extsrc/skills/acme-run-task.md`
 - optional `extsrc/setup/after_install.py`, `extsrc/setup/healthcheck.py`
-- optional `extsrc/mcp/windows.json`, `linux.json`, `macos.json` (see `spawn-ext-guide/ai/mcp-json.md`)
+- optional `extsrc/mcp/windows.json`, `linux.json`, `macos.json` (see `spawn/ext-creator/ai/mcp-json.md`)
