@@ -291,7 +291,10 @@ After Step 8, run Pattern extract (not a Status checkbox).
   - [1] `{model-1}` (default)
   - [2] `{model-2}`
   - [3] `{model-3}`
-- **Fallback model** — fallback per chosen model if the primary is unavailable; default: nearest model of another family; one common fallback is acceptable; record in `## Review models` as `fallback: {model}`
+- **Fallback model** — fallback if a chosen model is unavailable; default: nearest model of another family; record in `## Review models` as `fallback: {model}`:
+  - [1] one common fallback `{model-1}` (default)
+  - [2] per-model fallbacks, e.g. `{model-2}` for research, `{model-3}` for reviews
+  - [not needed] — no fallback
 - **Motivation** (used in 2.2; if unclear) — multiple choice; adapt to context:
   - bug fix — restore correct behavior, regression, or broken promise
   - new feature — new user-visible capability, use case, or revenue path
