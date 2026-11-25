@@ -23,3 +23,9 @@ Spawn ships stdio MCP descriptors under `extsrc/mcp/` (`windows.json`, `linux.js
 ## Spec-Tasks helper scripts
 
 `spec/scripts/rotate_history.py` (shipped as a static extension file) keeps only the newest 10 numeric `_DONE_*` task folders in `spec/tasks/` and moves older ones into `spec/tasks/__history/` (agent-ignored, git-tracked). The agent runs it at Step 8 of `spec/main.md` after closing a task: `py spec/scripts/rotate_history.py` (Windows) or `python3 spec/scripts/rotate_history.py` (Linux/macOS); `--dry-run` prints the plan without moving.
+
+## Design document navigation
+
+The pack no longer ships `spec/design.yaml`. Design docs are indexed as `rules` rows under `read-contextual` in the target repo's `spawn/navigation.yaml` (requires spawn-cli that keeps non-`spawn/rules/` rows). The after-install hook `extsrc/setup/install_spectask_mcp.py` (`_migrate_design_yaml`) moves an existing target `spec/design.yaml` into those rows and deletes the file only after a successful write; on any failure the file is kept.
+
+`spec/scripts/rotate_history.py` (shipped as a static extension file) keeps only the newest 10 numeric `_DONE_*` task folders in `spec/tasks/` and moves older ones into `spec/tasks/__history/` (agent-ignored, git-tracked). The agent runs it at Step 8 of `spec/main.md` after closing a task: `py spec/scripts/rotate_history.py` (Windows) or `python3 spec/scripts/rotate_history.py` (Linux/macOS); `--dry-run` prints the plan without moving.

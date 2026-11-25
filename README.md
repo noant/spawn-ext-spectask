@@ -52,7 +52,7 @@ The full cycle:
 4. Agent implements following the **Execution Scheme** in the spec — sequential and parallel phases — with one dedicated subagent per step. If the same chat produced Steps 1-3, the agent launches a **coordinator sub-agent** that owns Steps 5-6 end-to-end (not inline). In a fresh execute chat the current agent is the coordinator. Invoke skill `spectask-execute` (all steps in one run) or `spectask-execute-step-by-step` (one subtask per run, wait for you between steps)
 5. Agent self-reviews the code in a **dedicated subagent** (naming, imports, alignment with the spec), because a separate context window keeps the focus on the changes and the spec instead of the implementation thread that wrote them, which usually surfaces inconsistencies before your review
 6. **Code Review / Debugging** — "ok" / "lgtm" / "code review passed" or invoke skill `spectask-code-review-passed`
-7. Agent updates `spec/design/hla.md`, reconciles `spec/design.yaml` if needed, renames the task folder to `_DONE_`, closes any linked seed, and marks the task as done. After Step 8 the agent optionally extracts reusable patterns into `spawn/rules/`: it filters candidates and presents the entire filtered list to the user in one message in the same run (no per-candidate preliminary questions), then waits for the user's per-candidate Required/Optional/Decline answer before writing anything.
+7. Agent updates `spec/design/hla.md`, reconciles design rows in `spawn/navigation.yaml` if needed, renames the task folder to `_DONE_`, closes any linked seed, and marks the task as done. After Step 8 the agent optionally extracts reusable patterns into `spawn/rules/`: it filters candidates and presents the entire filtered list to the user in one message in the same run (no per-candidate preliminary questions), then waits for the user's per-candidate Required/Optional/Decline answer before writing anything.
 
 If you request rework or fixes after Step 5 (before Step 7 is marked), the agent carries out the changes and asks whether to update the specification to match the actual state — no re-run of the spec cycle.
 
@@ -63,9 +63,7 @@ Agent-executed steps record the **LLM model name** in `overview.md` status lines
 All significant methodology layout lives under `spec/` as defined in the shipped `spec/main.md`. Only allowed paths — no arbitrary documents alongside.
 
 - `spec/main.md` — process rules and the `overview.md` template
-- `spec/design.yaml` — index of architecture documents under `spec/design/` (path + description per entry)
-- `spec/design/hla.md` — current architecture overview; updated after every completed task
-- `spec/design/{name}.md` — additional architecture documents (ADRs, notes, etc.); register entries in `spec/design.yaml` and declare paths in the extension (or follow your org's Spawn layout) so agents see them via merged navigation
+- `spec/design/` — architecture documents; `hla.md` (required) plus optional ADRs and notes; declare design docs as readable paths in `spawn/navigation.yaml` read-contextual
 - `spec/tasks/{X}-{name}/overview.md` — task specification
 - `spec/tasks/{X}-{name}/{N}-{description}.md` — subtask files when decomposition is needed (each carries a `Status:` line with implementation state and model)
 - `spec/seeds/{X}-{slug}.md` — optional rough ideas before a full task; see [Seeds](#seeds)
@@ -85,7 +83,7 @@ After **Code Review / Debugging** (Step 7), Step 8 renames the task folder to `_
 
 **Explicit decomposition.** If a task touches more than one file, `overview.md` contains an explicit execution scheme: sequential and parallel phases, each step handled by a dedicated subagent. No "everything at once".
 
-**Architecture lives in the repo.** The baseline is `spec/design/hla.md` — a living overview updated after every task — but you can keep ADRs and other write-ups as additional `spec/design/{name}.md` files listed in `spec/design.yaml`.
+**Architecture lives in the repo.** The baseline is `spec/design/hla.md` — a living overview updated after every task — but you can keep ADRs and other write-ups as additional `spec/design/{name}.md` files declared in `spawn/navigation.yaml` read-contextual.
 
 **Concrete specs.** Every overview and subtask names concrete paths and symbols (packages/modules, classes, methods, functions) under change, and every Before/After pair is a fenced minimal code excerpt plus a behavior line.
 
@@ -111,7 +109,7 @@ After install, invoke methodology steps using these **skills** by name; Spawn re
 | **spectask-execute** | **Steps 5–6** in `spec/main.md` (implement all Execution Scheme steps + self code review); then wait for the user — **Step 7**. |
 | **spectask-execute-step-by-step** | **Step 5** only — one Execution Scheme subtask per run with per-step self-review; auto Step 6 when all subtasks are done. |
 | **spectask-code-review-passed** | Step 7: **Code Review / Debugging passed** in `overview.md` + Step 7 prompt; then **Step 8** and optional pattern extract in `spec/main.md`. The pattern extract step presents a single filtered list to the user (no per-candidate preliminary questions) and waits for the user's per-candidate decision. |
-| **spectask-design** | Register architecture files in `spec/design.yaml` or draft `spec/design/*.md`. |
+| **spectask-design** | Register architecture files in `spawn/navigation.yaml` read-contextual or draft `spec/design/*.md`. |
 | **spectask-seed-create** | Capture a rough idea as `spec/seeds/{X}-{slug}.md`; offer **spectask-create** when the user promotes. |
 | **spectask-from-jira** | Import a Jira issue into `spec/tasks/{task-code}-{slug}/` (MCP or CLI, with manual fallback); explore the codebase and complete Steps 2–3 before waiting for Step 4. |
 | **spectask-extract-patterns** | After Step 8 — optional extract of reusable patterns into `spawn/rules/` and `spawn/navigation.yaml`. Filters candidates against selection criteria, then presents the entire filtered list to the user in one message (no `R10-ask`, no per-candidate tool questions), waits for the user's per-candidate decision, writes rules and runs `spawn refresh`. |
@@ -175,8 +173,8 @@ To **import a Jira ticket into a Spectask folder**, use the **spectask-from-jira
 
 **`spawn/navigation.yaml`** (generated by Spawn after install) is the merged index of what agents should read first (`read-required` / contextual reads). It replaces a hand-maintained `spec/navigation.yaml` from older standalone Spectask layouts.
 
-**`spec/design.yaml`** is your project's explicit list of architecture markdown paths under `spec/design/` with short descriptions. Keep it aligned whenever you add or rename design docs.
+**Design docs under `spec/design/`** are your project's architecture markdown paths with short descriptions, registered as rows in `spawn/navigation.yaml` (read-contextual). Keep them aligned whenever you add or rename design docs.
 
-**spectask-design** covers entries in `spec/design.yaml` and companion files under `spec/design/`.
+**spectask-design** covers rows in `spawn/navigation.yaml` (read-contextual) and companion files under `spec/design/`.
 
 Task work under `spec/tasks/` is not listed as a registry file — those folders are opened directly when working on a task.
