@@ -114,7 +114,7 @@ _Interaction and context_
 - **`R23-review-scheme`**
   - review schemes (research review, spec review, code review) are chosen ONCE at the start of the task (Step 1.1 combined ask)
   - record them in `## Review models` of `overview.md`
-  - format per line: `single agent: {model}` or `cross-review: {model1}, {model2}`; optional `fallback: {model}` — used when a chosen model is unavailable
+  - format per line: `single agent: {model}` or `cross-review: {model1}, {model2}`
   - cross-review = TWO `A4-reviewer` subagents of DIFFERENT model families run IN PARALLEL on the same artifact
   - the coordinator merges verdicts
   - conflicting verdicts are escalated to the user (`R10-ask`)
