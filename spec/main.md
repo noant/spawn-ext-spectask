@@ -60,13 +60,9 @@ _Task specs_
 _Interaction and context_
 
 - **`R10-ask`**
-  - when you must ask the user (clarifications, confirmations, choices), **stop and request from the user**
-  - do not continue the workflow until they answer
-  - prefer the platform structured ask tool (see `R12-ask-tools`), multiple choice when possible
-  - fallback order: platform tool -> **direct request to the user in your reply**
-  - "Ask" / "request from the user" means only those channels
-  - **never** treat asking as launching a Task / sub-agent / other agent; those tools are not ask tools
-  - if no platform ask tool is available, stop, request from the user, then wait
+  - when you must ask the user (clarifications, confirmations, choices): **stop, request from the user, and wait** — do not continue until they answer
+  - prefer the platform structured ask tool (see `R12-ask-tools`), multiple choice when possible; fallback: direct request to the user in your reply
+  - "Ask" / "request from the user" means only those channels — **never** a Task / sub-agent / other agent launch
   - do not ask when context provides the answer; ask only when it materially changes the next action
 - **`R11-navigation`**
   - before drafting a spec, open **`spawn/navigation.yaml`**
@@ -93,9 +89,7 @@ _Interaction and context_
   - after finishing a create/edit batch, list every created or edited path (repo-relative, complete, no omissions)
   - renames and deletes count
   - applies to Step 1 (research), Step 2 (spec), Steps 5–6 (code), Step 8 (design), and any user-requested edits
-  - **Propagation:** the executor sub-agent includes the full list in its final response
-  - the coordinator (`A6-coordinator`) aggregates child sub-agent lists and forwards the complete set to the user
-  - a coordinator that is itself a sub-agent also forwards the complete set to its parent
+  - **Propagation:** every sub-agent returns its full list in its final response; the coordinator (`A6-coordinator`) aggregates child lists and forwards the complete set to the user (or to its parent, if itself a sub-agent)
   - do not drop or summarize away paths
 - **`R15-done-marking`**
   - after a Coder (`A5-coder`) replies, the coordinator (`A6-coordinator`) marks the subtask done:
@@ -252,24 +246,43 @@ After Step 8, run Pattern extract (not a Status checkbox).
 
 1.1 **Combined start-of-task ask** — **MANDATORY!** At the start of the task, ask the user (`R10-ask`) ALL questions below SIMULTANEOUSLY in ONE ask tool call — no follow-up asks. Each question has its own options (or a "default / decide later" option):
 
-- **Defaults** — for EVERY question the LLM proposes a default from its own judgment: recommended option as `{Option to select} (default)`, others as `{Option to select}` — so the user can accept all defaults in one reply.
-- **Run mode** — [interactive] (default) — user participates: questions, confirmations (Steps 4, 7), prompts as usual; [auto] — fully automatic: research, spec, self-reviews, implementation, reviews run entirely by the LLM, no user participation
-  - user questions and confirmations (Steps 4, 7) are skipped
+- **Defaults** — for every question, mark the recommended option `{Option to select} (default)`, others as `{Option to select}` — the user can accept all defaults in one reply. Models: strong for research and reviews, fast and cheap for the executor.
+- **Run mode** — [interactive] (default) — user participates: questions, confirmations (Steps 4, 7), prompts as usual; [auto] — research, spec, self-reviews, implementation, reviews run entirely by the LLM
+  - Steps 4, 7 questions and confirmations are skipped
   - in `overview.md`, the "Spec review" and "Code review / debugging" checkboxes are NOT checked; record the mode in `## Run mode`
 - **Research depth** — whether research is needed and at what depth:
-  - [inline] — no subagents; drafter researches in-chat (trivial, one-off questions)
-  - [medium] — a single `A3-explorer` (or `A2-researcher` for a narrow single-line question) subagent (default)
-  - [medium-cross] — the SAME single direction line researched by TWO `A3-explorer`/`A2-researcher` subagents of DIFFERENT models
-    - merge findings and highlight disagreements
-  - [high] — several `A3-explorer` subagents, one per direction line
-  - [high-cross] — [high] plus: EACH direction line researched by TWO subagents of DIFFERENT models
-  - [skip] — no research; proceed directly to Step 2 (Spec drafting)
-  Default to [medium] if unspecified.
+  - [inline] — no subagents; drafter researches in-chat;
+  - [medium-1] — one research subagent, `{model-1}` (default)
+  - [medium-2] — ..., `{model-2}`
+  - [medium-3] — ..., `{model-3}`
+  - [medium-cross-1] — one line, two subagents of different models, `{model-1} + {model-2}` (default)
+  - [medium-cross-2] — ..., `{model-3} + {model-4}`
+  - [medium-cross-3] — ..., `{model-5} + {model-6}`
+  - [high-1] — several subagents, one per direction line, `{model-1}` (default)
+  - [high-2] — ..., `{model-2}`
+  - [high-3] — ..., `{model-1}` for hard lines, `{model-2}` for simple ones
+  - [high-cross-1] — several lines, two subagents each, `{model-1} + {model-2}` (default)
+  - [high-cross-2] — ..., `{model-3} + {model-4}`
+  - [high-cross-3] — ..., `{model-1} + {model-2}` for hard lines, `{model-3} + {model-4}` for simple ones
+  - [skip] — no research; proceed directly to Step 2 (Spec drafting);
+  Default to [medium-1] if unspecified.
   Offer [skip] first when the task is trivial and the implementation path is obvious.
-- **Cross model menu** — two platform models for the cross pair (different families), plus a "not needed" option; always included in the batch, applied only when a cross depth was chosen
-- **Research review scheme** — single (one model) or cross (two models) — for Step 1.2.4 (`R23-review-scheme`)
-- **Spec review scheme** — single (one model) or cross (two models) — for Step 3 (`R23-review-scheme`)
-- **Code review scheme** — single (one model) or cross (two models) — for Step 6 (`R23-review-scheme`)
+- **Cross review menu** — pair of different-family platform models for the cross review subagents; always included in the batch; applied only when a cross review scheme was chosen:
+  - [1] `{model-1} + {model-2}` (default)
+  - [2] `{model-3} + {model-4}`
+  - [3] `{model-5} + {model-6}`
+  - [not needed] — no cross review scheme chosen
+- **Research review scheme** — single (one model) or cross (from cross menu selection) — for Step 1.2.4 (`R23-review-scheme`)
+- **Spec review scheme** — single (one model) or cross (from cross menu selection) — for Step 3 (`R23-review-scheme`)
+- **Code review scheme** — single (one model) or cross (from cross menu selection) — for Step 6 (`R23-review-scheme`)
+- **Coder model** — model for the `A5-coder` execution subagents; fast and cheap tier preferred:
+  - [1] `{model-1}` (default)
+  - [2] `{model-2}`
+  - [3] `{model-3}`
+- **Coordinator model** — model for the `A6-coordinator` subagent; mid tier preferred:
+  - [1] `{model-1}` (default)
+  - [2] `{model-2}`
+  - [3] `{model-3}`
 - **Motivation** (used in 2.2; if unclear) — multiple choice; adapt to context:
   - bug fix — restore correct behavior, regression, or broken promise
   - new feature — new user-visible capability, use case, or revenue path
@@ -496,20 +509,18 @@ If the user requests rework or fixes after Step 5:
 
 **Executor:** `A1-drafter` (current context)
 
-After Step 8, extract reusable approaches into **`spawn/rules/`** as project-standard candidates. Skill: **spectask-extract-patterns**.
+After Step 8, extract reusable approaches into **`spawn/rules/`** as project-standard candidates. Skill: **spectask-extract-patterns**. Always runs after Step 8; if Discover leaves zero candidates, say so briefly and stop.
 
-The agent filters candidates and presents the final list to the user in this run.
-It then asks per-candidate acceptance via the ask tool (`R10-ask`).
-**[auto] run mode (Step 1.1): skip Present and Ask — after Discover, write all survivors; scope auto-detected (Scope rule below).**
+The agent filters candidates, presents the final list to the user, and asks per-candidate acceptance via the ask tool (`R10-ask`).
 
 **Order (mandatory):**
 
 1. **Discover** — find and filter reusable candidates (agent only).
-2. **Present** — show the filtered list to the user in one message right after Step 8 (title + one-line rationale + suggested scope per survivor). Skipped in [auto].
-3. **Ask** — ask per-candidate acceptance via the ask tool (`R10-ask`); wait. Skipped in [auto].
-4. **Write** — accepted candidates; in [auto], all survivors (scope auto-detected).
+2. **Present** — show the filtered list to the user in one message right after Step 8 (title + one-line rationale + suggested scope per survivor).
+3. **Ask** — per-candidate acceptance via the ask tool (`R10-ask`); wait.
+4. **Write** — accepted candidates only.
 
-This step always runs after Step 8. If Discover leaves zero candidates, say so briefly and stop.
+**[auto] run mode (Step 1.1): skip Present and skip Ask — after Discover, write all survivors; scope auto-detected (Scope rule below).**
 
 ### Discover (before presenting)
 
@@ -537,12 +548,10 @@ Reject immediately (do not offer):
 
 ### Present (after Discover)
 
-- skipped in [auto] run mode (Step 1.1)
-- run only when Discover left one or more candidates
-- present the entire list in **one message**, right after Step 8
-- for each survivor: short title, one-line rationale, suggested scope (Required = `read-required`, Optional = `read-contextual`)
+- skipped in [auto]; run only when one or more candidates remain
+- present the entire list in **one message**, right after Step 8: per survivor — short title, one-line rationale, suggested scope (Required = `read-required`, Optional = `read-contextual`)
 - then ask via the ask tool (`R10-ask`): per-candidate Required/Optional/Decline, plus a "decline all" option
-- then wait — do not write rules, do not run `spawn refresh`, do not start the next task
+- then wait — no rule writing, no `spawn refresh`, no next task
 
 ### Apply (after the ask; in [auto] applied right after Discover)
 
